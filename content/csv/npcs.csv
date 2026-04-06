@@ -1,0 +1,4 @@
+id,name,base_hp,resource_type,resource_init,resource_cap,dice_pool
+cyan_ryder,Cyan Ryder,22,overload,0,3,cyan_beam_a|cyan_beam_b|cyan_shift|cyan_burst|cyan_pulse|cyan_cooldown|cyan_arcflare|cyan_vent
+helios_windchaser,Helios Windchaser,25,quiver,3,3,helios_mark|helios_sniper|helios_swoop|helios_recover|helios_pierce|helios_hunt|helios_trap|helios_volley
+umbral_draxx,Umbral Draxx,24,stance,0,2,black_sweep|black_charge|black_shock|black_guard|black_execute|black_pose|black_parry|black_reap

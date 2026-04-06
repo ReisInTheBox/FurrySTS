@@ -1,0 +1,36 @@
+class_name CombatState
+extends RefCounted
+
+const CombatUnit = preload("res://scripts/combat/combat_unit.gd")
+const DiceFaceDefinition = preload("res://scripts/combat/dice_face_definition.gd")
+
+var turn_index: int = 1
+var player: CombatUnit
+var enemy: CombatUnit
+var rolled_faces: Array[DiceFaceDefinition] = []
+var locked_face_ids: Array[String] = []
+var picks_budget: int = 2
+var picks_used: int = 0
+var rerolls_left: int = 1
+var bonus_rolls: int = 0
+var last_ranged_face_id: String = ""
+var cyan_prism_chain: int = 0
+var dice_type_counts: Dictionary = {}
+
+func _init(p_player: CombatUnit, p_enemy: CombatUnit) -> void:
+    player = p_player
+    enemy = p_enemy
+
+func battle_ended() -> bool:
+    return (not player.is_alive()) or (not enemy.is_alive())
+
+func reset_turn_state() -> void:
+    rolled_faces = []
+    locked_face_ids = []
+    picks_budget = 2
+    picks_used = 0
+    rerolls_left = 1
+    bonus_rolls = 0
+    last_ranged_face_id = ""
+    cyan_prism_chain = 0
+    dice_type_counts = {}
