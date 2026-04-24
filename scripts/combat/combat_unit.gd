@@ -1,14 +1,14 @@
 class_name CombatUnit
 extends RefCounted
 
-const CombatResourceState = preload("res://scripts/combat/combat_resource_state.gd")
+const CombatResourceStateScript = preload("res://scripts/combat/combat_resource_state.gd")
 
 var unit_id: String
 var hp: int
 var max_hp: int
 var block: int
 var power_mul: float = 1.0
-var resource: CombatResourceState
+var resource: CombatResourceStateScript
 var marks: int = 0
 var rupture_bonus: int = 0
 var temp_ranged_flat: int = 0
@@ -18,6 +18,7 @@ var next_attack_ignore_block: int = 0
 var thorns_value: int = 0
 var overclock_charges: int = 0
 var focus_stacks: int = 0
+var loadout_face_ids: Array[String] = []
 
 func _init(
     p_unit_id: String,
@@ -31,7 +32,7 @@ func _init(
     hp = p_hp
     max_hp = p_hp
     block = p_block
-    resource = CombatResourceState.new(resource_type, resource_init, resource_cap)
+    resource = CombatResourceStateScript.new(resource_type, resource_init, resource_cap)
 
 func is_alive() -> bool:
     return hp > 0

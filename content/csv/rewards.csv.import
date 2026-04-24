@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bxd6onsfbo8ra"
+
+[deps]
+
+files=["res://content/csv/rewards.type.translation", "res://content/csv/rewards.value.translation", "res://content/csv/rewards.rarity.translation", "res://content/csv/rewards.weight.translation"]
+
+source_file="res://content/csv/rewards.csv"
+dest_files=["res://content/csv/rewards.type.translation", "res://content/csv/rewards.value.translation", "res://content/csv/rewards.rarity.translation", "res://content/csv/rewards.weight.translation"]
+
+[params]
+
+compress=true
+delimiter=0

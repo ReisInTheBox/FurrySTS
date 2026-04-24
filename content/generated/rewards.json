@@ -1,0 +1,20 @@
+{
+	"row_count": 2,
+	"rows": [
+		{
+			"rarity": "common",
+			"reward_id": "rw_credits_small",
+			"type": "currency",
+			"value": "25",
+			"weight": "70"
+		},
+		{
+			"rarity": "rare",
+			"reward_id": "rw_growth_token",
+			"type": "growth_token",
+			"value": "1",
+			"weight": "30"
+		}
+	],
+	"source": "res://content/csv/rewards.csv"
+}

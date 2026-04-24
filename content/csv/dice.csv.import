@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://c1q0k3dhwp7k0"
+
+[deps]
+
+files=["res://content/csv/dice.face.translation", "res://content/csv/dice.effect.translation", "res://content/csv/dice.cost.translation", "res://content/csv/dice.cost.translation", "res://content/csv/dice.die.translation", "res://content/csv/dice.tags.translation"]
+
+source_file="res://content/csv/dice.csv"
+dest_files=["res://content/csv/dice.face.translation", "res://content/csv/dice.effect.translation", "res://content/csv/dice.cost.translation", "res://content/csv/dice.cost.translation", "res://content/csv/dice.die.translation", "res://content/csv/dice.tags.translation"]
+
+[params]
+
+compress=true
+delimiter=0

@@ -1,13 +1,13 @@
 class_name CombatState
 extends RefCounted
 
-const CombatUnit = preload("res://scripts/combat/combat_unit.gd")
-const DiceFaceDefinition = preload("res://scripts/combat/dice_face_definition.gd")
+const CombatUnitScript = preload("res://scripts/combat/combat_unit.gd")
+const DiceFaceDefinitionScript = preload("res://scripts/combat/dice_face_definition.gd")
 
 var turn_index: int = 1
-var player: CombatUnit
-var enemy: CombatUnit
-var rolled_faces: Array[DiceFaceDefinition] = []
+var player: CombatUnitScript
+var enemy: CombatUnitScript
+var rolled_faces: Array[DiceFaceDefinitionScript] = []
 var locked_face_ids: Array[String] = []
 var picks_budget: int = 2
 var picks_used: int = 0
@@ -17,7 +17,7 @@ var last_ranged_face_id: String = ""
 var cyan_prism_chain: int = 0
 var dice_type_counts: Dictionary = {}
 
-func _init(p_player: CombatUnit, p_enemy: CombatUnit) -> void:
+func _init(p_player: CombatUnitScript, p_enemy: CombatUnitScript) -> void:
     player = p_player
     enemy = p_enemy
 

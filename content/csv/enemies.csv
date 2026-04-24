@@ -1,2 +1,4 @@
 id,name,base_hp,atk_low,atk_high,bonus_every_turns,bonus_flat
 boss_vanguard,Hub Edge Vanguard,58,4,6,3,2
+reef_stalker,Reef Stalker,50,5,7,4,1
+void_howler,Void Howler,64,3,8,2,2

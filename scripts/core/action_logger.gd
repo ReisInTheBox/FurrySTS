@@ -1,12 +1,12 @@
 class_name ActionLogger
 extends RefCounted
 
-const ActionLogEntry = preload("res://scripts/core/action_log_entry.gd")
+const ActionLogEntryScript = preload("res://scripts/core/action_log_entry.gd")
 
-var _entries: Array[ActionLogEntry] = []
+var _entries: Array[ActionLogEntryScript] = []
 
-func append(entry: ActionLogEntry) -> void:
+func append(entry: ActionLogEntryScript) -> void:
     _entries.append(entry)
 
-func entries() -> Array[ActionLogEntry]:
+func entries() -> Array[ActionLogEntryScript]:
     return _entries.duplicate()

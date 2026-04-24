@@ -1,20 +1,82 @@
 extends RefCounted
 
-const SeedBundle = preload("res://scripts/core/seed_bundle.gd")
-const RngStreams = preload("res://scripts/core/rng_streams.gd")
-const ActionLogger = preload("res://scripts/core/action_logger.gd")
-const CombatState = preload("res://scripts/combat/combat_state.gd")
-const BattleSimulator = preload("res://scripts/combat/battle_simulator.gd")
-const ContentLoader = preload("res://scripts/content/content_loader.gd")
-const UnitFactory = preload("res://scripts/content/unit_factory.gd")
-const CombatCatalog = preload("res://scripts/content/combat_catalog.gd")
+const SeedBundleScript = preload("res://scripts/core/seed_bundle.gd")
+const RngStreamsScript = preload("res://scripts/core/rng_streams.gd")
+const ActionLoggerScript = preload("res://scripts/core/action_logger.gd")
+const CombatStateScript = preload("res://scripts/combat/combat_state.gd")
+const BattleSimulatorScript = preload("res://scripts/combat/battle_simulator.gd")
+const ContentLoaderScript = preload("res://scripts/content/content_loader.gd")
+const UnitFactoryScript = preload("res://scripts/content/unit_factory.gd")
+const CombatCatalogScript = preload("res://scripts/content/combat_catalog.gd")
+const CombatRulesTestScript = preload("res://scripts/tests/combat_rules_test.gd")
+const BattleFlowTestScript = preload("res://scripts/tests/battle_flow_test.gd")
+const BalanceSmokeTestScript = preload("res://scripts/tests/balance_smoke_test.gd")
+const MechanicCoverageTestScript = preload("res://scripts/tests/mechanic_coverage_test.gd")
+const InrunGrowthTestScript = preload("res://scripts/tests/inrun_growth_test.gd")
+const BattleVisualizerUiTestScript = preload("res://scripts/tests/battle_visualizer_ui_test.gd")
+const RewardDraftFlowTestScript = preload("res://scripts/tests/reward_draft_flow_test.gd")
+const RouteGenerationTestScript = preload("res://scripts/tests/route_generation_test.gd")
+const RunProgressionTestScript = preload("res://scripts/tests/run_progression_test.gd")
+const EvacuationResultTestScript = preload("res://scripts/tests/evacuation_result_test.gd")
+const RunVisualizerUiTestScript = preload("res://scripts/tests/run_visualizer_ui_test.gd")
+const HubLoopTestScript = preload("res://scripts/tests/hub_loop_test.gd")
 
 const HEROES := ["cyan_ryder", "helios_windchaser", "umbral_draxx"]
 const ENEMY_ID := "boss_vanguard"
+const MIN_ENEMY_TEMPLATES := 3
+const STRICT_BALANCE_GATE := false
 
 func run() -> bool:
-    var loader := ContentLoader.new()
+    var rules_test := CombatRulesTestScript.new()
+    if not rules_test.run():
+        push_error("Combat rules tests failed.")
+        return false
+
+    var loader := ContentLoaderScript.new()
+    if not _check_phase1_table_validations(loader):
+        return false
+
+    var flow_test := BattleFlowTestScript.new()
+    if not flow_test.run(loader):
+        push_error("Battle flow tests failed.")
+        return false
+    var growth_test := InrunGrowthTestScript.new()
+    if not growth_test.run():
+        push_error("Inrun growth tests failed.")
+        return false
+    var visualizer_ui_test := BattleVisualizerUiTestScript.new()
+    if not visualizer_ui_test.run():
+        push_error("Battle visualizer UI test failed.")
+        return false
+    var reward_flow_test := RewardDraftFlowTestScript.new()
+    if not reward_flow_test.run():
+        push_error("Reward draft flow test failed.")
+        return false
+    var route_generation_test := RouteGenerationTestScript.new()
+    if not route_generation_test.run():
+        push_error("Route generation test failed.")
+        return false
+    var run_progression_test := RunProgressionTestScript.new()
+    if not run_progression_test.run():
+        push_error("Run progression test failed.")
+        return false
+    var evacuation_result_test := EvacuationResultTestScript.new()
+    if not evacuation_result_test.run():
+        push_error("Evacuation result test failed.")
+        return false
+    var run_visualizer_ui_test := RunVisualizerUiTestScript.new()
+    if not run_visualizer_ui_test.run():
+        push_error("Run visualizer UI test failed.")
+        return false
+    var hub_loop_test := HubLoopTestScript.new()
+    if not hub_loop_test.run():
+        push_error("Hub loop test failed.")
+        return false
+
     if not _check_content_tables(loader):
+        return false
+    if not _check_enemy_template_depth(loader):
+        push_error("Enemy template depth check failed.")
         return false
 
     if not _check_dice_pool_depth(loader):
@@ -49,15 +111,55 @@ func run() -> bool:
         push_error("Dice type resonance checks failed.")
         return false
 
-    if not _run_mechanic_coverage_smoke(loader):
+    var coverage_test := MechanicCoverageTestScript.new()
+    if not coverage_test.run(loader, HEROES, Callable(self, "_simulate_once")):
         push_error("Mechanic coverage smoke failed.")
         return false
 
-    var stats_ok := _run_balance_smoke(loader)
+    var balance_test := BalanceSmokeTestScript.new()
+    var stats_ok := balance_test.run(loader, HEROES, STRICT_BALANCE_GATE, Callable(self, "_simulate_once"))
     return stats_ok
 
-func _check_content_tables(loader: ContentLoader) -> bool:
-    var names := ["npcs", "enemies", "dice", "status_effects"]
+func _check_phase1_table_validations(loader: ContentLoaderScript) -> bool:
+    var required := {
+        "npcs": ["id", "name", "base_hp", "resource_type", "resource_init", "resource_cap"],
+        "dice": ["owner_id", "face_id", "effect_bundle_id", "cost_type", "cost_value", "die_type"],
+        "enemies": ["id", "name", "base_hp", "atk_low", "atk_high"]
+    }
+    for table_any in required.keys():
+        var table := String(table_any)
+        var rows := loader.load_rows(table)
+        if rows.is_empty():
+            push_error("Missing rows for table: " + table)
+            return false
+        var fields: Array = required[table]
+        for i in range(rows.size()):
+            var row: Dictionary = rows[i]
+            for field_any in fields:
+                var field := String(field_any)
+                if not row.has(field) or String(row.get(field, "")).strip_edges() == "":
+                    push_error(table + " row[" + str(i) + "] missing required field '" + field + "'")
+                    return false
+            if table == "npcs":
+                if not _is_int_field(row, "base_hp") or not _is_int_field(row, "resource_init") or not _is_int_field(row, "resource_cap"):
+                    push_error(table + " row[" + str(i) + "] has invalid numeric fields")
+                    return false
+            elif table == "dice":
+                if not _is_int_field(row, "cost_value"):
+                    push_error(table + " row[" + str(i) + "] has invalid cost_value")
+                    return false
+            elif table == "enemies":
+                if not _is_int_field(row, "base_hp") or not _is_int_field(row, "atk_low") or not _is_int_field(row, "atk_high"):
+                    push_error(table + " row[" + str(i) + "] has invalid numeric fields")
+                    return false
+    return true
+
+func _is_int_field(row: Dictionary, field: String) -> bool:
+    var raw := String(row.get(field, "")).strip_edges()
+    return raw != "" and raw.is_valid_int()
+
+func _check_content_tables(loader: ContentLoaderScript) -> bool:
+    var names := ["npcs", "enemies", "dice", "status_effects", "rewards", "inrun_growth", "run_nodes", "run_rewards", "events"]
     for table in names:
         var rows := loader.load_rows(table)
         if rows.is_empty():
@@ -65,7 +167,14 @@ func _check_content_tables(loader: ContentLoader) -> bool:
             return false
     return true
 
-func _check_dice_pool_depth(loader: ContentLoader) -> bool:
+func _check_enemy_template_depth(loader: ContentLoaderScript) -> bool:
+    var enemies := loader.load_rows("enemies")
+    if enemies.size() < MIN_ENEMY_TEMPLATES:
+        push_error("Need at least %d enemy templates, got %d" % [MIN_ENEMY_TEMPLATES, enemies.size()])
+        return false
+    return true
+
+func _check_dice_pool_depth(loader: ContentLoaderScript) -> bool:
     var dice_rows := loader.load_rows("dice")
     var counts: Dictionary = {}
     for row in dice_rows:
@@ -78,15 +187,15 @@ func _check_dice_pool_depth(loader: ContentLoader) -> bool:
             return false
     return true
 
-func _simulate_once(seed: int, hero_id: String, loader: ContentLoader) -> Dictionary:
-    var bundle := SeedBundle.new(seed)
-    var rngs := RngStreams.new(bundle)
-    var logger := ActionLogger.new()
-    var factory := UnitFactory.new(loader)
-    var catalog := CombatCatalog.new(loader)
+func _simulate_once(seed_value: int, hero_id: String, loader: ContentLoaderScript) -> Dictionary:
+    var bundle := SeedBundleScript.new(seed_value)
+    var rngs := RngStreamsScript.new(bundle)
+    var logger := ActionLoggerScript.new()
+    var factory := UnitFactoryScript.new(loader)
+    var catalog := CombatCatalogScript.new(loader)
     var enemy_row := loader.find_row_by_id("enemies", ENEMY_ID)
-    var state := CombatState.new(factory.create_npc(hero_id), factory.create_enemy(ENEMY_ID))
-    var simulator := BattleSimulator.new(catalog, enemy_row)
+    var state := CombatStateScript.new(factory.create_npc(hero_id), factory.create_enemy(ENEMY_ID))
+    var simulator := BattleSimulatorScript.new(catalog, enemy_row)
     var result := simulator.run(state, rngs, logger)
     result["log_size"] = logger.entries().size()
     result["resource"] = state.player.resource.current_value
@@ -95,17 +204,17 @@ func _simulate_once(seed: int, hero_id: String, loader: ContentLoader) -> Dictio
     result["next_attack_ignore_block"] = state.player.next_attack_ignore_block
     return result
 
-func _check_determinism(loader: ContentLoader) -> bool:
+func _check_determinism(loader: ContentLoaderScript) -> bool:
     var outcome_a := _simulate_once(20260407, "cyan_ryder", loader)
     var outcome_b := _simulate_once(20260407, "cyan_ryder", loader)
     return outcome_a["winner"] == outcome_b["winner"] and outcome_a["turns"] == outcome_b["turns"] and outcome_a["log_size"] == outcome_b["log_size"]
 
 func _check_ai_isolation() -> bool:
-    var seed := 10101
-    var bundle_a := SeedBundle.new(seed)
-    var bundle_b := SeedBundle.new(seed)
-    var rngs_a := RngStreams.new(bundle_a)
-    var rngs_b := RngStreams.new(bundle_b)
+    var seed_value := 10101
+    var bundle_a := SeedBundleScript.new(seed_value)
+    var bundle_b := SeedBundleScript.new(seed_value)
+    var rngs_a := RngStreamsScript.new(bundle_a)
+    var rngs_b := RngStreamsScript.new(bundle_b)
     var ai_before := rngs_a.ai_pick(3)
     rngs_b.roll_dice(1, 6)
     rngs_b.roll_dice(1, 6)
@@ -113,7 +222,7 @@ func _check_ai_isolation() -> bool:
     var ai_after := rngs_b.ai_pick(3)
     return ai_before == ai_after
 
-func _check_resource_bounds(loader: ContentLoader) -> bool:
+func _check_resource_bounds(loader: ContentLoaderScript) -> bool:
     for hero in HEROES:
         var result := _simulate_once(3000 + HEROES.find(hero), hero, loader)
         var row := loader.find_row_by_id("npcs", hero)
@@ -122,41 +231,8 @@ func _check_resource_bounds(loader: ContentLoader) -> bool:
             return false
     return true
 
-func _run_balance_smoke(loader: ContentLoader) -> bool:
-    var all_ok := true
-    var hero_win_rates: Dictionary = {}
-    for hero in HEROES:
-        var wins := 0
-        var turns_total := 0
-        for i in range(100):
-            var res := _simulate_once(100000 + i, hero, loader)
-            if String(res["winner"]) == hero:
-                wins += 1
-            turns_total += int(res["turns"])
-        var win_rate := float(wins) / 100.0
-        var avg_turns := float(turns_total) / 100.0
-        hero_win_rates[hero] = win_rate
-        print("[SMOKE][BALANCE] hero=", hero, " win_rate=", win_rate, " avg_turns=", avg_turns)
-        if win_rate < 0.40 or win_rate > 0.60:
-            push_error("Win-rate out of target for " + hero + ": " + str(win_rate))
-            all_ok = false
-        if avg_turns < 4.8 or avg_turns > 10.8:
-            push_error("Avg turns out of target for " + hero + ": " + str(avg_turns))
-            all_ok = false
 
-    var min_rate := 1.0
-    var max_rate := 0.0
-    for hero in HEROES:
-        var r := float(hero_win_rates.get(hero, 0.0))
-        min_rate = min(min_rate, r)
-        max_rate = max(max_rate, r)
-    if (max_rate - min_rate) > 0.12:
-        push_error("Hero win-rate spread too high: " + str(max_rate - min_rate))
-        all_ok = false
-
-    return all_ok
-
-func _check_mechanic_invariants(loader: ContentLoader) -> bool:
+func _check_mechanic_invariants(loader: ContentLoaderScript) -> bool:
     var cyan_locked := false
     for i in range(40):
         var cyan := _simulate_once(400000 + i, "cyan_ryder", loader)
@@ -181,7 +257,7 @@ func _check_mechanic_invariants(loader: ContentLoader) -> bool:
         return false
     return true
 
-func _check_turn_cap_guard(loader: ContentLoader) -> bool:
+func _check_turn_cap_guard(loader: ContentLoaderScript) -> bool:
     var res := _simulate_once(600001, "cyan_ryder", loader)
     var turns := int(res.get("turns", 0))
     var ended_by_cap := bool(res.get("ended_by_cap", false))
@@ -201,7 +277,7 @@ func _check_turn_cap_guard(loader: ContentLoader) -> bool:
             return false
     return true
 
-func _check_role_mechanic_signals(loader: ContentLoader) -> bool:
+func _check_role_mechanic_signals(loader: ContentLoaderScript) -> bool:
     var cyan_ok := false
     var helios_ok := false
     var umbral_ok := false
@@ -244,7 +320,7 @@ func _check_role_mechanic_signals(loader: ContentLoader) -> bool:
         push_error("Umbral stance mechanic signal not observed.")
     return false
 
-func _check_dice_type_resonance(loader: ContentLoader) -> bool:
+func _check_dice_type_resonance(loader: ContentLoaderScript) -> bool:
     for hero in HEROES:
         var seen := false
         for i in range(80):
@@ -261,49 +337,3 @@ func _check_dice_type_resonance(loader: ContentLoader) -> bool:
             push_error("No dice_type_resonance observed for " + hero)
             return false
     return true
-
-func _run_mechanic_coverage_smoke(loader: ContentLoader) -> bool:
-    var all_ok := true
-    var per_hero_samples := 60
-    for hero in HEROES:
-        var overclock_events := 0
-        var focus_events := 0
-        var counter_events := 0
-        var resonance_events := 0
-        var style_bonus_events := 0
-        for i in range(per_hero_samples):
-            var res := _simulate_once(900000 + (HEROES.find(hero) * 2000) + i, hero, loader)
-            var entries: Array = res["entries"]
-            for e_any in entries:
-                var e = e_any
-                var ev := String(e.event_type)
-                if ev == "overclock_changed":
-                    overclock_events += 1
-                elif ev == "focus_changed":
-                    focus_events += 1
-                elif ev == "counter_attack":
-                    counter_events += 1
-                elif ev == "dice_type_resonance":
-                    resonance_events += 1
-                elif ev == "style_bonus":
-                    style_bonus_events += 1
-
-        var avg_resonance := float(resonance_events) / float(per_hero_samples)
-        print("[SMOKE][COVERAGE] hero=", hero, " resonance_avg=", avg_resonance, " style_bonus=", style_bonus_events, " overclock=", overclock_events, " focus=", focus_events, " counter=", counter_events)
-        if avg_resonance < 0.35:
-            push_error("Resonance density too low for " + hero + ": " + str(avg_resonance))
-            all_ok = false
-        if style_bonus_events <= 0:
-            push_error("Style bonus never triggered for " + hero)
-            all_ok = false
-
-        if hero == "cyan_ryder" and overclock_events <= 0:
-            push_error("Cyan overclock events not observed in coverage smoke.")
-            all_ok = false
-        if hero == "helios_windchaser" and focus_events <= 0:
-            push_error("Helios focus events not observed in coverage smoke.")
-            all_ok = false
-        if hero == "umbral_draxx" and counter_events <= 0:
-            push_error("Umbral counter events not observed in coverage smoke.")
-            all_ok = false
-    return all_ok

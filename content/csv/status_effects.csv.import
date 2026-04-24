@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://bgs1xxq58yd8a"
+
+[deps]
+
+files=["res://content/csv/status_effects.bundle.translation", "res://content/csv/status_effects.trigger.translation", "res://content/csv/status_effects.op.translation", "res://content/csv/status_effects.value.translation", "res://content/csv/status_effects.duration.translation", "res://content/csv/status_effects.stack.translation", "res://content/csv/status_effects.source.translation", "res://content/csv/status_effects.target.translation", "res://content/csv/status_effects.tags.translation"]
+
+source_file="res://content/csv/status_effects.csv"
+dest_files=["res://content/csv/status_effects.bundle.translation", "res://content/csv/status_effects.trigger.translation", "res://content/csv/status_effects.op.translation", "res://content/csv/status_effects.value.translation", "res://content/csv/status_effects.duration.translation", "res://content/csv/status_effects.stack.translation", "res://content/csv/status_effects.source.translation", "res://content/csv/status_effects.target.translation", "res://content/csv/status_effects.tags.translation"]
+
+[params]
+
+compress=true
+delimiter=0

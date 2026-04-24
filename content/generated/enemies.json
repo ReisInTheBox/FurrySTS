@@ -1,0 +1,33 @@
+{
+	"row_count": 3,
+	"rows": [
+		{
+			"atk_high": "6",
+			"atk_low": "4",
+			"base_hp": "58",
+			"bonus_every_turns": "3",
+			"bonus_flat": "2",
+			"id": "boss_vanguard",
+			"name": "Hub Edge Vanguard"
+		},
+		{
+			"atk_high": "7",
+			"atk_low": "5",
+			"base_hp": "50",
+			"bonus_every_turns": "4",
+			"bonus_flat": "1",
+			"id": "reef_stalker",
+			"name": "Reef Stalker"
+		},
+		{
+			"atk_high": "8",
+			"atk_low": "3",
+			"base_hp": "64",
+			"bonus_every_turns": "2",
+			"bonus_flat": "2",
+			"id": "void_howler",
+			"name": "Void Howler"
+		}
+	],
+	"source": "res://content/csv/enemies.csv"
+}

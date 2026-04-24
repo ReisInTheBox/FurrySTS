@@ -1,0 +1,222 @@
+{
+	"row_count": 24,
+	"rows": [
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "burst",
+			"effect_bundle_id": "fx_cyan_beam_a",
+			"face_id": "cyan_beam_a",
+			"owner_id": "cyan_ryder",
+			"tags": "ranged|attack"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "burst",
+			"effect_bundle_id": "fx_cyan_beam_b",
+			"face_id": "cyan_beam_b",
+			"owner_id": "cyan_ryder",
+			"tags": "ranged|attack"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "defense",
+			"effect_bundle_id": "fx_cyan_shift",
+			"face_id": "cyan_shift",
+			"owner_id": "cyan_ryder",
+			"tags": "utility|defense"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "setup",
+			"effect_bundle_id": "fx_cyan_burst",
+			"face_id": "cyan_burst",
+			"owner_id": "cyan_ryder",
+			"tags": "utility|power"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "finisher",
+			"effect_bundle_id": "fx_cyan_pulse",
+			"face_id": "cyan_pulse",
+			"owner_id": "cyan_ryder",
+			"tags": "ranged|attack"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "setup",
+			"effect_bundle_id": "fx_cyan_cooldown",
+			"face_id": "cyan_cooldown",
+			"owner_id": "cyan_ryder",
+			"tags": "utility"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "burst",
+			"effect_bundle_id": "fx_cyan_arcflare",
+			"face_id": "cyan_arcflare",
+			"owner_id": "cyan_ryder",
+			"tags": "ranged|attack|power"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "setup",
+			"effect_bundle_id": "fx_cyan_vent",
+			"face_id": "cyan_vent",
+			"owner_id": "cyan_ryder",
+			"tags": "utility|defense"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "setup",
+			"effect_bundle_id": "fx_helios_mark",
+			"face_id": "helios_mark",
+			"owner_id": "helios_windchaser",
+			"tags": "utility|mark"
+		},
+		{
+			"cost_type": "quiver",
+			"cost_value": "1",
+			"die_type": "finisher",
+			"effect_bundle_id": "fx_helios_sniper",
+			"face_id": "helios_sniper",
+			"owner_id": "helios_windchaser",
+			"tags": "ranged|attack"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "burst",
+			"effect_bundle_id": "fx_helios_swoop",
+			"face_id": "helios_swoop",
+			"owner_id": "helios_windchaser",
+			"tags": "ranged|attack"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "defense",
+			"effect_bundle_id": "fx_helios_recover",
+			"face_id": "helios_recover",
+			"owner_id": "helios_windchaser",
+			"tags": "utility|defense"
+		},
+		{
+			"cost_type": "quiver",
+			"cost_value": "1",
+			"die_type": "finisher",
+			"effect_bundle_id": "fx_helios_pierce",
+			"face_id": "helios_pierce",
+			"owner_id": "helios_windchaser",
+			"tags": "ranged|attack|pierce"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "burst",
+			"effect_bundle_id": "fx_helios_hunt",
+			"face_id": "helios_hunt",
+			"owner_id": "helios_windchaser",
+			"tags": "ranged|attack"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "setup",
+			"effect_bundle_id": "fx_helios_trap",
+			"face_id": "helios_trap",
+			"owner_id": "helios_windchaser",
+			"tags": "utility|mark|control"
+		},
+		{
+			"cost_type": "quiver",
+			"cost_value": "1",
+			"die_type": "burst",
+			"effect_bundle_id": "fx_helios_volley",
+			"face_id": "helios_volley",
+			"owner_id": "helios_windchaser",
+			"tags": "ranged|attack"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "defense",
+			"effect_bundle_id": "fx_black_sweep",
+			"face_id": "black_sweep",
+			"owner_id": "umbral_draxx",
+			"tags": "melee|attack|defense"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "setup",
+			"effect_bundle_id": "fx_black_charge",
+			"face_id": "black_charge",
+			"owner_id": "umbral_draxx",
+			"tags": "utility|charge"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "burst",
+			"effect_bundle_id": "fx_black_shock",
+			"face_id": "black_shock",
+			"owner_id": "umbral_draxx",
+			"tags": "melee|attack|debuff"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "defense",
+			"effect_bundle_id": "fx_black_guard",
+			"face_id": "black_guard",
+			"owner_id": "umbral_draxx",
+			"tags": "defense"
+		},
+		{
+			"cost_type": "stance",
+			"cost_value": "2",
+			"die_type": "finisher",
+			"effect_bundle_id": "fx_black_execute",
+			"face_id": "black_execute",
+			"owner_id": "umbral_draxx",
+			"tags": "melee|attack|execute"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "setup",
+			"effect_bundle_id": "fx_black_pose",
+			"face_id": "black_pose",
+			"owner_id": "umbral_draxx",
+			"tags": "utility|stance"
+		},
+		{
+			"cost_type": "none",
+			"cost_value": "0",
+			"die_type": "defense",
+			"effect_bundle_id": "fx_black_parry",
+			"face_id": "black_parry",
+			"owner_id": "umbral_draxx",
+			"tags": "melee|defense|counter"
+		},
+		{
+			"cost_type": "stance",
+			"cost_value": "1",
+			"die_type": "finisher",
+			"effect_bundle_id": "fx_black_reap",
+			"face_id": "black_reap",
+			"owner_id": "umbral_draxx",
+			"tags": "melee|attack|execute"
+		}
+	],
+	"source": "res://content/csv/dice.csv"
+}

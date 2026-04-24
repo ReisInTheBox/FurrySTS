@@ -1,0 +1,17 @@
+[remap]
+
+importer="csv_translation"
+type="Translation"
+uid="uid://dgyyolt7xy72t"
+
+[deps]
+
+files=["res://content/csv/inrun_growth.type.translation", "res://content/csv/inrun_growth.target.translation", "res://content/csv/inrun_growth.delta.translation", "res://content/csv/inrun_growth.duration.translation", "res://content/csv/inrun_growth.grant.translation"]
+
+source_file="res://content/csv/inrun_growth.csv"
+dest_files=["res://content/csv/inrun_growth.type.translation", "res://content/csv/inrun_growth.target.translation", "res://content/csv/inrun_growth.delta.translation", "res://content/csv/inrun_growth.duration.translation", "res://content/csv/inrun_growth.grant.translation"]
+
+[params]
+
+compress=true
+delimiter=0

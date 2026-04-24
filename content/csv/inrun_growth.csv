@@ -1,0 +1,7 @@
+growth_id,type,target,delta,duration_scope,grant_once
+gr_battle_ranged_boost,combat,temp_ranged_flat,2,battle,false
+gr_run_quiver_plus,resource,quiver,1,run,true
+gr_run_hull_plate,stat,base_hp,4,run,true
+gr_run_overload_boot,resource,overload,1,run,false
+gr_battle_guard_matrix,stat,block,3,battle,false
+gr_run_resource_cap,resource,resource_cap,1,run,true

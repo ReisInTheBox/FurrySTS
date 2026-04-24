@@ -1,13 +1,13 @@
 class_name RngStreams
 extends RefCounted
 
-const SeedBundle = preload("res://scripts/core/seed_bundle.gd")
+const SeedBundleScript = preload("res://scripts/core/seed_bundle.gd")
 
 var rng_run: RandomNumberGenerator = RandomNumberGenerator.new()
 var rng_dice: RandomNumberGenerator = RandomNumberGenerator.new()
 var rng_ai: RandomNumberGenerator = RandomNumberGenerator.new()
 
-func _init(bundle: SeedBundle) -> void:
+func _init(bundle: SeedBundleScript) -> void:
     rng_run.seed = bundle.run_seed
     rng_dice.seed = bundle.dice_seed
     rng_ai.seed = bundle.ai_seed

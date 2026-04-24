@@ -1,27 +1,28 @@
-$ErrorActionPreference = "Stop"
-
 param(
-    [string]$GodotPath = "godot4",
+    [string]$GodotPath = "G:\Godot\Godot.exe",
     [string]$ProjectPath = "G:\FurrySTS"
 )
+
+$ErrorActionPreference = "Stop"
 
 Write-Host "[SMOKE] Using Godot command: $GodotPath"
 Write-Host "[SMOKE] Project path: $ProjectPath"
 
-if ($GodotPath -eq "godot4") {
+if ($GodotPath -eq "godot") {
     try {
-        & godot4 --version | Out-Null
+        & godot --version | Out-Null
     } catch {
-        Write-Error "godot4 not found. Pass -GodotPath `"C:\path\to\Godot_v4.x-stable_win64.exe`""
+        Write-Error "godot not found. Pass -GodotPath `"C:\path\to\Godot_v4.x-stable_win64.exe`""
         exit 1
     }
 }
 
 & $GodotPath --headless --path $ProjectPath --quit
+$exitCode = if ($null -eq $LASTEXITCODE) { 0 } else { $LASTEXITCODE }
 
-if ($LASTEXITCODE -ne 0) {
-    Write-Error "Godot headless smoke failed with exit code $LASTEXITCODE"
-    exit $LASTEXITCODE
+if ($exitCode -ne 0) {
+    Write-Error "Godot headless smoke failed with exit code $exitCode"
+    exit $exitCode
 }
 
 Write-Host "[SMOKE] Completed."

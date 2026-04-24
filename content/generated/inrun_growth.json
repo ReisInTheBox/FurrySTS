@@ -1,0 +1,22 @@
+{
+	"row_count": 2,
+	"rows": [
+		{
+			"delta": "2",
+			"duration_scope": "battle",
+			"grant_once": "false",
+			"growth_id": "gr_battle_ranged_boost",
+			"target": "temp_ranged_flat",
+			"type": "combat"
+		},
+		{
+			"delta": "1",
+			"duration_scope": "run",
+			"grant_once": "true",
+			"growth_id": "gr_run_quiver_plus",
+			"target": "quiver",
+			"type": "resource"
+		}
+	],
+	"source": "res://content/csv/inrun_growth.csv"
+}

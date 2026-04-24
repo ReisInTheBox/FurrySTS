@@ -1,0 +1,8 @@
+id,node_type,pool,weight,next_pool,allow_evac,battle_enemy_id,event_id,text
+rn_start_battle,battle,start,100,mid,false,boss_vanguard,,首次遭遇，先突破前线守卫。
+rn_mid_supply,supply,mid,45,mid,true,,,废弃补给仓里也许还有能用的资源。
+rn_mid_event,event,mid,35,late,false,,ev_signal,边缘频道收到一段断续求救信号。
+rn_mid_battle,battle,mid,20,late,false,reef_stalker,,前方出现高速巡游的猎杀体。
+rn_late_battle,battle,late,45,late,true,void_howler,,深层区域的高威胁单位已经锁定你。
+rn_late_event,event,late,25,late,true,,ev_cache,废墟深处埋着一个未损坏的模块箱。
+rn_late_supply,supply,late,30,late,true,,,临时据点还留着应急补给。

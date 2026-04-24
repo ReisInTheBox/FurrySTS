@@ -1,0 +1,11 @@
+id,reward_id,source_node_type,weight
+rr_battle_credits,rw_credits_small,battle,20
+rr_battle_ranged,rw_growth_ranged,battle,30
+rr_battle_hull,rw_growth_hull,battle,16
+rr_battle_overload,rw_growth_overload,battle,18
+rr_battle_guard,rw_growth_guard,battle,20
+rr_battle_cap,rw_growth_cap,battle,10
+rr_supply_credits,rw_credits_small,supply,70
+rr_supply_cap,rw_growth_cap,supply,30
+rr_event_overload,rw_growth_overload,event,50
+rr_event_hull,rw_growth_hull,event,50

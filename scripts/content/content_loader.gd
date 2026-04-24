@@ -6,9 +6,13 @@ const CSV_ROOT := "res://content/csv"
 
 func load_rows(table_name: String) -> Array[Dictionary]:
     var generated := _load_generated(table_name)
-    if not generated.is_empty():
-        return generated
-    return _load_csv(table_name)
+    var csv := _load_csv(table_name)
+    if generated.is_empty():
+        return csv
+    # Prefer CSV when it contains more rows than generated cache.
+    if not csv.is_empty() and csv.size() > generated.size():
+        return csv
+    return generated
 
 func find_row_by_id(table_name: String, row_id: String) -> Dictionary:
     for row in load_rows(table_name):

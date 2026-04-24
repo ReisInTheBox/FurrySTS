@@ -1,0 +1,7 @@
+reward_id,type,value,rarity,weight
+rw_credits_small,currency,25,common,70
+rw_growth_ranged,growth,gr_battle_ranged_boost,common,30
+rw_growth_hull,growth,gr_run_hull_plate,rare,18
+rw_growth_overload,growth,gr_run_overload_boot,uncommon,22
+rw_growth_guard,growth,gr_battle_guard_matrix,common,20
+rw_growth_cap,growth,gr_run_resource_cap,rare,10
