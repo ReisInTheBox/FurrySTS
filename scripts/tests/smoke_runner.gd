@@ -159,7 +159,7 @@ func _is_int_field(row: Dictionary, field: String) -> bool:
     return raw != "" and raw.is_valid_int()
 
 func _check_content_tables(loader: ContentLoaderScript) -> bool:
-    var names := ["npcs", "enemies", "dice", "status_effects", "rewards", "inrun_growth", "run_nodes", "run_rewards", "events"]
+    var names := ["npcs", "enemies", "dice", "status_effects", "rewards", "inrun_growth", "run_nodes", "run_rewards", "events", "outgame_growth"]
     for table in names:
         var rows := loader.load_rows(table)
         if rows.is_empty():

@@ -1,0 +1,4 @@
+﻿id,title,description,base_cost,cost_step,max_level,growth_type,growth_target,growth_delta,duration_scope,grant_once
+hp_boost,舰体强化,本英雄最大生命 +2,18,8,3,stat,base_hp,2,run,false
+guard_boost,护甲预载,本英雄开场护甲 +2,14,8,3,stat,block,2,run,false
+resource_cap,资源上限,本英雄资源上限 +1,24,10,2,resource,resource_cap,1,run,false

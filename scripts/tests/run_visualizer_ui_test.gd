@@ -46,5 +46,22 @@ func run() -> bool:
 		push_error("Run did not advance after reward selection.")
 		return false
 
+	var forced_route: Array[Dictionary] = []
+	forced_route.append(visualizer._run_state.route_nodes[0])
+	forced_route.append({"id": "ui_supply", "node_type": "supply", "pool": "mid", "weight": "1", "next_pool": "late", "allow_evac": "true", "battle_enemy_id": "", "event_id": "", "text": "UI smoke supply"})
+	visualizer._run_state.route_nodes = forced_route
+	visualizer._run_state.current_node_index = 1
+	visualizer._on_resolve_pressed()
+	if not visualizer._node_result_active():
+		push_error("Run visualizer did not show event/supply result panel.")
+		return false
+	if not visualizer._resolve_btn.disabled:
+		push_error("Run visualizer allowed node advance while result panel is open.")
+		return false
+	visualizer._on_node_result_continue_pressed()
+	if visualizer._node_result_active():
+		push_error("Run visualizer did not hide result panel after continue.")
+		return false
+
 	visualizer.free()
 	return true

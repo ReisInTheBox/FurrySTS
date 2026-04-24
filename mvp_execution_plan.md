@@ -2,6 +2,38 @@
 
 ## Summary
 
+﻿## Current Progress（2026-04-25 / Update 4）
+### Overall Status
+- 当前主线进度：`Phase 4 已补完，Phase 5 已补完核心 DoD`
+- 当前开发阶段：`Phase 5 收口完成，下一阶段可进入 Phase 6`
+- 当前可运行形态：项目启动后进入 `Hub`，可选择英雄、编辑基础骰面、消费 Credits 购买局外成长，进入 `Run` 后完成路线、战斗、事件/补给、撤离/完成/失败结算，并回流到 Hub。
+- 当前优先事项：下一步可以开始 `Phase 6` 的关系与剧情最小闭环；数值平衡仍是已知 warning，不阻塞流程验收。
+
+### Phase 4 Closeout
+- `Run` 路线主闭环已补齐：路线预览、当前节点说明、战斗节点进入可视化战斗、战斗后奖励选择、撤离与完成结算都已接通。
+- 事件/补给节点已从“静默结算”升级为结果面板：显示节点类型、获得奖励、奖励描述、当前 Credits，并要求玩家点击“继续路线”后再推进。
+- `RunResult` 已携带 `hero_id`、`node_results`、清理节点数、Credits、成长数量等字段，能作为 Hub 战报与后续持久化基础。
+- `run_visualizer_ui_test.gd` 已覆盖战斗进入/返回、奖励选择、事件/补给结果面板、面板打开时禁止重复推进等关键路径。
+
+### Phase 5 Closeout
+- `Hub -> Run -> 结算 -> Hub` 主闭环已成立，并由 `RootFlow` 负责场景切换。
+- `HubState` 已管理局外 Credits、Run 次数、完成/撤离/失败统计、当前英雄、上次 Run 战报、英雄 loadout 与局外成长等级。
+- Hub 基础构筑已可编辑：每名英雄维护独立 loadout，下一局 Run 会按当前 loadout 初始化骰池。
+- 局外成长已改为表驱动：新增 `content/csv/outgame_growth.csv`，`HubState` 从表中读取升级标题、描述、费用、等级上限与对应成长效果。
+- 已购买局外成长会写入下一局 `run_setup.persistent_growths`，并在后续战斗初始化时生效。
+- `hub_loop_test.gd` 已覆盖 Hub 接收 Run 结算、消费 Credits 购买成长、编辑 loadout、将 loadout/growth 注入下一局 Run setup。
+
+### Verification
+- 本地验证命令：`godot --headless --path 'G:\FurrySTS' --quit`
+- 验证结果：通过。
+- 已知非阻塞 warning：`balance_smoke_test` 仍提示三名角色胜率差距较大，属于后续数值调参问题，不影响 P4/P5 流程闭环。
+
+### Remaining After P5
+- Hub 状态尚未落盘持久化；当前是进程内 MVP 状态。
+- Hub 构筑编辑仍是最小按钮式交互，尚未做完整卡牌/骰面详情面板美术化。
+- Run 路线仍是线性推进，不含正式分叉地图选择。
+- Phase 6 尚未开始：关系系统、剧情事件、NPC 关系奖励与解锁。
+
 ## Current Progress（2026-04-25 / Update 3）
 
 ### Overall Status

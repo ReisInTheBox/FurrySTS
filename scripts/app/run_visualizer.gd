@@ -28,6 +28,10 @@ var _node_hint_label: Label
 var _feedback_label: Label
 var _reward_panel: PanelContainer
 var _reward_row: HBoxContainer
+var _node_result_panel: PanelContainer
+var _node_result_title: Label
+var _node_result_detail: Label
+var _node_result_continue_btn: Button
 var _log_view: RichTextLabel
 var _resolve_btn: Button
 var _evac_btn: Button
@@ -230,6 +234,31 @@ func _build_current_node_panel() -> Control:
 	_feedback_label.modulate = Color(0.97, 0.88, 0.74)
 	v.add_child(_feedback_label)
 
+	_node_result_panel = PanelContainer.new()
+	_node_result_panel.visible = false
+	_node_result_panel.add_theme_stylebox_override("panel", _style_panel(Color(0.08, 0.13, 0.11), Color(0.44, 0.8, 0.62), 12))
+	v.add_child(_node_result_panel)
+
+	var result_v := VBoxContainer.new()
+	result_v.add_theme_constant_override("separation", 8)
+	_node_result_panel.add_child(result_v)
+
+	_node_result_title = Label.new()
+	_node_result_title.text = "节点结算"
+	_node_result_title.add_theme_font_size_override("font_size", 17)
+	_node_result_title.modulate = Color(0.9, 1.0, 0.94)
+	result_v.add_child(_node_result_title)
+
+	_node_result_detail = Label.new()
+	_node_result_detail.autowrap_mode = TextServer.AUTOWRAP_WORD
+	_node_result_detail.modulate = Color(0.82, 0.94, 0.88)
+	result_v.add_child(_node_result_detail)
+
+	_node_result_continue_btn = Button.new()
+	_node_result_continue_btn.text = "继续路线"
+	_node_result_continue_btn.pressed.connect(_on_node_result_continue_pressed)
+	result_v.add_child(_node_result_continue_btn)
+
 	_reward_panel = PanelContainer.new()
 	_reward_panel.visible = false
 	_reward_panel.add_theme_stylebox_override("panel", _style_panel(Color(0.14, 0.11, 0.07), Color(0.72, 0.6, 0.26), 12))
@@ -284,6 +313,7 @@ func _start_run() -> void:
 	var bundle: Dictionary = _simulator.create_run(_master_seed, _run_hero_id, 5, _run_setup)
 	_run_state = bundle["state"]
 	_rngs = bundle["rngs"]
+	_hide_node_result_panel()
 	_feedback_label.text = "Run 已初始化，准备推进第一处节点。"
 	_render_ui()
 
@@ -311,8 +341,9 @@ func _render_ui() -> void:
 	_render_log()
 
 	var battle_open := _active_battle != null
-	_resolve_btn.disabled = battle_open or _run_state.completed or not _run_state.pending_reward_choices.is_empty()
-	_evac_btn.disabled = battle_open or not _run_state.can_evac()
+	var node_result_open: bool = _node_result_active()
+	_resolve_btn.disabled = battle_open or node_result_open or _run_state.completed or not _run_state.pending_reward_choices.is_empty()
+	_evac_btn.disabled = battle_open or node_result_open or not _run_state.can_evac()
 	_new_run_btn.disabled = battle_open
 
 func _render_status_cards() -> void:
@@ -447,9 +478,40 @@ func _on_resolve_pressed() -> void:
 	var result: Dictionary = _simulator.resolve_current_node(_run_state, _rngs)
 	if bool(result.get("ok", false)):
 		_feedback_label.text = _resolve_feedback(result)
-		_emit_run_finished_if_needed()
+		_show_node_result(result)
 	else:
 		_feedback_label.text = "节点进入失败：%s" % str(result.get("reason", "unknown"))
+	_render_ui()
+
+func _show_node_result(result: Dictionary) -> void:
+	if _node_result_panel == null:
+		return
+	var node_type := String(result.get("node_type", ""))
+	var reward: Dictionary = result.get("reward", {})
+	_node_result_title.text = "%s结算完成" % _node_type_name(node_type)
+	var lines: Array[String] = []
+	lines.append(_resolve_feedback(result))
+	if not reward.is_empty():
+		lines.append("获得：%s" % String(reward.get("title", "奖励")))
+		lines.append(String(reward.get("description", "")))
+	lines.append("当前 Credits：%d" % _run_state.progress.get_currency("credits"))
+	if _run_state.completed:
+		lines.append("Run 已结束，点击继续返回 Hub。")
+	_node_result_detail.text = "\n".join(lines)
+	_node_result_panel.visible = true
+
+func _hide_node_result_panel() -> void:
+	if _node_result_panel == null:
+		return
+	_node_result_panel.visible = false
+	_node_result_detail.text = ""
+
+func _node_result_active() -> bool:
+	return _node_result_panel != null and _node_result_panel.visible
+
+func _on_node_result_continue_pressed() -> void:
+	_hide_node_result_panel()
+	_emit_run_finished_if_needed()
 	_render_ui()
 
 func _on_reward_selected(index: int) -> void:

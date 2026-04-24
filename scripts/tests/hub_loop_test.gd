@@ -7,6 +7,9 @@ const HubStateScript = preload("res://scripts/hub/hub_state.gd")
 func run() -> bool:
 	var root := RootFlowScript.new()
 	root._hub_state.ensure_content(ContentLoaderScript.new())
+	if not root._hub_state.upgrade_defs.has("guard_boost"):
+		push_error("Hub state did not load outgame growth definitions from content.")
+		return false
 	root._show_hub()
 	if root._active_view == null:
 		push_error("Root flow failed to open hub view.")
