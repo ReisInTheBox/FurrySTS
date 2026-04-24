@@ -1,6 +1,72 @@
 # MVP 技术方案与避坑计划
 
 ## Summary
+
+## Current Progress（2026-04-25 / Update 3）
+
+### Overall Status
+- 当前主线进度：`Phase 5 已进入可运行闭环`
+- 当前开发阶段：`Phase 5 进行中`
+- 当前可运行形态：项目启动后进入 `Hub`，可选择出战角色、配置基础骰面、消费 Credits 购买局外成长，然后进入 `Run`；Run 结束后会回到 Hub 并写入结算。
+- 当前优先事项：继续把 Hub 的局外成长、构筑编辑和结算信息从“最小可用”推进到“稳定可玩”，再进入 Phase 6 关系系统。
+
+### Completed Since Last Snapshot
+- `Phase 4` 已具备主闭环能力：
+  - Run 路线可按 seed 生成并展示
+  - 战斗节点会进入真实可视化战斗界面
+  - 战斗结束后可返回 Run，并继续奖励选择与路线推进
+  - 撤离、完成、失败三类 Run 结果已有最小结算出口
+
+- `Phase 5` 已补最小 Hub 闭环：
+  - 新增 `HubState`：保存累计 Credits、Run 次数、完成/撤离/失败统计、当前英雄、上次 Run 结果
+  - 新增 `HubVisualizer`：展示 Hub 状态、角色选择、局外成长、基础构筑、上次 Run 结算
+  - 新增 `RootFlow`：负责 `Hub -> Run -> Hub` 场景切换
+  - `RunVisualizer` 新增 `run_finished` 信号，Run 结束时会输出标准 `RunResult`
+  - `RunResult` 已扩展为包含 `hero_id`、`node_results` 等 Hub 可消费字段
+
+### Newly Implemented Gameplay Surfaces
+- 局外资源消费：
+  - Hub 可用 `Credits` 购买最小局外成长
+  - 当前成长包括：最大生命、开场护甲、资源上限
+  - 购买后的成长会写入下一局 Run 的初始化 setup
+
+- 基础构筑编辑：
+  - Hub 为每个英雄维护一套基础骰面 loadout
+  - 当前最小规则：默认 6 槽，最低保留 4 个骰面
+  - 下一局 Run 会按当前英雄 loadout 过滤骰池
+
+- 结算信息回流：
+  - Hub 会展示上次 Run 的结果类型、清理节点数、带回 Credits、获得成长数
+  - `node_results` 已进入 `RunResult`，后续可继续扩展为更完整的战报面板
+
+### Verification
+- 当前 smoke 已覆盖：
+  - `combat_rules`
+  - `battle_flow`
+  - `inrun_growth`
+  - `battle_visualizer_ui`
+  - `reward_draft_flow`
+  - `route_generation`
+  - `run_progression`
+  - `evacuation_result`
+  - `run_visualizer_ui`
+  - `hub_loop`
+- 最新本地验证命令：
+  - `godot --headless --path 'G:\FurrySTS' --quit`
+- 验证结果：通过；仍存在已知平衡警告，主要是三名角色胜率差距较大。
+
+### Known Gaps
+- Phase 5 尚未完成最终 DoD：
+  - Hub 构筑编辑仍是最小按钮式交互，没有完整卡牌/骰面详情面板
+  - 局外成长仍是硬编码最小定义，尚未表驱动
+  - Hub 状态尚未持久化到存档
+  - Credits 消费数值未平衡
+  - Run 结算战报还比较简略
+- Phase 6 尚未开始：
+  - 关系系统
+  - 剧情事件
+  - NPC 关系奖励与解锁
+
 ## Current Progress（2026-04-22 / Update 2）
 
 ### Phase 4 Snapshot
