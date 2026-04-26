@@ -3,30 +3,33 @@
 	"rows": [
 		{
 			"base_hp": "22",
-			"dice_pool": "cyan_beam_a|cyan_beam_b|cyan_shift|cyan_burst|cyan_pulse|cyan_cooldown|cyan_arcflare|cyan_vent",
+			"dice_pool": "cyan_pulse_die|cyan_shift_die|cyan_core_die",
 			"id": "cyan_ryder",
 			"name": "Cyan Ryder",
 			"resource_cap": "3",
 			"resource_init": "0",
-			"resource_type": "overload"
+			"resource_type": "overload",
+			"starting_dice_loadout": "cyan_pulse_die|cyan_shift_die|cyan_core_die"
 		},
 		{
 			"base_hp": "25",
-			"dice_pool": "helios_mark|helios_sniper|helios_swoop|helios_recover|helios_pierce|helios_hunt|helios_trap|helios_volley",
+			"dice_pool": "helios_hunt_die|helios_mark_die|helios_wild_die",
 			"id": "helios_windchaser",
 			"name": "Helios Windchaser",
 			"resource_cap": "3",
 			"resource_init": "3",
-			"resource_type": "quiver"
+			"resource_type": "quiver",
+			"starting_dice_loadout": "helios_hunt_die|helios_mark_die|helios_wild_die"
 		},
 		{
 			"base_hp": "24",
-			"dice_pool": "black_sweep|black_charge|black_shock|black_guard|black_execute|black_pose|black_parry|black_reap",
+			"dice_pool": "aurian_blade_die|aurian_guard_die|aurian_might_die",
 			"id": "umbral_draxx",
-			"name": "Umbral Draxx",
+			"name": "Aurian",
 			"resource_cap": "2",
 			"resource_init": "0",
-			"resource_type": "stance"
+			"resource_type": "stance",
+			"starting_dice_loadout": "aurian_blade_die|aurian_guard_die|aurian_might_die"
 		}
 	],
 	"source": "res://content/csv/npcs.csv"

@@ -1,5 +1,5 @@
 {
-	"row_count": 2,
+	"row_count": 6,
 	"rows": [
 		{
 			"delta": "2",
@@ -15,6 +15,38 @@
 			"grant_once": "true",
 			"growth_id": "gr_run_quiver_plus",
 			"target": "quiver",
+			"type": "resource"
+		},
+		{
+			"delta": "4",
+			"duration_scope": "run",
+			"grant_once": "true",
+			"growth_id": "gr_run_hull_plate",
+			"target": "base_hp",
+			"type": "stat"
+		},
+		{
+			"delta": "1",
+			"duration_scope": "run",
+			"grant_once": "false",
+			"growth_id": "gr_run_overload_boot",
+			"target": "overload",
+			"type": "resource"
+		},
+		{
+			"delta": "3",
+			"duration_scope": "battle",
+			"grant_once": "false",
+			"growth_id": "gr_battle_guard_matrix",
+			"target": "block",
+			"type": "stat"
+		},
+		{
+			"delta": "1",
+			"duration_scope": "run",
+			"grant_once": "true",
+			"growth_id": "gr_run_resource_cap",
+			"target": "resource_cap",
 			"type": "resource"
 		}
 	],

@@ -9,19 +9,26 @@ const TurnStateMachineScript = preload("res://scripts/core/turn_state_machine.gd
 const CombatCatalogScript = preload("res://scripts/content/combat_catalog.gd")
 const DiceFaceDefinitionScript = preload("res://scripts/combat/dice_face_definition.gd")
 const EffectResolverScript = preload("res://scripts/combat/effect_resolver.gd")
+const EquipmentEffectResolverScript = preload("res://scripts/combat/equipment_effect_resolver.gd")
 const EnemyIntentScript = preload("res://scripts/combat/enemy_intent.gd")
 
 const EVENT_BATTLE_END := "battle_end"
 const EVENT_BATTLE_STALEMATE := "battle_stalemate"
 const EVENT_DICE_LOCKED := "dice_locked"
 const EVENT_ENEMY_ATTACK := "enemy_attack"
+const EVENT_ENEMY_BLOCK := "enemy_block"
+const EVENT_ENEMY_DEBUFF := "enemy_debuff"
 const EVENT_ACTION_REJECTED := "action_rejected"
 const EVENT_COUNTER_ATTACK := "counter_attack"
 const EVENT_STYLE_BONUS := "style_bonus"
+const EVENT_NEGATIVE_FACE := "negative_face_resolved"
 const MAX_TURNS := 60
+const DICE_PER_TURN := 3
+const BASE_REROLLS_PER_TURN := 2
 
 var _catalog: CombatCatalogScript
 var _effects: EffectResolverScript = EffectResolverScript.new()
+var _equipment_effects: EquipmentEffectResolverScript = EquipmentEffectResolverScript.new()
 var _enemy_data: Dictionary = {}
 
 func _init(catalog: CombatCatalogScript, enemy_data: Dictionary) -> void:
@@ -72,6 +79,18 @@ func run(state: CombatStateScript, rngs: RngStreamsScript, logger: ActionLoggerS
     ))
     return {"winner": winner, "turns": state.turn_index, "ended_by_cap": ended_by_cap}
 
+func initialize_equipment_for_battle(state: CombatStateScript, equipment_instances: Array, logger: ActionLoggerScript) -> void:
+    _equipment_effects.initialize_battle(state, equipment_instances, logger)
+
+func can_use_active_item(state: CombatStateScript) -> bool:
+    return _equipment_effects.can_use_active_item(state)
+
+func active_item_label(state: CombatStateScript) -> String:
+    return _equipment_effects.active_item_label(state)
+
+func use_active_item(state: CombatStateScript, logger: ActionLoggerScript) -> Dictionary:
+    return _equipment_effects.use_active_item(state, logger)
+
 func start_manual_player_turn(state: CombatStateScript, rngs: RngStreamsScript, logger: ActionLoggerScript) -> void:
     _start_player_turn(state, rngs, logger)
 
@@ -96,7 +115,7 @@ func manual_reroll_once(state: CombatStateScript, rngs: RngStreamsScript) -> boo
         return false
     if not _reroll_one(state, rngs):
         return false
-    state.rerolls_left -= 1
+    _consume_reroll_cost(state, null)
     return true
 
 func manual_reroll_selected(state: CombatStateScript, rngs: RngStreamsScript, selected_indices: Array[int]) -> bool:
@@ -104,10 +123,6 @@ func manual_reroll_selected(state: CombatStateScript, rngs: RngStreamsScript, se
         return false
     if selected_indices.is_empty():
         return false
-    var pool := _catalog.dice_for_owner(state.player.unit_id, state.player.loadout_face_ids)
-    if pool.is_empty():
-        return false
-
     var normalized: Array[int] = []
     for idx in selected_indices:
         if idx < 0 or idx >= state.rolled_faces.size():
@@ -123,10 +138,16 @@ func manual_reroll_selected(state: CombatStateScript, rngs: RngStreamsScript, se
 
     normalized.sort()
     for idx in normalized:
-        var next_idx := rngs.roll_dice(0, pool.size() - 1)
-        state.rolled_faces[idx] = pool[next_idx]
+        var current: DiceFaceDefinitionScript = state.rolled_faces[idx]
+        var die_faces := _catalog.faces_for_die(current.die_id)
+        if die_faces.is_empty():
+            die_faces = _catalog.dice_for_owner(state.player.unit_id, state.player.loadout_face_ids)
+        if die_faces.is_empty():
+            continue
+        var next_idx := rngs.roll_dice(0, die_faces.size() - 1)
+        state.rolled_faces[idx] = die_faces[next_idx]
 
-    state.rerolls_left -= 1
+    _consume_reroll_cost(state, null)
     return true
 
 func apply_manual_face_pick(state: CombatStateScript, rngs: RngStreamsScript, logger: ActionLoggerScript, face_id: String) -> bool:
@@ -157,9 +178,6 @@ func apply_manual_face_pick(state: CombatStateScript, rngs: RngStreamsScript, lo
     state.rolled_faces.erase(picked)
     _execute_face(state, picked, logger)
     state.picks_used += 1
-    if state.bonus_rolls > 0:
-        state.bonus_rolls -= 1
-        _roll_faces(state, rngs, 1)
     return true
 
 func apply_manual_face_pick_at(state: CombatStateScript, rngs: RngStreamsScript, logger: ActionLoggerScript, slot_index: int) -> bool:
@@ -195,9 +213,6 @@ func apply_manual_face_pick_at(state: CombatStateScript, rngs: RngStreamsScript,
     state.rolled_faces.remove_at(slot_index)
     _execute_face(state, picked, logger)
     state.picks_used += 1
-    if state.bonus_rolls > 0:
-        state.bonus_rolls -= 1
-        _roll_faces(state, rngs, 1)
     return true
 
 func preview_enemy_intent(state: CombatStateScript, rngs: RngStreamsScript) -> EnemyIntentScript:
@@ -215,7 +230,8 @@ func run_manual_enemy_phase(state: CombatStateScript, rngs: RngStreamsScript, lo
 
 func _start_player_turn(state: CombatStateScript, rngs: RngStreamsScript, logger: ActionLoggerScript) -> void:
     state.reset_turn_state()
-    var dice_pool := _catalog.dice_for_owner(state.player.unit_id, state.player.loadout_face_ids)
+    state.rerolls_left = BASE_REROLLS_PER_TURN
+    var dice_pool := _catalog.dice_for_owner(state.player.unit_id, _active_loadout_ids(state))
     if state.player.pending_lock_faces > 0:
         for _i in range(state.player.pending_lock_faces):
             if dice_pool.is_empty():
@@ -232,35 +248,87 @@ func _start_player_turn(state: CombatStateScript, rngs: RngStreamsScript, logger
             {"locked_faces": state.locked_face_ids}
         ))
         state.player.pending_lock_faces = 0
-    _roll_faces(state, rngs, 3)
+    _roll_loadout_dice(state, rngs)
+    state.picks_budget = state.rolled_faces.size()
 
 func _player_phase(state: CombatStateScript, rngs: RngStreamsScript, logger: ActionLoggerScript) -> void:
     while state.picks_used < state.picks_budget and not state.battle_ended():
         var pick := _pick_best_face(state)
         if pick == null:
             if state.rerolls_left > 0 and _reroll_one(state, rngs):
-                state.rerolls_left -= 1
+                _consume_reroll_cost(state, logger)
                 continue
             break
         var face: DiceFaceDefinitionScript = pick
         state.rolled_faces.erase(face)
         _execute_face(state, face, logger)
         state.picks_used += 1
-        if state.bonus_rolls > 0:
-            state.bonus_rolls -= 1
-            _roll_faces(state, rngs, 1)
 
 func _execute_face(state: CombatStateScript, face: DiceFaceDefinitionScript, logger: ActionLoggerScript) -> void:
     var pre_resource := state.player.resource.current_value
+    var pre_block := state.player.block
+    var effects := _catalog.effects_for_bundle(face.effect_bundle_id)
+    for enchant_effect in _enchant_effects_for_face(state, face, logger):
+        effects.append(enchant_effect)
+    _equipment_effects.before_face(state, face, effects, logger)
+    if face.is_negative or face.has_tag("negative"):
+        logger.append(ActionLogEntryScript.new(
+            EVENT_NEGATIVE_FACE,
+            state.turn_index,
+            state.player.unit_id,
+            state.player.unit_id,
+            {"face_id": face.face_id, "die_id": face.die_id}
+        ))
     var paid := _try_pay_cost(state, face)
     if not paid:
         _effects.apply_bundle(state, face, [{"op_type": "damage", "value": "1", "trigger": "OnDiceResolved", "effect_id": "fallback_min_damage"}], logger)
         return
-    var effects := _catalog.effects_for_bundle(face.effect_bundle_id)
     _effects.apply_bundle(state, face, effects, logger)
+    _equipment_effects.after_face(state, face, effects, pre_block, logger)
     _apply_face_post_rules(state, face, pre_resource, logger)
     _apply_character_face_passives(state, face, logger)
     _apply_dice_type_resonance(state, face, logger)
+
+func _enchant_effects_for_face(state: CombatStateScript, face: DiceFaceDefinitionScript, logger: ActionLoggerScript) -> Array[Dictionary]:
+    var out: Array[Dictionary] = []
+    for binding_any in state.player.enchant_bindings:
+        var binding: Dictionary = binding_any
+        if String(binding.get("die_id", "")) != face.die_id:
+            continue
+        if int(binding.get("face_index", "0")) != face.face_index:
+            continue
+        var enchant_id := String(binding.get("enchant_id", ""))
+        var enchantment := _catalog.enchantment_by_id(enchant_id)
+        if enchantment.is_empty():
+            continue
+        out.append({
+            "effect_id": "enchant_" + enchant_id,
+            "bundle_id": "enchant_" + enchant_id,
+            "trigger": String(enchantment.get("trigger", "OnDiceResolved")),
+            "op_type": String(enchantment.get("op_type", "")),
+            "value": String(enchantment.get("value", "")),
+            "duration": "0",
+            "stack_rule": "none",
+            "source": "enchant",
+            "target": "target",
+            "tags": String(enchantment.get("tags", ""))
+        })
+        logger.append(ActionLogEntryScript.new(
+            "enchant_triggered",
+            state.turn_index,
+            state.player.unit_id,
+            state.player.unit_id,
+            {
+                "face_id": face.face_id,
+                "die_id": face.die_id,
+                "face_index": face.face_index,
+                "enchant_id": enchant_id,
+                "op_type": String(enchantment.get("op_type", "")),
+                "value": String(enchantment.get("value", "")),
+                "source": String(binding.get("source", "reward"))
+            }
+        ))
+    return out
 
 func _apply_face_post_rules(state: CombatStateScript, face: DiceFaceDefinitionScript, pre_resource: int, logger: ActionLoggerScript) -> void:
     if state.player.resource.has_type("overload"):
@@ -292,14 +360,14 @@ func _apply_character_face_passives(state: CombatStateScript, face: DiceFaceDefi
         if state.last_ranged_face_id != "" and state.last_ranged_face_id != face.face_id:
             state.cyan_prism_chain += 1
             if state.cyan_prism_chain >= 1:
-                state.bonus_rolls += 1
+                state.rerolls_left = min(BASE_REROLLS_PER_TURN, state.rerolls_left + 1)
                 state.cyan_prism_chain = 0
                 logger.append(ActionLogEntryScript.new(
                     "bonus_roll_granted",
                     state.turn_index,
                     state.player.unit_id,
                     state.player.unit_id,
-                    {"face_id": face.face_id, "bonus_rolls": state.bonus_rolls, "source": "prism_chain"}
+                    {"face_id": face.face_id, "rerolls_left": state.rerolls_left, "source": "prism_chain"}
                 ))
         state.last_ranged_face_id = face.face_id
 
@@ -312,20 +380,44 @@ func _try_pay_cost(state: CombatStateScript, face: DiceFaceDefinitionScript) -> 
 
 func _enemy_turn(state: CombatStateScript, rngs: RngStreamsScript, logger: ActionLoggerScript) -> void:
     var intent := _build_enemy_intent(state, rngs)
-    var result := state.player.apply_damage(intent.attack_value)
-    logger.append(ActionLogEntryScript.new(
-        EVENT_ENEMY_ATTACK,
-        state.turn_index,
-        state.enemy.unit_id,
-        state.player.unit_id,
-        {
-            "value": intent.attack_value,
-            "intent_source": intent.source,
-            "blocked": result["blocked"],
-            "damage": result["damage"],
-            "target_hp": state.player.hp
-        }
-    ))
+    if intent.block_value > 0:
+        var enemy_block := state.enemy.add_block(intent.block_value)
+        logger.append(ActionLogEntryScript.new(
+            EVENT_ENEMY_BLOCK,
+            state.turn_index,
+            state.enemy.unit_id,
+            state.enemy.unit_id,
+            {
+                "value": enemy_block,
+                "intent_type": intent.intent_type,
+                "intent_source": intent.source,
+                "telegraph": intent.telegraph
+            }
+        ))
+
+    var result := {"blocked": 0, "damage": 0}
+    if intent.attack_value > 0:
+        var incoming := _equipment_effects.before_enemy_attack(state, intent.attack_value, logger)
+        result = state.player.apply_damage(incoming)
+        logger.append(ActionLogEntryScript.new(
+            EVENT_ENEMY_ATTACK,
+            state.turn_index,
+            state.enemy.unit_id,
+            state.player.unit_id,
+            {
+                "value": incoming,
+                "base_value": intent.attack_value,
+                "intent_type": intent.intent_type,
+                "intent_source": intent.source,
+                "telegraph": intent.telegraph,
+                "counter_tag": intent.counter_tag,
+                "blocked": result["blocked"],
+                "damage": result["damage"],
+                "target_hp": state.player.hp
+            }
+        ))
+    if intent.status_type != "":
+        _apply_enemy_status_intent(state, intent, logger)
     if state.player.thorns_value > 0 and state.enemy.is_alive():
         var thorns := state.player.thorns_value
         state.player.thorns_value = 0
@@ -359,6 +451,9 @@ func _enemy_turn(state: CombatStateScript, rngs: RngStreamsScript, logger: Actio
         ))
 
 func _build_enemy_intent(state: CombatStateScript, rngs: RngStreamsScript) -> EnemyIntentScript:
+    var scripted := _scripted_enemy_intent(state)
+    if scripted != null:
+        return scripted
     var low := int(_enemy_data.get("atk_low", "6"))
     var high := int(_enemy_data.get("atk_high", "9"))
     var choose_high := rngs.ai_pick(2) == 1
@@ -368,9 +463,68 @@ func _build_enemy_intent(state: CombatStateScript, rngs: RngStreamsScript) -> En
     if every > 0 and state.turn_index % every == 0:
         value += int(_enemy_data.get("bonus_flat", "0"))
         source = source + "+bonus"
-    return EnemyIntentScript.new(value, source)
+    return EnemyIntentScript.new(value, source, "attack")
+
+func _scripted_enemy_intent(state: CombatStateScript) -> EnemyIntentScript:
+    var rows := _catalog.enemy_intents_for(state.enemy.unit_id)
+    if rows.is_empty():
+        return null
+    var best: Dictionary = {}
+    var best_priority := -999999
+    var cycle_length := 1
+    for row_any in rows:
+        var row: Dictionary = row_any
+        cycle_length = max(cycle_length, int(row.get("turn_mod", "0")))
+    var cycle_slot := ((state.turn_index - 1) % cycle_length) + 1
+    for row_any in rows:
+        var row: Dictionary = row_any
+        var turn_mod := int(row.get("turn_mod", "0"))
+        if turn_mod > 0:
+            if cycle_slot != turn_mod:
+                continue
+        elif cycle_slot != cycle_length:
+            continue
+        var priority := int(row.get("priority", "0"))
+        if priority > best_priority:
+            best_priority = priority
+            best = row
+    if best.is_empty():
+        best = rows[(state.turn_index - 1) % rows.size()]
+    return EnemyIntentScript.new(
+        int(best.get("attack_value", "0")),
+        String(best.get("intent_type", "scripted")),
+        String(best.get("intent_type", "attack")),
+        int(best.get("block_value", "0")),
+        String(best.get("status_type", "")),
+        int(best.get("status_value", "0")),
+        String(best.get("telegraph", "")),
+        String(best.get("counter_tag", ""))
+    )
+
+func _apply_enemy_status_intent(state: CombatStateScript, intent: EnemyIntentScript, logger: ActionLoggerScript) -> void:
+    match intent.status_type:
+        "lock_die":
+            state.player.pending_lock_faces += intent.status_value
+        "pollute_die":
+            state.rerolls_left = max(0, state.rerolls_left - intent.status_value)
+        _:
+            pass
+    logger.append(ActionLogEntryScript.new(
+        EVENT_ENEMY_DEBUFF,
+        state.turn_index,
+        state.enemy.unit_id,
+        state.player.unit_id,
+        {
+            "intent_type": intent.intent_type,
+            "intent_source": intent.source,
+            "status_type": intent.status_type,
+            "status_value": intent.status_value,
+            "telegraph": intent.telegraph
+        }
+    ))
 
 func _end_turn(state: CombatStateScript, logger: ActionLoggerScript) -> void:
+    _equipment_effects.end_turn(state, logger)
     var distinct_types := 0
     for k in state.dice_type_counts.keys():
         if int(state.dice_type_counts.get(k, 0)) > 0:
@@ -390,6 +544,9 @@ func _end_turn(state: CombatStateScript, logger: ActionLoggerScript) -> void:
         state.player.pending_lock_faces = 1
         state.player.resource.apply_delta(-2)
     if state.player.unit_id == "cyan_ryder" and state.player.resource.has_type("overload") and state.player.resource.current_value >= 2:
+        if _equipment_effects.prevent_overheat_self_damage(state, logger):
+            state.player.temp_ranged_flat = 0
+            return
         var burn := state.player.apply_damage(1, 999)
         if int(burn["damage"]) > 0:
             logger.append(ActionLogEntryScript.new(
@@ -410,12 +567,43 @@ func _end_turn(state: CombatStateScript, logger: ActionLoggerScript) -> void:
     state.player.temp_ranged_flat = 0
 
 func _roll_faces(state: CombatStateScript, rngs: RngStreamsScript, count: int) -> void:
-    var pool := _catalog.dice_for_owner(state.player.unit_id, state.player.loadout_face_ids)
+    var die_ids := _active_die_ids(state)
+    var pool := _catalog.dice_for_owner(state.player.unit_id, _active_loadout_ids(state))
     if pool.is_empty():
         return
     for _i in range(count):
+        if die_ids.is_empty():
+            var idx := rngs.roll_dice(0, pool.size() - 1)
+            state.rolled_faces.append(pool[idx])
+        else:
+            var die_idx := rngs.roll_dice(0, die_ids.size() - 1)
+            var faces := _catalog.faces_for_die(die_ids[die_idx])
+            if faces.is_empty():
+                continue
+            var face_idx := rngs.roll_dice(0, faces.size() - 1)
+            state.rolled_faces.append(faces[face_idx])
+
+func _roll_loadout_dice(state: CombatStateScript, rngs: RngStreamsScript) -> void:
+    var die_ids := _active_die_ids(state)
+    if die_ids.is_empty():
+        _roll_faces(state, rngs, DICE_PER_TURN)
+        return
+    var turn_die_ids := _choose_turn_die_ids(die_ids, rngs)
+    for die_id in turn_die_ids:
+        var faces := _catalog.faces_for_die(die_id)
+        if faces.is_empty():
+            continue
+        var idx := rngs.roll_dice(0, faces.size() - 1)
+        state.rolled_faces.append(faces[idx])
+
+func _choose_turn_die_ids(die_ids: Array[String], rngs: RngStreamsScript) -> Array[String]:
+    var pool := die_ids.duplicate()
+    var out: Array[String] = []
+    while not pool.is_empty() and out.size() < DICE_PER_TURN:
         var idx := rngs.roll_dice(0, pool.size() - 1)
-        state.rolled_faces.append(pool[idx])
+        out.append(pool[idx])
+        pool.remove_at(idx)
+    return out
 
 func _pick_best_face(state: CombatStateScript) -> DiceFaceDefinitionScript:
     var best: DiceFaceDefinitionScript = null
@@ -493,14 +681,14 @@ func _apply_dice_type_resonance(state: CombatStateScript, face: DiceFaceDefiniti
 
     var payload := {"face_id": face.face_id, "die_type": d_type}
     if d_type == "burst":
-        if state.bonus_rolls >= 2:
+        if state.rerolls_left >= BASE_REROLLS_PER_TURN:
             return
-        state.bonus_rolls += 1
-        payload["bonus_rolls"] = state.bonus_rolls
+        state.rerolls_left = min(BASE_REROLLS_PER_TURN, state.rerolls_left + 1)
+        payload["rerolls_left"] = state.rerolls_left
     elif d_type == "setup":
-        if state.rerolls_left >= 2:
+        if state.rerolls_left >= BASE_REROLLS_PER_TURN:
             return
-        state.rerolls_left += 1
+        state.rerolls_left = min(BASE_REROLLS_PER_TURN, state.rerolls_left + 1)
         payload["rerolls_left"] = state.rerolls_left
     elif d_type == "defense":
         var gain := state.player.add_block(2)
@@ -522,10 +710,40 @@ func _apply_dice_type_resonance(state: CombatStateScript, face: DiceFaceDefiniti
 func _reroll_one(state: CombatStateScript, rngs: RngStreamsScript) -> bool:
     if state.rolled_faces.is_empty():
         return false
-    var pool := _catalog.dice_for_owner(state.player.unit_id, state.player.loadout_face_ids)
+    var target_idx := rngs.roll_dice(0, state.rolled_faces.size() - 1)
+    var current: DiceFaceDefinitionScript = state.rolled_faces[target_idx]
+    var pool := _catalog.faces_for_die(current.die_id)
+    if pool.is_empty():
+        pool = _catalog.dice_for_owner(state.player.unit_id, _active_loadout_ids(state))
     if pool.is_empty():
         return false
-    var target_idx := rngs.roll_dice(0, state.rolled_faces.size() - 1)
     var next_idx := rngs.roll_dice(0, pool.size() - 1)
     state.rolled_faces[target_idx] = pool[next_idx]
     return true
+
+func _consume_reroll_cost(state: CombatStateScript, logger: Variant) -> void:
+    if logger != null and _equipment_effects.should_free_reroll(state, logger):
+        return
+    if logger == null and _equipment_effects.has_equipment(state, "lucky_knuckle") and bool(state.equipment_battle_flags.get("lucky_knuckle_ready", false)):
+        state.equipment_battle_flags["lucky_knuckle_ready"] = false
+        return
+    state.rerolls_left -= 1
+
+func _active_loadout_ids(state: CombatStateScript) -> Array[String]:
+    if not state.player.loadout_die_ids.is_empty():
+        return state.player.loadout_die_ids
+    return state.player.loadout_face_ids
+
+func _active_die_ids(state: CombatStateScript) -> Array[String]:
+    var raw_ids := _active_loadout_ids(state)
+    if raw_ids.is_empty():
+        return _catalog.die_ids_for_owner(state.player.unit_id, [])
+    var out: Array[String] = []
+    for id_any in raw_ids:
+        var id := String(id_any)
+        if not _catalog.faces_for_die(id).is_empty():
+            out.append(id)
+        else:
+            for die_id in _catalog.die_ids_for_owner(state.player.unit_id, [id]):
+                out.append(die_id)
+    return out

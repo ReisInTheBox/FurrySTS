@@ -1,0 +1,336 @@
+{
+	"row_count": 55,
+	"rows": [
+		{
+			"id": "rr_battle_credits",
+			"reward_id": "rw_credits_small",
+			"source_node_type": "battle",
+			"weight": "20"
+		},
+		{
+			"id": "rr_battle_ranged",
+			"reward_id": "rw_growth_ranged",
+			"source_node_type": "battle",
+			"weight": "30"
+		},
+		{
+			"id": "rr_battle_hull",
+			"reward_id": "rw_growth_hull",
+			"source_node_type": "battle",
+			"weight": "16"
+		},
+		{
+			"id": "rr_battle_overload",
+			"reward_id": "rw_growth_overload",
+			"source_node_type": "battle",
+			"weight": "18"
+		},
+		{
+			"id": "rr_battle_guard",
+			"reward_id": "rw_growth_guard",
+			"source_node_type": "battle",
+			"weight": "20"
+		},
+		{
+			"id": "rr_battle_cap",
+			"reward_id": "rw_growth_cap",
+			"source_node_type": "battle",
+			"weight": "10"
+		},
+		{
+			"id": "rr_battle_cyan_clean",
+			"reward_id": "rw_cyan_clean_core",
+			"source_node_type": "battle",
+			"weight": "5"
+		},
+		{
+			"id": "rr_battle_helios_clean",
+			"reward_id": "rw_helios_clean_wild",
+			"source_node_type": "battle",
+			"weight": "5"
+		},
+		{
+			"id": "rr_battle_aurian_clean",
+			"reward_id": "rw_aurian_clean_might",
+			"source_node_type": "battle",
+			"weight": "5"
+		},
+		{
+			"id": "rr_elite_cap",
+			"reward_id": "rw_growth_cap",
+			"source_node_type": "elite",
+			"weight": "25"
+		},
+		{
+			"id": "rr_elite_cyan_clean",
+			"reward_id": "rw_cyan_clean_core",
+			"source_node_type": "elite",
+			"weight": "15"
+		},
+		{
+			"id": "rr_elite_helios_clean",
+			"reward_id": "rw_helios_clean_wild",
+			"source_node_type": "elite",
+			"weight": "15"
+		},
+		{
+			"id": "rr_elite_aurian_clean",
+			"reward_id": "rw_aurian_clean_might",
+			"source_node_type": "elite",
+			"weight": "15"
+		},
+		{
+			"id": "rr_boss_credits",
+			"reward_id": "rw_credits_small",
+			"source_node_type": "boss",
+			"weight": "30"
+		},
+		{
+			"id": "rr_boss_cap",
+			"reward_id": "rw_growth_cap",
+			"source_node_type": "boss",
+			"weight": "20"
+		},
+		{
+			"id": "rr_supply_credits",
+			"reward_id": "rw_credits_small",
+			"source_node_type": "supply",
+			"weight": "70"
+		},
+		{
+			"id": "rr_supply_cap",
+			"reward_id": "rw_growth_cap",
+			"source_node_type": "supply",
+			"weight": "30"
+		},
+		{
+			"id": "rr_supply_cyan_clean",
+			"reward_id": "rw_cyan_clean_core",
+			"source_node_type": "supply",
+			"weight": "10"
+		},
+		{
+			"id": "rr_supply_helios_clean",
+			"reward_id": "rw_helios_clean_wild",
+			"source_node_type": "supply",
+			"weight": "10"
+		},
+		{
+			"id": "rr_supply_aurian_clean",
+			"reward_id": "rw_aurian_clean_might",
+			"source_node_type": "supply",
+			"weight": "10"
+		},
+		{
+			"id": "rr_shop_credits",
+			"reward_id": "rw_credits_small",
+			"source_node_type": "shop",
+			"weight": "15"
+		},
+		{
+			"id": "rr_shop_cap",
+			"reward_id": "rw_growth_cap",
+			"source_node_type": "shop",
+			"weight": "20"
+		},
+		{
+			"id": "rr_shop_cyan_clean",
+			"reward_id": "rw_cyan_clean_core",
+			"source_node_type": "shop",
+			"weight": "20"
+		},
+		{
+			"id": "rr_shop_helios_clean",
+			"reward_id": "rw_helios_clean_wild",
+			"source_node_type": "shop",
+			"weight": "20"
+		},
+		{
+			"id": "rr_shop_aurian_clean",
+			"reward_id": "rw_aurian_clean_might",
+			"source_node_type": "shop",
+			"weight": "20"
+		},
+		{
+			"id": "rr_event_overload",
+			"reward_id": "rw_growth_overload",
+			"source_node_type": "event",
+			"weight": "50"
+		},
+		{
+			"id": "rr_event_hull",
+			"reward_id": "rw_growth_hull",
+			"source_node_type": "event",
+			"weight": "50"
+		},
+		{
+			"id": "rr_battle_eq_field_jacket",
+			"reward_id": "rw_eq_field_jacket",
+			"source_node_type": "battle",
+			"weight": "10"
+		},
+		{
+			"id": "rr_battle_eq_lucky",
+			"reward_id": "rw_eq_lucky_knuckle",
+			"source_node_type": "battle",
+			"weight": "10"
+		},
+		{
+			"id": "rr_battle_eq_scope",
+			"reward_id": "rw_eq_hunter_scope",
+			"source_node_type": "battle",
+			"weight": "8"
+		},
+		{
+			"id": "rr_battle_eq_heat",
+			"reward_id": "rw_eq_heat_sink",
+			"source_node_type": "battle",
+			"weight": "8"
+		},
+		{
+			"id": "rr_elite_eq_weapon",
+			"reward_id": "rw_eq_blood_whetstone",
+			"source_node_type": "elite",
+			"weight": "12"
+		},
+		{
+			"id": "rr_elite_eq_glass",
+			"reward_id": "rw_eq_glass_fang",
+			"source_node_type": "elite",
+			"weight": "12"
+		},
+		{
+			"id": "rr_elite_eq_guard",
+			"reward_id": "rw_eq_spiked_guard",
+			"source_node_type": "elite",
+			"weight": "12"
+		},
+		{
+			"id": "rr_elite_eq_forge",
+			"reward_id": "rw_eq_forge_needle",
+			"source_node_type": "elite",
+			"weight": "10"
+		},
+		{
+			"id": "rr_boss_eq_pulse",
+			"reward_id": "rw_eq_pulse_carbine",
+			"source_node_type": "boss",
+			"weight": "20"
+		},
+		{
+			"id": "rr_boss_eq_totem",
+			"reward_id": "rw_eq_guardian_totem",
+			"source_node_type": "boss",
+			"weight": "20"
+		},
+		{
+			"id": "rr_boss_eq_battery",
+			"reward_id": "rw_eq_emergency_battery",
+			"source_node_type": "boss",
+			"weight": "18"
+		},
+		{
+			"id": "rr_supply_eq_jacket",
+			"reward_id": "rw_eq_field_jacket",
+			"source_node_type": "supply",
+			"weight": "20"
+		},
+		{
+			"id": "rr_supply_eq_lucky",
+			"reward_id": "rw_eq_lucky_knuckle",
+			"source_node_type": "supply",
+			"weight": "20"
+		},
+		{
+			"id": "rr_shop_eq_pulse",
+			"reward_id": "rw_eq_pulse_carbine",
+			"source_node_type": "shop",
+			"weight": "20"
+		},
+		{
+			"id": "rr_shop_eq_scope",
+			"reward_id": "rw_eq_hunter_scope",
+			"source_node_type": "shop",
+			"weight": "20"
+		},
+		{
+			"id": "rr_shop_eq_banner",
+			"reward_id": "rw_eq_iron_banner",
+			"source_node_type": "shop",
+			"weight": "20"
+		},
+		{
+			"id": "rr_shop_eq_drone",
+			"reward_id": "rw_eq_micro_drone",
+			"source_node_type": "shop",
+			"weight": "18"
+		},
+		{
+			"id": "rr_shop_eq_whistle",
+			"reward_id": "rw_eq_companion_whistle",
+			"source_node_type": "shop",
+			"weight": "18"
+		},
+		{
+			"id": "rr_shop_eq_battery",
+			"reward_id": "rw_eq_emergency_battery",
+			"source_node_type": "shop",
+			"weight": "18"
+		},
+		{
+			"id": "rr_event_eq_compass",
+			"reward_id": "rw_eq_old_compass",
+			"source_node_type": "event",
+			"weight": "24"
+		},
+		{
+			"id": "rr_event_eq_ledger",
+			"reward_id": "rw_eq_risk_ledger",
+			"source_node_type": "event",
+			"weight": "18"
+		},
+		{
+			"id": "rr_event_eq_harness",
+			"reward_id": "rw_eq_throwing_harness",
+			"source_node_type": "event",
+			"weight": "16"
+		},
+		{
+			"id": "rr_event_eq_totem",
+			"reward_id": "rw_eq_guardian_totem",
+			"source_node_type": "event",
+			"weight": "16"
+		},
+		{
+			"id": "rr_event_enchant_spark",
+			"reward_id": "rw_enchant_spark",
+			"source_node_type": "event",
+			"weight": "16"
+		},
+		{
+			"id": "rr_elite_enchant_echo",
+			"reward_id": "rw_enchant_echo",
+			"source_node_type": "elite",
+			"weight": "12"
+		},
+		{
+			"id": "rr_shop_enchant_guard",
+			"reward_id": "rw_enchant_guard",
+			"source_node_type": "shop",
+			"weight": "16"
+		},
+		{
+			"id": "rr_shop_enchant_mark",
+			"reward_id": "rw_enchant_mark",
+			"source_node_type": "shop",
+			"weight": "14"
+		},
+		{
+			"id": "rr_boss_enchant_focus",
+			"reward_id": "rw_enchant_focus",
+			"source_node_type": "boss",
+			"weight": "18"
+		}
+	],
+	"source": "res://content/csv/run_rewards.csv"
+}

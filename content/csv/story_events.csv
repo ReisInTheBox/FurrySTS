@@ -1,0 +1,3 @@
+id,trigger_type,relationship_node_id,text
+se_aurian_intro,relationship_node_completed,rel_aurian_intro,Aurian looks up from the ash and acknowledges the command.
+se_aurian_trust,relationship_node_completed,rel_aurian_trust,Aurian rises with a rekindled oath.

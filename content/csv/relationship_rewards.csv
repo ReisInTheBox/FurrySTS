@@ -1,0 +1,3 @@
+id,type,target,delta,duration_scope,grant_once,title,description
+rr_aurian_guard,stat,block,1,run,true,Aurian Guard,Aurian starts each run with +1 block.
+rr_aurian_stance,resource,resource_cap,1,run,true,Aurian Resolve,Aurian gains +1 stance cap.

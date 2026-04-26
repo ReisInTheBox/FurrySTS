@@ -1,0 +1,18 @@
+{
+	"row_count": 2,
+	"rows": [
+		{
+			"id": "se_aurian_intro",
+			"relationship_node_id": "rel_aurian_intro",
+			"text": "Aurian looks up from the ash and acknowledges the command.",
+			"trigger_type": "relationship_node_completed"
+		},
+		{
+			"id": "se_aurian_trust",
+			"relationship_node_id": "rel_aurian_trust",
+			"text": "Aurian rises with a rekindled oath.",
+			"trigger_type": "relationship_node_completed"
+		}
+	],
+	"source": "res://content/csv/story_events.csv"
+}

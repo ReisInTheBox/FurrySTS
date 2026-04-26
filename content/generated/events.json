@@ -1,0 +1,16 @@
+{
+	"row_count": 2,
+	"rows": [
+		{
+			"id": "ev_signal",
+			"reward_source": "event",
+			"text": "你沿着信号找到一处半毁的前哨，里面还留着一些可回收资源"
+		},
+		{
+			"id": "ev_cache",
+			"reward_source": "event",
+			"text": "你撬开模块箱，找到一件还能工作的强化模块"
+		}
+	],
+	"source": "res://content/csv/events.csv"
+}

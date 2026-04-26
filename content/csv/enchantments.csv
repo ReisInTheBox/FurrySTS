@@ -1,0 +1,7 @@
+﻿enchant_id,name,trigger,op_type,value,tags,rarity,exclusive_group
+ench_spark_edge,Spark Edge,OnDiceResolved,damage,1,attack|flat,common,flat_damage
+ench_guard_rune,Guard Rune,OnDiceResolved,add_block,2,defense|block,common,guard
+ench_marking_rune,Marking Rune,OnDiceResolved,add_mark,1,mark|attack,uncommon,mark
+ench_echo_chip,Echo Chip,OnDiceResolved,damage_multihit,1x2,attack|multi_hit,rare,echo
+ench_focus_thread,Focus Thread,OnDiceResolved,grant_reroll,1,setup|reroll,uncommon,reroll
+ench_piercing_rune,Piercing Rune,OnDiceResolved,set_next_attack_ignore_block,2,pierce|finisher,uncommon,pierce

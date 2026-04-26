@@ -1,0 +1,58 @@
+{
+	"row_count": 4,
+	"rows": [
+		{
+			"base_cost": "18",
+			"cost_step": "8",
+			"description": "本英雄最大生命 +2",
+			"duration_scope": "run",
+			"grant_once": "false",
+			"growth_delta": "2",
+			"growth_target": "base_hp",
+			"growth_type": "stat",
+			"id": "hp_boost",
+			"max_level": "3",
+			"title": "舰体强化"
+		},
+		{
+			"base_cost": "14",
+			"cost_step": "8",
+			"description": "本英雄开场护甲 +2",
+			"duration_scope": "run",
+			"grant_once": "false",
+			"growth_delta": "2",
+			"growth_target": "block",
+			"growth_type": "stat",
+			"id": "guard_boost",
+			"max_level": "3",
+			"title": "护甲预载"
+		},
+		{
+			"base_cost": "24",
+			"cost_step": "10",
+			"description": "本英雄资源上限 +1",
+			"duration_scope": "run",
+			"grant_once": "false",
+			"growth_delta": "1",
+			"growth_target": "resource_cap",
+			"growth_type": "resource",
+			"id": "resource_cap",
+			"max_level": "2",
+			"title": "资源上限"
+		},
+		{
+			"base_cost": "30",
+			"cost_step": "15",
+			"description": "Home storage capacity +4",
+			"duration_scope": "permanent",
+			"grant_once": "false",
+			"growth_delta": "4",
+			"growth_target": "storage_capacity",
+			"growth_type": "equipment",
+			"id": "equipment_storage",
+			"max_level": "4",
+			"title": "Equipment storage"
+		}
+	],
+	"source": "res://content/csv/outgame_growth.csv"
+}

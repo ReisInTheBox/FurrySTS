@@ -1,4 +1,4 @@
-id,name,base_hp,resource_type,resource_init,resource_cap,dice_pool
-cyan_ryder,Cyan Ryder,22,overload,0,3,cyan_beam_a|cyan_beam_b|cyan_shift|cyan_burst|cyan_pulse|cyan_cooldown|cyan_arcflare|cyan_vent
-helios_windchaser,Helios Windchaser,25,quiver,3,3,helios_mark|helios_sniper|helios_swoop|helios_recover|helios_pierce|helios_hunt|helios_trap|helios_volley
-umbral_draxx,Umbral Draxx,24,stance,0,2,black_sweep|black_charge|black_shock|black_guard|black_execute|black_pose|black_parry|black_reap
+id,name,base_hp,resource_type,resource_init,resource_cap,starting_dice_loadout,dice_pool
+cyan_ryder,Cyan Ryder,22,overload,0,3,cyan_pulse_die|cyan_shift_die|cyan_core_die,cyan_pulse_die|cyan_shift_die|cyan_core_die
+helios_windchaser,Helios Windchaser,25,quiver,3,3,helios_hunt_die|helios_mark_die|helios_wild_die,helios_hunt_die|helios_mark_die|helios_wild_die
+umbral_draxx,Aurian,24,stance,0,2,aurian_blade_die|aurian_guard_die|aurian_might_die,aurian_blade_die|aurian_guard_die|aurian_might_die

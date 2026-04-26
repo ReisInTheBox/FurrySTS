@@ -21,15 +21,16 @@ func create_npc(unit_id: String, loadout_face_ids: Array[String] = []) -> Combat
     var unit := CombatUnitScript.new(unit_id, hp, 0, resource_type, resource_init, resource_cap)
     unit.power_mul = float(row.get("base_power_mul", "1.0"))
     if loadout_face_ids.is_empty():
-        for face_any in String(row.get("dice_pool", "")).split("|", false):
-            var face_id := String(face_any).strip_edges()
-            if face_id != "":
-                unit.loadout_face_ids.append(face_id)
+        for die_any in String(row.get("starting_dice_loadout", row.get("dice_pool", ""))).split("|", false):
+            var die_id := String(die_any).strip_edges()
+            if die_id != "":
+                unit.loadout_die_ids.append(die_id)
     else:
         for face_id_any in loadout_face_ids:
             var face_id := String(face_id_any).strip_edges()
             if face_id != "":
                 unit.loadout_face_ids.append(face_id)
+                unit.loadout_die_ids.append(face_id)
     return unit
 
 func create_enemy(unit_id: String) -> CombatUnitScript:

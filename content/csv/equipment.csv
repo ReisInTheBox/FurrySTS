@@ -1,0 +1,18 @@
+equipment_id,display_name,equip_slot,item_mode,rarity,tags,effect_bundle_id,damaged_effect_bundle_id,damage_profile_id,unlock_id,weight,min_layer,max_layer,description
+pulse_carbine,Pulse Carbine,weapon,none,uncommon,weapon|tech|multi_hit|overload,eq_pulse_carbine,eq_pulse_carbine_damaged,standard,,14,1,12,First multi-hit each battle grants 1 overload.
+hunter_scope,Hunter Scope,weapon,none,uncommon,weapon|mark|precision,eq_hunter_scope,eq_hunter_scope_damaged,standard,,14,1,12,First mark each battle gains +2 or first attack applies mark 1.
+blood_whetstone,Blood Whetstone,weapon,none,rare,weapon|self_damage|finisher,eq_blood_whetstone,eq_blood_whetstone_damaged,standard,,8,5,12,First self damage each turn empowers the next attack.
+glass_fang,Glass Fang,weapon,none,rare,weapon|risk|attack,eq_glass_fang,eq_glass_fang_damaged,standard,,8,5,12,Attack faces hit harder but idle turns hurt.
+throwing_harness,Throwing Harness,weapon,none,uncommon,weapon|pierce|finisher,eq_throwing_harness,eq_throwing_harness_damaged,standard,,12,1,12,First finisher each battle pierces and refunds resource.
+heat_sink_plating,Heat Sink Plating,armor,none,uncommon,armor|overheat|cleanse,eq_heat_sink,eq_heat_sink_damaged,standard,,14,1,12,First overheat or self damage penalty becomes block loss.
+iron_banner,Iron Banner,armor,none,uncommon,armor|block|counter,eq_iron_banner,eq_iron_banner_damaged,standard,,14,1,12,First 8+ block turn grants counter pressure.
+guardian_totem,Guardian Totem,armor,none,uncommon,armor|summon|protect,eq_guardian_totem,eq_guardian_totem_damaged,standard,,12,1,12,Summons absorb the first incoming hit.
+field_jacket,Field Jacket,armor,none,common,armor|stable|defense,eq_field_jacket,eq_field_jacket_damaged,standard,,22,1,12,Battle start block.
+spiked_guard,Spiked Guard,armor,none,rare,armor|counter|risk,eq_spiked_guard,eq_spiked_guard_damaged,standard,,8,5,12,Block turns into retaliation pressure.
+lucky_knuckle,Lucky Knuckle,item,passive,common,item|reroll|stable,eq_lucky_knuckle,eq_lucky_knuckle_damaged,standard,,20,1,12,First reroll each battle is protected.
+old_compass,Old Compass,item,passive,common,item|event|route,eq_old_compass,eq_old_compass_damaged,standard,,16,1,12,Events offer a safer extra line.
+micro_drone_dock,Micro Drone Dock,item,active,uncommon,item|summon|tech,eq_micro_drone,eq_micro_drone_damaged,standard,,12,1,12,Active once per battle to add a temporary drone.
+companion_whistle,Companion Whistle,item,active,uncommon,item|summon|mark,eq_companion_whistle,eq_companion_whistle_damaged,standard,,12,1,12,Active once per battle to command a summon.
+forge_needle,Forge Needle,item,passive,rare,item|enchant|craft,eq_forge_needle,eq_forge_needle_damaged,standard,,7,5,12,First face reward each layer can become an enchant.
+risk_ledger,Risk Ledger,item,passive,uncommon,item|negative|reroll,eq_risk_ledger,eq_risk_ledger_damaged,standard,,12,1,12,Every two negative faces grant a reroll.
+emergency_battery,Emergency Battery,item,active,common,item|resource|risk,eq_emergency_battery,eq_emergency_battery_damaged,standard,,18,1,12,Active once per battle to gain 2 resource with next-turn strain.

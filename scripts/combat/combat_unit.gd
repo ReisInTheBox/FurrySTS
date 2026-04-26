@@ -15,10 +15,14 @@ var temp_ranged_flat: int = 0
 var pending_lock_faces: int = 0
 var next_attack_mult: float = 1.0
 var next_attack_ignore_block: int = 0
+var next_attack_flat: int = 0
+var equipment_attack_flat: int = 0
 var thorns_value: int = 0
 var overclock_charges: int = 0
 var focus_stacks: int = 0
 var loadout_face_ids: Array[String] = []
+var loadout_die_ids: Array[String] = []
+var enchant_bindings: Array[Dictionary] = []
 
 func _init(
     p_unit_id: String,

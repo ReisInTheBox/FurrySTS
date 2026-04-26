@@ -1,0 +1,10 @@
+enemy_id,turn_mod,priority,intent_type,attack_value,block_value,status_type,status_value,telegraph,counter_tag
+boss_vanguard,1,10,attack,6,0,,,Blade sweep,
+boss_vanguard,2,10,block,4,5,,,Guard stance,attack
+boss_vanguard,0,10,charge,12,0,,,Charged cleave,defense
+reef_stalker,1,10,debuff,5,0,pollute_die,1,Venom spines,cleanse
+reef_stalker,2,10,attack,7,0,,,Pounce,
+reef_stalker,0,10,block,4,4,,,Shell roll,attack
+void_howler,1,10,charge,10,0,,,Void howl,setup
+void_howler,2,10,debuff,4,0,lock_die,1,Gravity snare,control
+void_howler,0,10,attack,8,0,,,Rift bite,

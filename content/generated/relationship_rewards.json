@@ -1,0 +1,26 @@
+{
+	"row_count": 2,
+	"rows": [
+		{
+			"delta": "1",
+			"description": "Aurian starts each run with +1 block.",
+			"duration_scope": "run",
+			"grant_once": "true",
+			"id": "rr_aurian_guard",
+			"target": "block",
+			"title": "Aurian Guard",
+			"type": "stat"
+		},
+		{
+			"delta": "1",
+			"description": "Aurian gains +1 stance cap.",
+			"duration_scope": "run",
+			"grant_once": "true",
+			"id": "rr_aurian_stance",
+			"target": "resource_cap",
+			"title": "Aurian Resolve",
+			"type": "resource"
+		}
+	],
+	"source": "res://content/csv/relationship_rewards.csv"
+}

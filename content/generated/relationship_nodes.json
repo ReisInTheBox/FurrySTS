@@ -1,0 +1,26 @@
+{
+	"row_count": 2,
+	"rows": [
+		{
+			"description": "After the first run Aurian finally speaks beside the Hub fire.",
+			"id": "rel_aurian_intro",
+			"next_node_id": "rel_aurian_trust",
+			"npc_id": "umbral_draxx",
+			"required_value": "1",
+			"reward_id": "rr_aurian_guard",
+			"title": "Aurian: Ember Silence",
+			"trigger_type": "run_count_at_least"
+		},
+		{
+			"description": "After a completed route Aurian accepts the organizer command.",
+			"id": "rel_aurian_trust",
+			"next_node_id": "",
+			"npc_id": "umbral_draxx",
+			"required_value": "1",
+			"reward_id": "rr_aurian_stance",
+			"title": "Aurian: Oath Rekindled",
+			"trigger_type": "completed_runs_at_least"
+		}
+	],
+	"source": "res://content/csv/relationship_nodes.csv"
+}

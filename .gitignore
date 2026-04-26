@@ -1,3 +1,6 @@
 .godot/
 *.tmp
 *.bak
+*.uid
+content/csv/*.csv.import
+content/csv/*.translation

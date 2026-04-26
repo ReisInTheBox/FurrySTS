@@ -1,0 +1,114 @@
+{
+	"row_count": 9,
+	"rows": [
+		{
+			"attack_value": "6",
+			"block_value": "0",
+			"counter_tag": "",
+			"enemy_id": "boss_vanguard",
+			"intent_type": "attack",
+			"priority": "10",
+			"status_type": "Blade sweep",
+			"status_value": "",
+			"telegraph": "",
+			"turn_mod": "1"
+		},
+		{
+			"attack_value": "4",
+			"block_value": "5",
+			"counter_tag": "",
+			"enemy_id": "boss_vanguard",
+			"intent_type": "block",
+			"priority": "10",
+			"status_type": "Guard stance",
+			"status_value": "attack",
+			"telegraph": "",
+			"turn_mod": "2"
+		},
+		{
+			"attack_value": "12",
+			"block_value": "0",
+			"counter_tag": "",
+			"enemy_id": "boss_vanguard",
+			"intent_type": "charge",
+			"priority": "10",
+			"status_type": "Charged cleave",
+			"status_value": "defense",
+			"telegraph": "",
+			"turn_mod": "0"
+		},
+		{
+			"attack_value": "5",
+			"block_value": "0",
+			"counter_tag": "cleanse",
+			"enemy_id": "reef_stalker",
+			"intent_type": "debuff",
+			"priority": "10",
+			"status_type": "pollute_die",
+			"status_value": "1",
+			"telegraph": "Venom spines",
+			"turn_mod": "1"
+		},
+		{
+			"attack_value": "7",
+			"block_value": "0",
+			"counter_tag": "",
+			"enemy_id": "reef_stalker",
+			"intent_type": "attack",
+			"priority": "10",
+			"status_type": "Pounce",
+			"status_value": "",
+			"telegraph": "",
+			"turn_mod": "2"
+		},
+		{
+			"attack_value": "4",
+			"block_value": "4",
+			"counter_tag": "",
+			"enemy_id": "reef_stalker",
+			"intent_type": "block",
+			"priority": "10",
+			"status_type": "Shell roll",
+			"status_value": "attack",
+			"telegraph": "",
+			"turn_mod": "0"
+		},
+		{
+			"attack_value": "10",
+			"block_value": "0",
+			"counter_tag": "",
+			"enemy_id": "void_howler",
+			"intent_type": "charge",
+			"priority": "10",
+			"status_type": "Void howl",
+			"status_value": "setup",
+			"telegraph": "",
+			"turn_mod": "1"
+		},
+		{
+			"attack_value": "4",
+			"block_value": "0",
+			"counter_tag": "control",
+			"enemy_id": "void_howler",
+			"intent_type": "debuff",
+			"priority": "10",
+			"status_type": "lock_die",
+			"status_value": "1",
+			"telegraph": "Gravity snare",
+			"turn_mod": "2"
+		},
+		{
+			"attack_value": "8",
+			"block_value": "0",
+			"counter_tag": "",
+			"enemy_id": "void_howler",
+			"intent_type": "attack",
+			"priority": "10",
+			"status_type": "Rift bite",
+			"status_value": "",
+			"telegraph": "",
+			"turn_mod": "0"
+		}
+	],
+	"source": "res://content/csv/enemy_intents.csv"
+}

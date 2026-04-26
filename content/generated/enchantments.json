@@ -1,0 +1,66 @@
+{
+	"row_count": 6,
+	"rows": [
+		{
+			"enchant_id": "ench_spark_edge",
+			"name": "Spark Edge",
+			"trigger": "OnDiceResolved",
+			"op_type": "damage",
+			"value": "1",
+			"tags": "attack|flat",
+			"rarity": "common",
+			"exclusive_group": "flat_damage"
+		},
+		{
+			"enchant_id": "ench_guard_rune",
+			"name": "Guard Rune",
+			"trigger": "OnDiceResolved",
+			"op_type": "add_block",
+			"value": "2",
+			"tags": "defense|block",
+			"rarity": "common",
+			"exclusive_group": "guard"
+		},
+		{
+			"enchant_id": "ench_marking_rune",
+			"name": "Marking Rune",
+			"trigger": "OnDiceResolved",
+			"op_type": "add_mark",
+			"value": "1",
+			"tags": "mark|attack",
+			"rarity": "uncommon",
+			"exclusive_group": "mark"
+		},
+		{
+			"enchant_id": "ench_echo_chip",
+			"name": "Echo Chip",
+			"trigger": "OnDiceResolved",
+			"op_type": "damage_multihit",
+			"value": "1x2",
+			"tags": "attack|multi_hit",
+			"rarity": "rare",
+			"exclusive_group": "echo"
+		},
+		{
+			"enchant_id": "ench_focus_thread",
+			"name": "Focus Thread",
+			"trigger": "OnDiceResolved",
+			"op_type": "grant_reroll",
+			"value": "1",
+			"tags": "setup|reroll",
+			"rarity": "uncommon",
+			"exclusive_group": "reroll"
+		},
+		{
+			"enchant_id": "ench_piercing_rune",
+			"name": "Piercing Rune",
+			"trigger": "OnDiceResolved",
+			"op_type": "set_next_attack_ignore_block",
+			"value": "2",
+			"tags": "pierce|finisher",
+			"rarity": "uncommon",
+			"exclusive_group": "pierce"
+		}
+	],
+	"source": "res://content/csv/enchantments.csv"
+}

@@ -7,10 +7,11 @@ const CSV_ROOT := "res://content/csv"
 func load_rows(table_name: String) -> Array[Dictionary]:
     var generated := _load_generated(table_name)
     var csv := _load_csv(table_name)
-    if generated.is_empty():
+    # CSV files are the source of truth. Generated JSON is only a fallback cache
+    # and can be stale when Godot misimports data CSVs as translation CSVs.
+    if not csv.is_empty():
         return csv
-    # Prefer CSV when it contains more rows than generated cache.
-    if not csv.is_empty() and csv.size() > generated.size():
+    if generated.is_empty():
         return csv
     return generated
 
@@ -59,11 +60,13 @@ func _load_csv(table_name: String) -> Array[Dictionary]:
         var line := lines[i].strip_edges()
         if line == "":
             continue
-        var cols := line.split(",", false)
+        var cols := line.split(",", true)
         var row: Dictionary = {}
         for c in range(headers.size()):
             var key := headers[c].strip_edges()
             var value := cols[c].strip_edges() if c < cols.size() else ""
+            if value.length() >= 2 and value.begins_with("\"") and value.ends_with("\""):
+                value = value.substr(1, value.length() - 2)
             row[key] = value
         out.append(row)
     return out

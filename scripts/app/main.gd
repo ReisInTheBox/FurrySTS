@@ -10,6 +10,7 @@ func _ready() -> void:
 
     # Keep smoke as startup gate, then show the Hub -> Run root flow in non-headless mode.
     if DisplayServer.get_name() == "headless":
+        get_tree().quit(0 if result else 1)
         return
 
     var root_flow_scene: PackedScene = preload("res://scenes/root_flow.tscn")

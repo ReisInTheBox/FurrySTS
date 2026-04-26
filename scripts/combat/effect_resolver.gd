@@ -6,6 +6,8 @@ const DiceFaceDefinitionScript = preload("res://scripts/combat/dice_face_definit
 const ActionLoggerScript = preload("res://scripts/core/action_logger.gd")
 const ActionLogEntryScript = preload("res://scripts/core/action_log_entry.gd")
 
+const BASE_REROLLS_PER_TURN := 2
+
 func apply_bundle(
 	state: CombatStateScript,
 	face: DiceFaceDefinitionScript,
@@ -39,6 +41,9 @@ func _apply_effect(
 		"add_block":
 			var gain := state.player.add_block(int(effect.get("value", "0")))
 			_log_simple(logger, state, "status_applied", state.player.unit_id, state.player.unit_id, face.face_id, {"add_block": gain})
+		"add_enemy_block":
+			var enemy_gain := state.enemy.add_block(int(effect.get("value", "0")))
+			_log_simple(logger, state, "status_applied", state.player.unit_id, state.enemy.unit_id, face.face_id, {"add_enemy_block": enemy_gain})
 		"mod_resource":
 			_mod_resource(state, String(effect.get("value", "")), face, logger)
 		"add_temp_ranged_flat":
@@ -49,11 +54,11 @@ func _apply_effect(
 			if cond.size() >= 3 and state.player.resource.has_type(cond[0]) and state.player.resource.current_value >= int(cond[1]):
 				_do_damage(state, face, int(cond[2]), 0, logger, [String(effect.get("effect_id", ""))])
 		"grant_reroll":
-			state.rerolls_left += int(effect.get("value", "0"))
+			state.rerolls_left = min(BASE_REROLLS_PER_TURN, state.rerolls_left + int(effect.get("value", "0")))
 			_log_simple(logger, state, "status_applied", state.player.unit_id, state.player.unit_id, face.face_id, {"rerolls_left": state.rerolls_left})
 		"grant_bonus_roll":
-			state.bonus_rolls += int(effect.get("value", "0"))
-			_log_simple(logger, state, "bonus_roll_granted", state.player.unit_id, state.player.unit_id, face.face_id, {"bonus_rolls": state.bonus_rolls})
+			state.rerolls_left = min(BASE_REROLLS_PER_TURN, state.rerolls_left + int(effect.get("value", "0")))
+			_log_simple(logger, state, "bonus_roll_granted", state.player.unit_id, state.player.unit_id, face.face_id, {"rerolls_left": state.rerolls_left})
 		"add_mark":
 			state.enemy.add_mark(int(effect.get("value", "0")))
 			_log_simple(logger, state, "status_applied", state.player.unit_id, state.enemy.unit_id, face.face_id, {"mark": state.enemy.marks})
@@ -71,8 +76,8 @@ func _apply_effect(
 		"conditional_bonus_roll_if_resource_ge":
 			var br_cond := String(effect.get("value", "none:0:0")).split(":", false)
 			if br_cond.size() >= 3 and state.player.resource.has_type(br_cond[0]) and state.player.resource.current_value >= int(br_cond[1]):
-				state.bonus_rolls += int(br_cond[2])
-				_log_simple(logger, state, "bonus_roll_granted", state.player.unit_id, state.player.unit_id, face.face_id, {"bonus_rolls": state.bonus_rolls})
+				state.rerolls_left = min(BASE_REROLLS_PER_TURN, state.rerolls_left + int(br_cond[2]))
+				_log_simple(logger, state, "bonus_roll_granted", state.player.unit_id, state.player.unit_id, face.face_id, {"rerolls_left": state.rerolls_left})
 		"set_next_attack_mult":
 			state.player.next_attack_mult = float(effect.get("value", "1.0"))
 			_log_simple(logger, state, "status_applied", state.player.unit_id, state.player.unit_id, face.face_id, {"next_attack_mult": state.player.next_attack_mult})
@@ -100,6 +105,12 @@ func _apply_effect(
 			_log_simple(logger, state, "status_applied", state.player.unit_id, state.player.unit_id, face.face_id, {"thorns_value": state.player.thorns_value})
 		"damage_self":
 			var self_damage: int = int(max(0, int(effect.get("value", "0"))))
+			if bool(state.equipment_battle_flags.get("prevent_next_self_damage", false)):
+				state.equipment_battle_flags["prevent_next_self_damage"] = false
+				var loss: int = mini(state.player.block, 2)
+				state.player.block = max(0, state.player.block - loss)
+				_log_simple(logger, state, "equipment_triggered", state.player.unit_id, state.player.unit_id, face.face_id, {"equipment_id": "heat_sink_plating", "prevented_self_damage": self_damage, "block_lost": loss})
+				return
 			var self_result := state.player.apply_damage(self_damage, 999)
 			_log_simple(logger, state, "self_damage", state.player.unit_id, state.player.unit_id, face.face_id, {"value": self_damage, "damage": self_result["damage"], "self_hp": state.player.hp})
 		_:
@@ -117,7 +128,7 @@ func _do_damage(
 	var face_bonus_flat := 0
 	if unit_id == "cyan_ryder" and face.has_tag("ranged") and state.player.overclock_charges > 0:
 		state.player.overclock_charges -= 1
-		state.bonus_rolls += 1
+		state.rerolls_left = min(BASE_REROLLS_PER_TURN, state.rerolls_left + 1)
 		face_bonus_flat += 4
 		_log_simple(
 			logger,
@@ -126,7 +137,7 @@ func _do_damage(
 			unit_id,
 			unit_id,
 			face.face_id,
-			{"overclock_charges": state.player.overclock_charges, "bonus_rolls": state.bonus_rolls}
+			{"overclock_charges": state.player.overclock_charges, "rerolls_left": state.rerolls_left}
 		)
 
 	var mark_bonus := state.enemy.consume_mark_on_hit()
@@ -138,7 +149,7 @@ func _do_damage(
 	var execute_bonus := 0
 	var spent_stance := 0
 	var charged_mult := state.player.next_attack_mult
-	if unit_id == "helios_windchaser" and (face.face_id == "helios_sniper" or face.face_id == "helios_pierce"):
+	if unit_id == "helios_windchaser" and face.has_tag("finisher"):
 		var focus_used: int = int(min(3, state.player.focus_stacks))
 		if focus_used > 0:
 			state.player.focus_stacks -= focus_used
@@ -163,7 +174,7 @@ func _do_damage(
 					face.face_id,
 					{"pre_resource": q["before"], "post_resource": q["after"], "resource_type": "quiver", "source": "focus_refund"}
 				)
-	if unit_id == "umbral_draxx" and (face.face_id == "black_execute" or face.face_id == "black_reap"):
+	if unit_id == "umbral_draxx" and face.has_tag("execute"):
 		execute_bonus = int((state.enemy.max_hp - state.enemy.hp) / 4.0)
 		if state.player.resource.has_type("stance"):
 			spent_stance = state.player.resource.current_value
@@ -179,12 +190,14 @@ func _do_damage(
 					{"pre_resource": s["before"], "post_resource": s["after"], "resource_type": "stance", "source": "execute_spend_all"}
 				)
 
-	var flat_total := base_damage + mark_bonus + ranged_bonus + overload_bonus + rupture_bonus + face_bonus_flat + execute_bonus + (spent_stance * 3)
+	var equipment_flat := state.player.equipment_attack_flat + state.player.next_attack_flat
+	var flat_total := base_damage + mark_bonus + ranged_bonus + overload_bonus + rupture_bonus + face_bonus_flat + execute_bonus + equipment_flat + (spent_stance * 3)
 	var multiplied := int(round(flat_total * charged_mult * state.player.power_mul))
 	var ignore_total := ignore_block + state.player.next_attack_ignore_block + (spent_stance * 2)
 	var result := state.enemy.apply_damage(multiplied, ignore_total)
 	state.player.next_attack_mult = 1.0
 	state.player.next_attack_ignore_block = 0
+	state.player.next_attack_flat = 0
 	state.enemy.rupture_bonus = 0
 
 	if unit_id == "helios_windchaser" and mark_bonus > 0:
@@ -214,6 +227,7 @@ func _do_damage(
 				"rupture_bonus": rupture_bonus,
 				"face_bonus_flat": face_bonus_flat,
 				"execute_bonus": execute_bonus,
+				"equipment_flat": equipment_flat,
 				"spent_stance": spent_stance,
 				"multiplier": state.player.power_mul,
 				"next_attack_mult": charged_mult

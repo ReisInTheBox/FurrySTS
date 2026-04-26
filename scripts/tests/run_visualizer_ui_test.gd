@@ -24,6 +24,9 @@ func run() -> bool:
 	var battle = visualizer._active_battle
 	battle._build_ui()
 	battle._start_manual_battle()
+	if battle._return_btn == null or battle._return_btn.disabled:
+		push_error("Managed battle must always allow returning to Run as a surrender escape hatch.")
+		return false
 	battle._state.enemy.hp = 0
 	battle._render_ui()
 	battle._on_return_pressed()
@@ -49,6 +52,9 @@ func run() -> bool:
 	var forced_route: Array[Dictionary] = []
 	forced_route.append(visualizer._run_state.route_nodes[0])
 	forced_route.append({"id": "ui_supply", "node_type": "supply", "pool": "mid", "weight": "1", "next_pool": "late", "allow_evac": "true", "battle_enemy_id": "", "event_id": "", "text": "UI smoke supply"})
+	visualizer._run_state.route_layers = []
+	visualizer._run_state.current_node_uid = ""
+	visualizer._run_state.current_available_uids.clear()
 	visualizer._run_state.route_nodes = forced_route
 	visualizer._run_state.current_node_index = 1
 	visualizer._on_resolve_pressed()

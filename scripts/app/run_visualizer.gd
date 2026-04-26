@@ -73,16 +73,32 @@ func _build_ui() -> void:
 	root.add_theme_constant_override("margin_bottom", 16)
 	add_child(root)
 
-	var main_v := VBoxContainer.new()
-	main_v.add_theme_constant_override("separation", 12)
-	root.add_child(main_v)
-	_root_layout = main_v
+	var page := VBoxContainer.new()
+	page.size_flags_horizontal = SIZE_EXPAND_FILL
+	page.size_flags_vertical = SIZE_EXPAND_FILL
+	page.add_theme_constant_override("separation", 10)
+	root.add_child(page)
+	_root_layout = page
 
-	main_v.add_child(_build_header())
-	main_v.add_child(_build_status_strip())
-	main_v.add_child(_build_route_panel())
-	main_v.add_child(_build_current_node_panel())
-	main_v.add_child(_build_log_panel())
+	page.add_child(_build_header())
+
+	var scroll := ScrollContainer.new()
+	scroll.size_flags_horizontal = SIZE_EXPAND_FILL
+	scroll.size_flags_vertical = SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	page.add_child(scroll)
+
+	var content := VBoxContainer.new()
+	content.size_flags_horizontal = SIZE_EXPAND_FILL
+	content.add_theme_constant_override("separation", 10)
+	scroll.add_child(content)
+	content.add_child(_build_status_strip())
+	content.add_child(_build_route_panel())
+	content.add_child(_build_current_node_panel())
+	content.add_child(_build_log_panel())
+
+	page.add_child(_build_action_bar())
 
 func _build_header() -> Control:
 	var panel := PanelContainer.new()
@@ -210,25 +226,6 @@ func _build_current_node_panel() -> Control:
 	_node_hint_label.modulate = Color(0.92, 0.82, 0.68)
 	v.add_child(_node_hint_label)
 
-	var controls := HBoxContainer.new()
-	controls.add_theme_constant_override("separation", 8)
-	v.add_child(controls)
-
-	_new_run_btn = Button.new()
-	_new_run_btn.text = "新 Run"
-	_new_run_btn.pressed.connect(_start_run)
-	controls.add_child(_new_run_btn)
-
-	_resolve_btn = Button.new()
-	_resolve_btn.text = "推进当前节点"
-	_resolve_btn.pressed.connect(_on_resolve_pressed)
-	controls.add_child(_resolve_btn)
-
-	_evac_btn = Button.new()
-	_evac_btn.text = "立即撤离"
-	_evac_btn.pressed.connect(_on_evac_pressed)
-	controls.add_child(_evac_btn)
-
 	_feedback_label = Label.new()
 	_feedback_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_feedback_label.modulate = Color(0.97, 0.88, 0.74)
@@ -280,6 +277,40 @@ func _build_current_node_panel() -> Control:
 
 	return panel
 
+func _build_action_bar() -> Control:
+	var panel := PanelContainer.new()
+	panel.add_theme_stylebox_override("panel", _style_panel(Color(0.08, 0.095, 0.13), Color(0.55, 0.62, 0.82), 12))
+
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	panel.add_child(row)
+
+	var hint := Label.new()
+	hint.text = "操作栏固定在底部：推进节点、撤离或重新开始 Run。"
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD
+	hint.size_flags_horizontal = SIZE_EXPAND_FILL
+	hint.modulate = Color(0.82, 0.9, 1.0)
+	row.add_child(hint)
+
+	_new_run_btn = Button.new()
+	_new_run_btn.text = "? Run"
+	_new_run_btn.custom_minimum_size = Vector2(110, 42)
+	_new_run_btn.pressed.connect(_start_run)
+	row.add_child(_new_run_btn)
+
+	_resolve_btn = Button.new()
+	_resolve_btn.text = "推进当前节点"
+	_resolve_btn.custom_minimum_size = Vector2(150, 42)
+	_resolve_btn.pressed.connect(_on_resolve_pressed)
+	row.add_child(_resolve_btn)
+
+	_evac_btn = Button.new()
+	_evac_btn.text = "立即撤离"
+	_evac_btn.custom_minimum_size = Vector2(110, 42)
+	_evac_btn.pressed.connect(_on_evac_pressed)
+	row.add_child(_evac_btn)
+	return panel
+
 func _build_log_panel() -> Control:
 	var panel := PanelContainer.new()
 	panel.custom_minimum_size = Vector2(0, 180)
@@ -310,7 +341,7 @@ func _start_run() -> void:
 		_active_battle = null
 	_loader = ContentLoaderScript.new()
 	_simulator = RunSimulatorScript.new(_loader)
-	var bundle: Dictionary = _simulator.create_run(_master_seed, _run_hero_id, 5, _run_setup)
+	var bundle: Dictionary = _simulator.create_run(_master_seed, _run_hero_id, 13, _run_setup)
 	_run_state = bundle["state"]
 	_rngs = bundle["rngs"]
 	_hide_node_result_panel()
@@ -383,6 +414,27 @@ func _render_route_nodes() -> void:
 	for child in _route_flow.get_children():
 		child.queue_free()
 
+	if not _run_state.route_layers.is_empty():
+		for layer_any in _run_state.route_layers:
+			var layer: Array = layer_any
+			if layer.is_empty():
+				continue
+			var layer_box := VBoxContainer.new()
+			layer_box.custom_minimum_size = Vector2(178, 0)
+			layer_box.add_theme_constant_override("separation", 6)
+			_route_flow.add_child(layer_box)
+
+			var first: Dictionary = layer[0]
+			var layer_label := Label.new()
+			layer_label.text = "Layer %02d" % int(first.get("layer_index", 0))
+			layer_label.modulate = Color(0.72, 0.82, 0.96)
+			layer_box.add_child(layer_label)
+
+			for node_any in layer:
+				var node: Dictionary = node_any
+				layer_box.add_child(_build_route_node_button(node))
+		return
+
 	for i in range(_run_state.route_nodes.size()):
 		var node: Dictionary = _run_state.route_nodes[i]
 		var node_type := String(node.get("node_type", ""))
@@ -431,6 +483,48 @@ func _render_route_nodes() -> void:
 		desc.custom_minimum_size = Vector2(0, 42)
 		v.add_child(desc)
 
+func _build_route_node_button(node: Dictionary) -> Button:
+	var node_type := String(node.get("node_type", ""))
+	var uid := String(node.get("route_node_uid", ""))
+	var colors := _node_colors(node_type)
+	var state_label := "Locked"
+	if _run_state.selected_path.has(uid):
+		state_label = "Done"
+	elif uid == _run_state.current_node_uid:
+		state_label = "Current"
+	elif _run_state.is_node_available(uid):
+		state_label = "Available"
+
+	var btn := Button.new()
+	btn.custom_minimum_size = Vector2(168, 82)
+	btn.autowrap_mode = TextServer.AUTOWRAP_WORD
+	btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+	btn.text = "#%d %s [%s]\n%s" % [
+		int(node.get("lane_index", 0)),
+		_node_type_name(node_type),
+		state_label,
+		String(node.get("text", ""))
+	]
+	var border: Color = colors["border"]
+	var bg: Color = colors["bg"]
+	if state_label == "Current":
+		border = Color(1.0, 0.86, 0.42)
+	elif state_label == "Available":
+		border = Color(0.55, 0.9, 1.0)
+	elif state_label == "Done":
+		border = Color(0.48, 0.86, 0.64)
+		bg = Color(0.08, 0.13, 0.11)
+	else:
+		border = Color(0.22, 0.26, 0.34)
+		bg = Color(0.06, 0.065, 0.085)
+	btn.add_theme_stylebox_override("normal", _style_panel(bg, border, 10))
+	btn.add_theme_stylebox_override("hover", _style_panel(bg.lightened(0.08), border.lightened(0.1), 10))
+	btn.add_theme_stylebox_override("disabled", _style_panel(bg.darkened(0.15), border.darkened(0.2), 10))
+	btn.disabled = state_label == "Locked" or state_label == "Done" or not _run_state.pending_reward_choices.is_empty()
+	if not btn.disabled:
+		btn.pressed.connect(_on_route_node_pressed.bind(uid))
+	return btn
+
 func _render_rewards() -> void:
 	for child in _reward_row.get_children():
 		child.queue_free()
@@ -443,16 +537,23 @@ func _render_rewards() -> void:
 		var reward: Dictionary = _run_state.pending_reward_choices[i]
 		var btn := Button.new()
 		btn.custom_minimum_size = Vector2(250, 108)
-		btn.text = "[%s | %s]\n%s\n%s" % [
+		var price := int(reward.get("price", 0))
+		var price_text := ""
+		if price > 0:
+			price_text = "\nCost: %d credits" % price
+		btn.text = "[%s | %s]\n%s\n%s%s" % [
 			str(reward.get("rarity_label", "普通")),
 			str(reward.get("scope_label", "下一场")),
 			str(reward.get("title", "奖励")),
-			str(reward.get("description", ""))
+			str(reward.get("description", "")),
+			price_text
 		]
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		btn.add_theme_stylebox_override("normal", _style_panel(Color(0.19, 0.15, 0.09), Color(0.76, 0.62, 0.26), 10))
 		btn.add_theme_stylebox_override("hover", _style_panel(Color(0.24, 0.18, 0.11), Color(0.92, 0.77, 0.33), 10))
+		btn.add_theme_stylebox_override("disabled", _style_panel(Color(0.11, 0.1, 0.09), Color(0.3, 0.28, 0.24), 10))
+		btn.disabled = price > _run_state.progress.get_currency("credits")
 		btn.pressed.connect(_on_reward_selected.bind(i))
 		_reward_row.add_child(btn)
 
@@ -472,7 +573,7 @@ func _on_resolve_pressed() -> void:
 		_feedback_label.text = "当前没有可推进的节点。"
 		_render_ui()
 		return
-	if String(node.get("node_type", "")) == "battle":
+	if ["battle", "elite", "boss"].has(String(node.get("node_type", ""))):
 		_open_battle_node(node)
 		return
 	var result: Dictionary = _simulator.resolve_current_node(_run_state, _rngs)
@@ -521,7 +622,19 @@ func _on_reward_selected(index: int) -> void:
 		_feedback_label.text = "已领取奖励：%s" % str(reward.get("title", "奖励"))
 		_emit_run_finished_if_needed()
 	else:
-		_feedback_label.text = "奖励领取失败：%s" % str(result.get("reason", "unknown"))
+		var reason := str(result.get("reason", "unknown"))
+		if reason == "not_enough_credits":
+			_feedback_label.text = "Credits 不足：需要 %d。" % int(result.get("price", 0))
+		else:
+			_feedback_label.text = "奖励领取失败：%s" % reason
+	_render_ui()
+
+func _on_route_node_pressed(route_node_uid: String) -> void:
+	var result: Dictionary = _simulator.select_route_node(_run_state, route_node_uid)
+	if bool(result.get("ok", false)):
+		_feedback_label.text = "Selected route node: %s" % route_node_uid
+	else:
+		_feedback_label.text = "This route node is not currently reachable."
 	_render_ui()
 
 func _on_evac_pressed() -> void:
@@ -538,9 +651,9 @@ func _open_battle_node(node: Dictionary) -> void:
 	_active_battle = battle
 	add_child(battle)
 	var enemy_id := String(node.get("battle_enemy_id", "boss_vanguard"))
-	var title := "%s：%s" % [_node_type_name("battle"), String(node.get("text", ""))]
+	var title := "%s: %s" % [_node_type_name(String(node.get("node_type", "battle"))), String(node.get("text", ""))]
 	var battle_seed := _battle_seed_for_node(node)
-	battle.configure_for_run(battle_seed, _run_state.hero_id, enemy_id, _run_state.progress, title, _run_state.loadout_face_ids)
+	battle.configure_for_run(battle_seed, _run_state.hero_id, enemy_id, _run_state.progress, title, _run_state.loadout_face_ids, _run_state.equipped_equipment_instances())
 	battle.battle_closed.connect(_on_battle_closed)
 	_feedback_label.text = "已进入战斗节点，请在战斗界面完成结算。"
 	_render_ui()
@@ -593,7 +706,7 @@ func _current_node_detail() -> String:
 	var node_type := String(node.get("node_type", ""))
 	var details: Array[String] = []
 	details.append("节点类型：%s" % _node_type_name(node_type))
-	if node_type == "battle":
+	if ["battle", "elite", "boss"].has(node_type):
 		details.append("敌人：%s" % _enemy_name(String(node.get("battle_enemy_id", "boss_vanguard"))))
 		details.append("结算方式：进入真实战斗界面，打完后回到 Run。")
 	elif node_type == "event":
@@ -601,6 +714,10 @@ func _current_node_detail() -> String:
 		details.append(_event_text(String(node.get("event_id", ""))))
 	elif node_type == "supply":
 		details.append("补给节点会直接从补给奖池中结算一份奖励。")
+	elif node_type == "shop":
+		details.append("商店节点提供更定向的构筑奖励选择。")
+	elif node_type == "rest":
+		details.append("休息节点用于在高压层之间恢复节奏。")
 	details.append("可撤离：%s" % ("是" if _run_state.can_evac() else "否"))
 	return "\n".join(details)
 
@@ -610,7 +727,7 @@ func _current_node_hint() -> String:
 	var node_type := _current_node_type()
 	if not _run_state.pending_reward_choices.is_empty():
 		return "当前有待领取奖励，先选 1 个奖励，才能继续推进路线。"
-	if node_type == "battle":
+	if ["battle", "elite", "boss"].has(node_type):
 		return "这是压力节点：会消耗真实战斗时间，但也是主要成长来源。"
 	if node_type == "event":
 		return "这是缓冲节点：先做轻量事件结算，验证奖励与文本反馈。"
@@ -620,7 +737,7 @@ func _current_node_hint() -> String:
 
 func _resolve_feedback(result: Dictionary) -> String:
 	var node_type := String(result.get("node_type", ""))
-	if node_type == "battle":
+	if ["battle", "elite", "boss"].has(node_type):
 		return "战斗节点已结算：%s" % String(result.get("battle_result", ""))
 	if node_type == "event":
 		var reward: Dictionary = result.get("reward", {})
@@ -659,7 +776,7 @@ func _hero_name(hero_id: String) -> String:
 		"helios_windchaser":
 			return "Helios Windchaser（狮鹫）"
 		"umbral_draxx":
-			return "黑龙（暂名）"
+			return "Aurian（奥瑞恩）"
 		_:
 			return hero_id
 
@@ -686,12 +803,20 @@ func _node_type_name(node_type: String) -> String:
 	match node_type:
 		"battle":
 			return "战斗"
+		"elite":
+			return "精英"
 		"event":
 			return "事件"
 		"supply":
 			return "补给"
+		"shop":
+			return "商店"
+		"rest":
+			return "休息"
 		"evac":
 			return "撤离"
+		"boss":
+			return "Boss"
 		"completed":
 			return "完成"
 		_:
@@ -705,6 +830,12 @@ func _node_colors(node_type: String) -> Dictionary:
 				"border": Color(0.82, 0.34, 0.38),
 				"text": Color(1.0, 0.85, 0.86)
 			}
+		"elite":
+			return {
+				"bg": Color(0.25, 0.12, 0.08),
+				"border": Color(0.95, 0.55, 0.26),
+				"text": Color(1.0, 0.9, 0.78)
+			}
 		"event":
 			return {
 				"bg": Color(0.11, 0.16, 0.24),
@@ -716,6 +847,24 @@ func _node_colors(node_type: String) -> Dictionary:
 				"bg": Color(0.12, 0.18, 0.13),
 				"border": Color(0.45, 0.83, 0.56),
 				"text": Color(0.9, 1.0, 0.92)
+			}
+		"shop":
+			return {
+				"bg": Color(0.18, 0.14, 0.08),
+				"border": Color(0.85, 0.66, 0.28),
+				"text": Color(1.0, 0.94, 0.78)
+			}
+		"rest":
+			return {
+				"bg": Color(0.09, 0.16, 0.16),
+				"border": Color(0.42, 0.82, 0.78),
+				"text": Color(0.86, 1.0, 0.98)
+			}
+		"boss":
+			return {
+				"bg": Color(0.2, 0.08, 0.2),
+				"border": Color(0.9, 0.48, 0.95),
+				"text": Color(1.0, 0.86, 1.0)
 			}
 		"completed":
 			return {

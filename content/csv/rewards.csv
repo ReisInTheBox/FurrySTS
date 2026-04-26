@@ -1,7 +1,35 @@
-reward_id,type,value,rarity,weight
+reward_id,type,value,rarity,weight,title,description
 rw_credits_small,currency,25,common,70
 rw_growth_ranged,growth,gr_battle_ranged_boost,common,30
 rw_growth_hull,growth,gr_run_hull_plate,rare,18
 rw_growth_overload,growth,gr_run_overload_boot,uncommon,22
 rw_growth_guard,growth,gr_battle_guard_matrix,common,20
 rw_growth_cap,growth,gr_run_resource_cap,rare,10
+rw_add_cyan_support,add_die,cyan_shift_die,uncommon,12,Extra Shift Die,Add another Cyan shift/control D6 for this run.
+rw_add_helios_support,add_die,helios_mark_die,uncommon,12,Extra Mark Die,Add another Helios mark/control D6 for this run.
+rw_add_aurian_support,add_die,aurian_guard_die,uncommon,12,Extra Guard Die,Add another Aurian guard/counter D6 for this run.
+rw_cyan_clean_core,remove_negative,cyan_core_die:cyan_pulse_die,rare,8,Clean Cyan Core,Replace Cyan's volatile core die with a stable pulse die for this run.
+rw_helios_clean_wild,remove_negative,helios_wild_die:helios_hunt_die,rare,8,Steady Wild Path,Replace Helios' wild die with a stable hunt die for this run.
+rw_aurian_clean_might,remove_negative,aurian_might_die:aurian_blade_die,rare,8,Tempered Might,Replace Aurian's volatile might die with a stable blade die for this run.
+rw_eq_pulse_carbine,equipment,pulse_carbine,uncommon,18,Pulse Carbine,Equip a tech weapon that rewards multi-hit overload starts.
+rw_eq_hunter_scope,equipment,hunter_scope,uncommon,18,Hunter Scope,Equip a precision weapon that opens mark payoffs for any hero.
+rw_eq_blood_whetstone,equipment,blood_whetstone,rare,8,Blood Whetstone,Equip a risky weapon for self-damage finishers.
+rw_eq_glass_fang,equipment,glass_fang,rare,8,Glass Fang,Equip a risky weapon that boosts attack density.
+rw_eq_throwing_harness,equipment,throwing_harness,uncommon,14,Throwing Harness,Equip a pierce finisher weapon.
+rw_eq_heat_sink,equipment,heat_sink_plating,uncommon,18,Heat Sink Plating,Equip armor that softens overheat and self-damage risk.
+rw_eq_iron_banner,equipment,iron_banner,uncommon,18,Iron Banner,Equip armor that turns big block turns into counter pressure.
+rw_eq_guardian_totem,equipment,guardian_totem,uncommon,14,Guardian Totem,Equip armor that protects summon builds.
+rw_eq_field_jacket,equipment,field_jacket,common,24,Field Jacket,Equip stable armor that grants battle-start block.
+rw_eq_spiked_guard,equipment,spiked_guard,rare,8,Spiked Guard,Equip risky armor for retaliation builds.
+rw_eq_lucky_knuckle,equipment,lucky_knuckle,common,22,Lucky Knuckle,Equip a passive item that protects reroll tempo.
+rw_eq_old_compass,equipment,old_compass,common,16,Old Compass,Equip a passive item that improves event safety.
+rw_eq_micro_drone,equipment,micro_drone_dock,uncommon,14,Micro Drone Dock,Equip an active item for summon and drone starts.
+rw_eq_companion_whistle,equipment,companion_whistle,uncommon,14,Companion Whistle,Equip an active item for summon burst turns.
+rw_eq_forge_needle,equipment,forge_needle,rare,7,Forge Needle,Equip a craft item that opens enchant routing.
+rw_eq_risk_ledger,equipment,risk_ledger,uncommon,14,Risk Ledger,Equip a passive item that converts negative faces into rerolls.
+rw_eq_emergency_battery,equipment,emergency_battery,common,18,Emergency Battery,Equip an active resource item with a risk tail.
+rw_enchant_spark,grant_enchant,cyan_pulse_die:1:ench_spark_edge,common,14,Spark Edge,Enchant Cyan Pulse face 1 with +1 damage.
+rw_enchant_guard,grant_enchant,cyan_shift_die:1:ench_guard_rune,common,14,Guard Rune,Enchant Cyan Shift face 1 with +2 block.
+rw_enchant_mark,grant_enchant,helios_mark_die:1:ench_marking_rune,uncommon,10,Marking Rune,Enchant Helios Mark face 1 with +1 mark.
+rw_enchant_echo,grant_enchant,aurian_blade_die:1:ench_echo_chip,rare,6,Echo Chip,Enchant Aurian Blade face 1 with a small echo hit.
+rw_enchant_focus,grant_enchant,cyan_shift_die:2:ench_focus_thread,uncommon,10,Focus Thread,Enchant Cyan Shift face 2 with +1 reroll.

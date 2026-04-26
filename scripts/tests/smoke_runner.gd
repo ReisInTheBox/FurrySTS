@@ -20,6 +20,17 @@ const RunProgressionTestScript = preload("res://scripts/tests/run_progression_te
 const EvacuationResultTestScript = preload("res://scripts/tests/evacuation_result_test.gd")
 const RunVisualizerUiTestScript = preload("res://scripts/tests/run_visualizer_ui_test.gd")
 const HubLoopTestScript = preload("res://scripts/tests/hub_loop_test.gd")
+const RelationshipTriggerTestScript = preload("res://scripts/tests/relationship_trigger_test.gd")
+const RelationshipRewardTestScript = preload("res://scripts/tests/relationship_reward_test.gd")
+const StoryIntegrationTestScript = preload("res://scripts/tests/story_integration_test.gd")
+const UiLayoutSmokeTestScript = preload("res://scripts/tests/ui_layout_smoke_test.gd")
+const D6DataIntegrityTestScript = preload("res://scripts/tests/d6_data_integrity_test.gd")
+const BuildLoadoutTestScript = preload("res://scripts/tests/build_loadout_test.gd")
+const RunBuildRewardTestScript = preload("res://scripts/tests/run_build_reward_test.gd")
+const RunNodeChoicesTestScript = preload("res://scripts/tests/run_node_choices_test.gd")
+const EquipmentSystemTestScript = preload("res://scripts/tests/equipment_system_test.gd")
+const EnchantSystemTestScript = preload("res://scripts/tests/enchant_system_test.gd")
+const ReadabilityGuardTestScript = preload("res://scripts/tests/readability_guard_test.gd")
 
 const HEROES := ["cyan_ryder", "helios_windchaser", "umbral_draxx"]
 const ENEMY_ID := "boss_vanguard"
@@ -27,6 +38,11 @@ const MIN_ENEMY_TEMPLATES := 3
 const STRICT_BALANCE_GATE := false
 
 func run() -> bool:
+    var readability_guard_test := ReadabilityGuardTestScript.new()
+    if not readability_guard_test.run():
+        push_error("Readability guard test failed.")
+        return false
+
     var rules_test := CombatRulesTestScript.new()
     if not rules_test.run():
         push_error("Combat rules tests failed.")
@@ -72,11 +88,61 @@ func run() -> bool:
     if not hub_loop_test.run():
         push_error("Hub loop test failed.")
         return false
+    var relationship_trigger_test := RelationshipTriggerTestScript.new()
+    if not relationship_trigger_test.run():
+        push_error("Relationship trigger test failed.")
+        return false
+    var relationship_reward_test := RelationshipRewardTestScript.new()
+    if not relationship_reward_test.run():
+        push_error("Relationship reward test failed.")
+        return false
+    var story_integration_test := StoryIntegrationTestScript.new()
+    if not story_integration_test.run():
+        push_error("Story integration test failed.")
+        return false
+
+    var ui_layout_test := UiLayoutSmokeTestScript.new()
+    if not ui_layout_test.run():
+        push_error("UI layout smoke test failed.")
+        return false
+
+    var d6_data_test := D6DataIntegrityTestScript.new()
+    if not d6_data_test.run():
+        push_error("D6 data integrity test failed.")
+        return false
+
+    var build_loadout_test := BuildLoadoutTestScript.new()
+    if not build_loadout_test.run():
+        push_error("Build loadout test failed.")
+        return false
+
+    var run_build_reward_test := RunBuildRewardTestScript.new()
+    if not run_build_reward_test.run():
+        push_error("Run build reward test failed.")
+        return false
+
+    var run_node_choices_test := RunNodeChoicesTestScript.new()
+    if not run_node_choices_test.run():
+        push_error("Run node choices test failed.")
+        return false
+
+    var equipment_system_test := EquipmentSystemTestScript.new()
+    if not equipment_system_test.run():
+        push_error("Equipment system test failed.")
+        return false
+
+    var enchant_system_test := EnchantSystemTestScript.new()
+    if not enchant_system_test.run():
+        push_error("Enchant system test failed.")
+        return false
 
     if not _check_content_tables(loader):
         return false
     if not _check_enemy_template_depth(loader):
         push_error("Enemy template depth check failed.")
+        return false
+    if not _check_enemy_intent_depth(loader):
+        push_error("Enemy intent depth check failed.")
         return false
 
     if not _check_dice_pool_depth(loader):
@@ -103,6 +169,10 @@ func run() -> bool:
         push_error("Turn cap guard checks failed.")
         return false
 
+    if not _check_enemy_intent_signals(loader):
+        push_error("Enemy intent signal checks failed.")
+        return false
+
     if not _check_role_mechanic_signals(loader):
         push_error("Role mechanic signal checks failed.")
         return false
@@ -122,8 +192,8 @@ func run() -> bool:
 
 func _check_phase1_table_validations(loader: ContentLoaderScript) -> bool:
     var required := {
-        "npcs": ["id", "name", "base_hp", "resource_type", "resource_init", "resource_cap"],
-        "dice": ["owner_id", "face_id", "effect_bundle_id", "cost_type", "cost_value", "die_type"],
+        "npcs": ["id", "name", "base_hp", "resource_type", "resource_init", "resource_cap", "starting_dice_loadout"],
+        "dice": ["owner_id", "die_id", "face_index", "face_id", "effect_bundle_id", "cost_type", "cost_value", "die_type", "risk_grade", "is_negative"],
         "enemies": ["id", "name", "base_hp", "atk_low", "atk_high"]
     }
     for table_any in required.keys():
@@ -145,7 +215,7 @@ func _check_phase1_table_validations(loader: ContentLoaderScript) -> bool:
                     push_error(table + " row[" + str(i) + "] has invalid numeric fields")
                     return false
             elif table == "dice":
-                if not _is_int_field(row, "cost_value"):
+                if not _is_int_field(row, "cost_value") or not _is_int_field(row, "face_index"):
                     push_error(table + " row[" + str(i) + "] has invalid cost_value")
                     return false
             elif table == "enemies":
@@ -159,7 +229,7 @@ func _is_int_field(row: Dictionary, field: String) -> bool:
     return raw != "" and raw.is_valid_int()
 
 func _check_content_tables(loader: ContentLoaderScript) -> bool:
-    var names := ["npcs", "enemies", "dice", "status_effects", "rewards", "inrun_growth", "run_nodes", "run_rewards", "events", "outgame_growth"]
+    var names := ["npcs", "enemies", "dice", "status_effects", "rewards", "inrun_growth", "run_nodes", "run_rewards", "events", "outgame_growth", "relationship_nodes", "relationship_rewards", "story_events", "equipment", "enchantments"]
     for table in names:
         var rows := loader.load_rows(table)
         if rows.is_empty():
@@ -176,14 +246,66 @@ func _check_enemy_template_depth(loader: ContentLoaderScript) -> bool:
 
 func _check_dice_pool_depth(loader: ContentLoaderScript) -> bool:
     var dice_rows := loader.load_rows("dice")
-    var counts: Dictionary = {}
+    var die_counts_by_owner: Dictionary = {}
+    var face_counts_by_die: Dictionary = {}
+    var tags_by_die: Dictionary = {}
+    var negatives_by_die: Dictionary = {}
     for row in dice_rows:
         var owner := String(row.get("owner_id", ""))
-        counts[owner] = int(counts.get(owner, 0)) + 1
+        var die_id := String(row.get("die_id", ""))
+        if not die_counts_by_owner.has(owner):
+            die_counts_by_owner[owner] = []
+        var owner_dice: Array = die_counts_by_owner[owner]
+        if not owner_dice.has(die_id):
+            owner_dice.append(die_id)
+        die_counts_by_owner[owner] = owner_dice
+        face_counts_by_die[die_id] = int(face_counts_by_die.get(die_id, 0)) + 1
+        if not tags_by_die.has(die_id):
+            tags_by_die[die_id] = {}
+        var tag_map: Dictionary = tags_by_die[die_id]
+        for tag in String(row.get("tags", "")).split("|", false):
+            var clean := String(tag).strip_edges()
+            if clean != "":
+                tag_map[clean] = true
+        tags_by_die[die_id] = tag_map
+        if String(row.get("is_negative", "false")).to_lower() == "true":
+            negatives_by_die[die_id] = int(negatives_by_die.get(die_id, 0)) + 1
     for hero in HEROES:
-        var c := int(counts.get(hero, 0))
-        if c < 8:
-            push_error("Dice count too low for " + hero + ": " + str(c))
+        var dice_for_hero: Array = die_counts_by_owner.get(hero, [])
+        if dice_for_hero.size() != 3:
+            push_error("Starting D6 count invalid for " + hero + ": " + str(dice_for_hero.size()))
+            return false
+        for die_id_any in dice_for_hero:
+            var die_id := String(die_id_any)
+            if int(face_counts_by_die.get(die_id, 0)) != 6:
+                push_error("D6 face count invalid for " + die_id + ": " + str(face_counts_by_die.get(die_id, 0)))
+                return false
+            var tag_count := Dictionary(tags_by_die.get(die_id, {})).keys().size()
+            if tag_count < 2:
+                push_error("D6 tag variety too low for " + die_id)
+                return false
+    return true
+
+func _check_enemy_intent_depth(loader: ContentLoaderScript) -> bool:
+    var rows := loader.load_rows("enemy_intents")
+    if rows.is_empty():
+        push_error("Missing enemy_intents table rows.")
+        return false
+    var types_by_enemy: Dictionary = {}
+    for row in rows:
+        var enemy_id := String(row.get("enemy_id", ""))
+        if enemy_id == "":
+            continue
+        if not types_by_enemy.has(enemy_id):
+            types_by_enemy[enemy_id] = {}
+        var type_map: Dictionary = types_by_enemy[enemy_id]
+        type_map[String(row.get("intent_type", ""))] = true
+        types_by_enemy[enemy_id] = type_map
+    for enemy in loader.load_rows("enemies"):
+        var enemy_id := String(enemy.get("id", ""))
+        var type_count := Dictionary(types_by_enemy.get(enemy_id, {})).keys().size()
+        if type_count < 3:
+            push_error("Enemy needs at least 3 intent types: " + enemy_id)
             return false
     return true
 
@@ -276,6 +398,43 @@ func _check_turn_cap_guard(loader: ContentLoaderScript) -> bool:
             push_error("ended_by_cap set but battle_stalemate event missing.")
             return false
     return true
+
+func _check_enemy_intent_signals(loader: ContentLoaderScript) -> bool:
+    var seen_attack := false
+    var seen_block := false
+    var seen_debuff := false
+    var enemy_rows := loader.load_rows("enemies")
+    for i in range(enemy_rows.size()):
+        var enemy_id := String(Dictionary(enemy_rows[i]).get("id", ENEMY_ID))
+        var entries := _simulate_enemy_once(610000 + i, "cyan_ryder", enemy_id, loader)
+        for e_any in entries:
+            var e = e_any
+            match String(e.event_type):
+                "enemy_attack":
+                    seen_attack = true
+                "enemy_block":
+                    seen_block = true
+                "enemy_debuff":
+                    seen_debuff = true
+    if not seen_attack:
+        push_error("No enemy_attack signal observed.")
+    if not seen_block:
+        push_error("No enemy_block signal observed.")
+    if not seen_debuff:
+        push_error("No enemy_debuff signal observed.")
+    return seen_attack and seen_block and seen_debuff
+
+func _simulate_enemy_once(seed_value: int, hero_id: String, enemy_id: String, loader: ContentLoaderScript) -> Array:
+    var bundle := SeedBundleScript.new(seed_value)
+    var rngs := RngStreamsScript.new(bundle)
+    var logger := ActionLoggerScript.new()
+    var factory := UnitFactoryScript.new(loader)
+    var catalog := CombatCatalogScript.new(loader)
+    var enemy_row := loader.find_row_by_id("enemies", enemy_id)
+    var state := CombatStateScript.new(factory.create_npc(hero_id), factory.create_enemy(enemy_id))
+    var simulator := BattleSimulatorScript.new(catalog, enemy_row)
+    simulator.run(state, rngs, logger)
+    return logger.entries()
 
 func _check_role_mechanic_signals(loader: ContentLoaderScript) -> bool:
     var cyan_ok := false

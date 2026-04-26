@@ -1,8 +1,21 @@
-id,node_type,pool,weight,next_pool,allow_evac,battle_enemy_id,event_id,text
-rn_start_battle,battle,start,100,mid,false,boss_vanguard,,首次遭遇，先突破前线守卫。
-rn_mid_supply,supply,mid,45,mid,true,,,废弃补给仓里也许还有能用的资源。
-rn_mid_event,event,mid,35,late,false,,ev_signal,边缘频道收到一段断续求救信号。
-rn_mid_battle,battle,mid,20,late,false,reef_stalker,,前方出现高速巡游的猎杀体。
-rn_late_battle,battle,late,45,late,true,void_howler,,深层区域的高威胁单位已经锁定你。
-rn_late_event,event,late,25,late,true,,ev_cache,废墟深处埋着一个未损坏的模块箱。
-rn_late_supply,supply,late,30,late,true,,,临时据点还留着应急补给。
+id,node_type,phase,pool,weight,next_pool,allow_evac,battle_enemy_id,event_id,min_layer,max_layer,elite_weight_bias,requires_after_layer,text
+rn_start_battle_vanguard,battle,starter,start,100,starter,false,boss_vanguard,,1,1,0,0,First contact. Break through the vanguard.
+rn_starter_battle_vanguard,battle,starter,starter,60,starter,false,boss_vanguard,,2,4,0,0,Another patrol blocks the way forward.
+rn_starter_battle_stalker,battle,starter,starter,35,starter,false,reef_stalker,,2,4,0,0,A fast hunter tests your early defense.
+rn_starter_event_signal,event,starter,starter,28,starter,false,,ev_signal,2,4,0,0,A faint signal points to a risky salvage route.
+rn_starter_supply_cache,supply,starter,starter,18,starter,false,,,2,4,0,0,A safe cache offers a small stabilizer.
+rn_mid_battle_stalker,battle,mid,mid,35,mid,false,reef_stalker,,5,8,0,0,A fast hunter pressures your dice control.
+rn_mid_battle_vanguard,battle,mid,mid,30,mid,false,boss_vanguard,,5,8,0,0,A hardened vanguard blocks a richer route.
+rn_mid_event_signal,event,mid,mid,28,mid,false,,ev_signal,5,8,0,0,A side channel offers a build-altering choice.
+rn_mid_event_cache,event,mid,mid,18,mid,false,,ev_cache,5,8,0,0,A sealed cache can reshape your run.
+rn_mid_supply_cache,supply,mid,mid,18,mid,false,,,5,8,0,0,A supply point lets you stabilize before pushing deeper.
+rn_mid_shop_trader,shop,mid,mid,14,mid,false,,,5,8,0,4,A field trader offers controlled build edits.
+rn_mid_elite_howler,elite,mid,mid,10,mid,false,void_howler,,6,8,2,5,An elite threat guards a rare upgrade route.
+rn_deep_battle_howler,battle,deep,deep,35,deep,false,void_howler,,9,12,0,0,Deep pressure starts locking your options.
+rn_deep_battle_stalker,battle,deep,deep,25,deep,false,reef_stalker,,9,12,0,0,A relentless hunter punishes loose sequencing.
+rn_deep_elite_howler,elite,deep,deep,20,deep,false,void_howler,,9,12,2,8,An elite howl tests whether your build is real.
+rn_deep_event_cache,event,deep,deep,24,deep,false,,ev_cache,9,12,0,0,A dangerous cache can reshape the final push.
+rn_deep_event_signal,event,deep,deep,12,deep,false,,ev_signal,9,12,0,0,A late signal offers power at an awkward price.
+rn_deep_rest_pocket,rest,deep,deep,14,deep,false,,,9,12,0,8,A quiet pocket gives time to recover.
+rn_deep_shop_trader,shop,deep,deep,12,deep,false,,,9,12,0,8,A final trader offers precise build surgery.
+rn_boss_vanguard,boss,boss,boss,100,,false,boss_vanguard,,13,13,0,0,The vanguard core tests your finished build.

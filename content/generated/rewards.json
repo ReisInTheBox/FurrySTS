@@ -1,19 +1,311 @@
 {
-	"row_count": 2,
+	"row_count": 34,
 	"rows": [
 		{
-			"rarity": "common",
 			"reward_id": "rw_credits_small",
 			"type": "currency",
 			"value": "25",
-			"weight": "70"
+			"rarity": "common",
+			"weight": "70",
+			"title": null,
+			"description": null
 		},
 		{
+			"reward_id": "rw_growth_ranged",
+			"type": "growth",
+			"value": "gr_battle_ranged_boost",
+			"rarity": "common",
+			"weight": "30",
+			"title": null,
+			"description": null
+		},
+		{
+			"reward_id": "rw_growth_hull",
+			"type": "growth",
+			"value": "gr_run_hull_plate",
 			"rarity": "rare",
-			"reward_id": "rw_growth_token",
-			"type": "growth_token",
-			"value": "1",
-			"weight": "30"
+			"weight": "18",
+			"title": null,
+			"description": null
+		},
+		{
+			"reward_id": "rw_growth_overload",
+			"type": "growth",
+			"value": "gr_run_overload_boot",
+			"rarity": "uncommon",
+			"weight": "22",
+			"title": null,
+			"description": null
+		},
+		{
+			"reward_id": "rw_growth_guard",
+			"type": "growth",
+			"value": "gr_battle_guard_matrix",
+			"rarity": "common",
+			"weight": "20",
+			"title": null,
+			"description": null
+		},
+		{
+			"reward_id": "rw_growth_cap",
+			"type": "growth",
+			"value": "gr_run_resource_cap",
+			"rarity": "rare",
+			"weight": "10",
+			"title": null,
+			"description": null
+		},
+		{
+			"reward_id": "rw_add_cyan_support",
+			"type": "add_die",
+			"value": "cyan_shift_die",
+			"rarity": "uncommon",
+			"weight": "12",
+			"title": "Extra Shift Die",
+			"description": "Add another Cyan shift/control D6 for this run."
+		},
+		{
+			"reward_id": "rw_add_helios_support",
+			"type": "add_die",
+			"value": "helios_mark_die",
+			"rarity": "uncommon",
+			"weight": "12",
+			"title": "Extra Mark Die",
+			"description": "Add another Helios mark/control D6 for this run."
+		},
+		{
+			"reward_id": "rw_add_aurian_support",
+			"type": "add_die",
+			"value": "aurian_guard_die",
+			"rarity": "uncommon",
+			"weight": "12",
+			"title": "Extra Guard Die",
+			"description": "Add another Aurian guard/counter D6 for this run."
+		},
+		{
+			"reward_id": "rw_cyan_clean_core",
+			"type": "remove_negative",
+			"value": "cyan_core_die:cyan_pulse_die",
+			"rarity": "rare",
+			"weight": "8",
+			"title": "Clean Cyan Core",
+			"description": "Replace Cyan's volatile core die with a stable pulse die for this run."
+		},
+		{
+			"reward_id": "rw_helios_clean_wild",
+			"type": "remove_negative",
+			"value": "helios_wild_die:helios_hunt_die",
+			"rarity": "rare",
+			"weight": "8",
+			"title": "Steady Wild Path",
+			"description": "Replace Helios' wild die with a stable hunt die for this run."
+		},
+		{
+			"reward_id": "rw_aurian_clean_might",
+			"type": "remove_negative",
+			"value": "aurian_might_die:aurian_blade_die",
+			"rarity": "rare",
+			"weight": "8",
+			"title": "Tempered Might",
+			"description": "Replace Aurian's volatile might die with a stable blade die for this run."
+		},
+		{
+			"reward_id": "rw_eq_pulse_carbine",
+			"type": "equipment",
+			"value": "pulse_carbine",
+			"rarity": "uncommon",
+			"weight": "18",
+			"title": "Pulse Carbine",
+			"description": "Equip a tech weapon that rewards multi-hit overload starts."
+		},
+		{
+			"reward_id": "rw_eq_hunter_scope",
+			"type": "equipment",
+			"value": "hunter_scope",
+			"rarity": "uncommon",
+			"weight": "18",
+			"title": "Hunter Scope",
+			"description": "Equip a precision weapon that opens mark payoffs for any hero."
+		},
+		{
+			"reward_id": "rw_eq_blood_whetstone",
+			"type": "equipment",
+			"value": "blood_whetstone",
+			"rarity": "rare",
+			"weight": "8",
+			"title": "Blood Whetstone",
+			"description": "Equip a risky weapon for self-damage finishers."
+		},
+		{
+			"reward_id": "rw_eq_glass_fang",
+			"type": "equipment",
+			"value": "glass_fang",
+			"rarity": "rare",
+			"weight": "8",
+			"title": "Glass Fang",
+			"description": "Equip a risky weapon that boosts attack density."
+		},
+		{
+			"reward_id": "rw_eq_throwing_harness",
+			"type": "equipment",
+			"value": "throwing_harness",
+			"rarity": "uncommon",
+			"weight": "14",
+			"title": "Throwing Harness",
+			"description": "Equip a pierce finisher weapon."
+		},
+		{
+			"reward_id": "rw_eq_heat_sink",
+			"type": "equipment",
+			"value": "heat_sink_plating",
+			"rarity": "uncommon",
+			"weight": "18",
+			"title": "Heat Sink Plating",
+			"description": "Equip armor that softens overheat and self-damage risk."
+		},
+		{
+			"reward_id": "rw_eq_iron_banner",
+			"type": "equipment",
+			"value": "iron_banner",
+			"rarity": "uncommon",
+			"weight": "18",
+			"title": "Iron Banner",
+			"description": "Equip armor that turns big block turns into counter pressure."
+		},
+		{
+			"reward_id": "rw_eq_guardian_totem",
+			"type": "equipment",
+			"value": "guardian_totem",
+			"rarity": "uncommon",
+			"weight": "14",
+			"title": "Guardian Totem",
+			"description": "Equip armor that protects summon builds."
+		},
+		{
+			"reward_id": "rw_eq_field_jacket",
+			"type": "equipment",
+			"value": "field_jacket",
+			"rarity": "common",
+			"weight": "24",
+			"title": "Field Jacket",
+			"description": "Equip stable armor that grants battle-start block."
+		},
+		{
+			"reward_id": "rw_eq_spiked_guard",
+			"type": "equipment",
+			"value": "spiked_guard",
+			"rarity": "rare",
+			"weight": "8",
+			"title": "Spiked Guard",
+			"description": "Equip risky armor for retaliation builds."
+		},
+		{
+			"reward_id": "rw_eq_lucky_knuckle",
+			"type": "equipment",
+			"value": "lucky_knuckle",
+			"rarity": "common",
+			"weight": "22",
+			"title": "Lucky Knuckle",
+			"description": "Equip a passive item that protects reroll tempo."
+		},
+		{
+			"reward_id": "rw_eq_old_compass",
+			"type": "equipment",
+			"value": "old_compass",
+			"rarity": "common",
+			"weight": "16",
+			"title": "Old Compass",
+			"description": "Equip a passive item that improves event safety."
+		},
+		{
+			"reward_id": "rw_eq_micro_drone",
+			"type": "equipment",
+			"value": "micro_drone_dock",
+			"rarity": "uncommon",
+			"weight": "14",
+			"title": "Micro Drone Dock",
+			"description": "Equip an active item for summon and drone starts."
+		},
+		{
+			"reward_id": "rw_eq_companion_whistle",
+			"type": "equipment",
+			"value": "companion_whistle",
+			"rarity": "uncommon",
+			"weight": "14",
+			"title": "Companion Whistle",
+			"description": "Equip an active item for summon burst turns."
+		},
+		{
+			"reward_id": "rw_eq_forge_needle",
+			"type": "equipment",
+			"value": "forge_needle",
+			"rarity": "rare",
+			"weight": "7",
+			"title": "Forge Needle",
+			"description": "Equip a craft item that opens enchant routing."
+		},
+		{
+			"reward_id": "rw_eq_risk_ledger",
+			"type": "equipment",
+			"value": "risk_ledger",
+			"rarity": "uncommon",
+			"weight": "14",
+			"title": "Risk Ledger",
+			"description": "Equip a passive item that converts negative faces into rerolls."
+		},
+		{
+			"reward_id": "rw_eq_emergency_battery",
+			"type": "equipment",
+			"value": "emergency_battery",
+			"rarity": "common",
+			"weight": "18",
+			"title": "Emergency Battery",
+			"description": "Equip an active resource item with a risk tail."
+		},
+		{
+			"reward_id": "rw_enchant_spark",
+			"type": "grant_enchant",
+			"value": "cyan_pulse_die:1:ench_spark_edge",
+			"rarity": "common",
+			"weight": "14",
+			"title": "Spark Edge",
+			"description": "Enchant Cyan Pulse face 1 with +1 damage."
+		},
+		{
+			"reward_id": "rw_enchant_guard",
+			"type": "grant_enchant",
+			"value": "cyan_shift_die:1:ench_guard_rune",
+			"rarity": "common",
+			"weight": "14",
+			"title": "Guard Rune",
+			"description": "Enchant Cyan Shift face 1 with +2 block."
+		},
+		{
+			"reward_id": "rw_enchant_mark",
+			"type": "grant_enchant",
+			"value": "helios_mark_die:1:ench_marking_rune",
+			"rarity": "uncommon",
+			"weight": "10",
+			"title": "Marking Rune",
+			"description": "Enchant Helios Mark face 1 with +1 mark."
+		},
+		{
+			"reward_id": "rw_enchant_echo",
+			"type": "grant_enchant",
+			"value": "aurian_blade_die:1:ench_echo_chip",
+			"rarity": "rare",
+			"weight": "6",
+			"title": "Echo Chip",
+			"description": "Enchant Aurian Blade face 1 with a small echo hit."
+		},
+		{
+			"reward_id": "rw_enchant_focus",
+			"type": "grant_enchant",
+			"value": "cyan_shift_die:2:ench_focus_thread",
+			"rarity": "uncommon",
+			"weight": "10",
+			"title": "Focus Thread",
+			"description": "Enchant Cyan Shift face 2 with +1 reroll."
 		}
 	],
 	"source": "res://content/csv/rewards.csv"
