@@ -3,6 +3,9 @@ extends Control
 signal run_finished(result: Dictionary)
 
 const ContentLoaderScript = preload("res://scripts/content/content_loader.gd")
+const ArtCatalogScript = preload("res://scripts/content/art_catalog.gd")
+const ArtSlotFactoryScript = preload("res://scripts/ui/art_slot_factory.gd")
+const UnitFactoryScript = preload("res://scripts/content/unit_factory.gd")
 const RunSimulatorScript = preload("res://scripts/run/run_simulator.gd")
 const BattleVisualizerScene = preload("res://scenes/battle_visualizer.tscn")
 
@@ -23,6 +26,7 @@ var _route_flow: HFlowContainer
 var _route_hint_label: Label
 var _current_node_label: Label
 var _current_node_badge: Label
+var _node_art_holder: Control
 var _detail_label: Label
 var _node_hint_label: Label
 var _feedback_label: Label
@@ -57,6 +61,12 @@ func _build_ui() -> void:
 	bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	bg.color = Color(0.035, 0.045, 0.07, 1.0)
 	add_child(bg)
+
+	var bg_art := _art_slot("bg_run", Vector2(0, 0), "裂隙路线", "推进、回收、判断撤离窗口")
+	bg_art.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	bg_art.modulate = Color(1, 1, 1, 0.22)
+	_set_mouse_filter_recursive(bg_art, Control.MOUSE_FILTER_IGNORE)
+	add_child(bg_art)
 
 	var glow_top := ColorRect.new()
 	glow_top.anchor_right = 1.0
@@ -114,13 +124,13 @@ func _build_header() -> Control:
 	row.add_child(title_box)
 
 	var title := Label.new()
-	title.text = "FurrySTS Run 原型"
+	title.text = "裂隙路线行动"
 	title.add_theme_font_size_override("font_size", 24)
 	title.modulate = Color(0.96, 0.98, 1.0)
 	title_box.add_child(title)
 
 	var subtitle := Label.new()
-	subtitle.text = "线性推进，不做分支选择。当前重点是验证节点节奏、奖励闭环和撤离判断。"
+	subtitle.text = "信标只能短暂稳定这条路线。推进越深，收益越高；能否带着资源回到 Hub，同样是胜利条件。"
 	subtitle.autowrap_mode = TextServer.AUTOWRAP_WORD
 	subtitle.modulate = Color(0.75, 0.84, 0.96)
 	title_box.add_child(subtitle)
@@ -216,6 +226,10 @@ func _build_current_node_panel() -> Control:
 	_current_node_badge.custom_minimum_size = Vector2(110, 28)
 	top_row.add_child(_current_node_badge)
 
+	_node_art_holder = MarginContainer.new()
+	_node_art_holder.custom_minimum_size = Vector2(0, 82)
+	v.add_child(_node_art_holder)
+
 	_detail_label = Label.new()
 	_detail_label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_detail_label.modulate = Color(0.82, 0.88, 0.98)
@@ -286,26 +300,26 @@ func _build_action_bar() -> Control:
 	panel.add_child(row)
 
 	var hint := Label.new()
-	hint.text = "操作栏固定在底部：推进节点、撤离或重新开始 Run。"
+	hint.text = "操作栏固定在底部：推进节点、抓住撤离窗口，或重新校准路线。"
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD
 	hint.size_flags_horizontal = SIZE_EXPAND_FILL
 	hint.modulate = Color(0.82, 0.9, 1.0)
 	row.add_child(hint)
 
 	_new_run_btn = Button.new()
-	_new_run_btn.text = "? Run"
+	_new_run_btn.text = "重校准"
 	_new_run_btn.custom_minimum_size = Vector2(110, 42)
 	_new_run_btn.pressed.connect(_start_run)
 	row.add_child(_new_run_btn)
 
 	_resolve_btn = Button.new()
-	_resolve_btn.text = "推进当前节点"
+	_resolve_btn.text = "推进节点"
 	_resolve_btn.custom_minimum_size = Vector2(150, 42)
 	_resolve_btn.pressed.connect(_on_resolve_pressed)
 	row.add_child(_resolve_btn)
 
 	_evac_btn = Button.new()
-	_evac_btn.text = "立即撤离"
+	_evac_btn.text = "撤离"
 	_evac_btn.custom_minimum_size = Vector2(110, 42)
 	_evac_btn.pressed.connect(_on_evac_pressed)
 	row.add_child(_evac_btn)
@@ -345,7 +359,7 @@ func _start_run() -> void:
 	_run_state = bundle["state"]
 	_rngs = bundle["rngs"]
 	_hide_node_result_panel()
-	_feedback_label.text = "Run 已初始化，准备推进第一处节点。"
+	_feedback_label.text = "信标已打开短暂路线。目标不是无脑深入，而是带回足够让 Hub 继续运转的东西。"
 	_render_ui()
 
 func _render_ui() -> void:
@@ -354,7 +368,7 @@ func _render_ui() -> void:
 
 	_seed_label.text = "Seed %d" % _master_seed
 	_hero_label.text = "主出战：%s" % _hero_name(_run_state.hero_id)
-	_summary_label.text = "已清理 %d 个节点，当前持有 %d Credits，已获得 %d 项成长。" % [
+	_summary_label.text = "已稳定 %d 个节点，当前带回预算 %d Credits，临时成长 %d 项。撤离窗口会在关键层后出现。" % [
 		_run_state.nodes_cleared(),
 		_run_state.progress.get_currency("credits"),
 		_run_state.progress.all_growths().size()
@@ -366,6 +380,7 @@ func _render_ui() -> void:
 	_current_node_badge.text = _node_type_name(_current_node_type())
 	_current_node_badge.add_theme_color_override("font_color", _node_colors(_current_node_type())["text"])
 	_current_node_badge.add_theme_font_size_override("font_size", 15)
+	_render_node_art()
 	_detail_label.text = _current_node_detail()
 	_node_hint_label.text = _current_node_hint()
 	_render_rewards()
@@ -410,6 +425,43 @@ func _render_status_cards() -> void:
 		value.add_theme_font_size_override("font_size", 18)
 		value.modulate = Color(0.96, 0.98, 1.0)
 		v.add_child(value)
+
+func _render_node_art() -> void:
+	if _node_art_holder == null:
+		return
+	for child in _node_art_holder.get_children():
+		child.queue_free()
+	var node_type := _current_node_type()
+	_node_art_holder.add_child(_art_slot(_node_art_id(node_type), Vector2(0, 82), _node_type_name(node_type), "当前路线节点"))
+
+func _node_art_id(node_type: String) -> String:
+	match node_type:
+		"battle", "elite":
+			return "node_battle"
+		"event":
+			return "node_event"
+		"supply":
+			return "node_supply"
+		"shop":
+			return "node_shop"
+		"rest":
+			return "node_rest"
+		"boss":
+			return "node_boss"
+		_:
+			return "bg_run"
+
+func _art_slot(art_id: String, slot_size: Vector2, fallback_title: String, fallback_subtitle: String) -> Control:
+	var loader := _loader if _loader != null else ContentLoaderScript.new()
+	var catalog := ArtCatalogScript.new(loader)
+	var factory := ArtSlotFactoryScript.new(catalog)
+	return factory.create_slot(art_id, slot_size, fallback_title, fallback_subtitle)
+
+func _set_mouse_filter_recursive(node: Node, filter: int) -> void:
+	if node is Control:
+		(node as Control).mouse_filter = filter
+	for child in node.get_children():
+		_set_mouse_filter_recursive(child, filter)
 
 func _render_route_nodes() -> void:
 	for child in _route_flow.get_children():
@@ -543,11 +595,13 @@ func _render_rewards() -> void:
 		if price > 0:
 			price_text = "\n价格：%d Credits" % price
 		var rule_hint := _reward_rule_hint(reward)
-		btn.text = "[%s | %s]\n%s\n%s%s%s" % [
+		var bd_hint := _reward_bd_hint(reward)
+		btn.text = "[%s | %s]\n%s\n%s%s%s%s" % [
 			str(reward.get("rarity_label", "普通")),
 			str(reward.get("scope_label", "下一场")),
 			str(reward.get("title", "奖励")),
 			str(reward.get("description", "")),
+			bd_hint,
 			rule_hint,
 			price_text
 		]
@@ -595,12 +649,15 @@ func _show_node_result(result: Dictionary) -> void:
 	_node_result_title.text = "%s结算完成" % _node_type_name(node_type)
 	var lines: Array[String] = []
 	lines.append(_resolve_feedback(result))
+	var decision_summary := String(result.get("decision_summary", ""))
+	if decision_summary != "":
+		lines.append("决策说明：" + decision_summary)
 	if not reward.is_empty():
 		lines.append("获得：%s" % String(reward.get("title", "奖励")))
 		lines.append(String(reward.get("description", "")))
 	lines.append("当前 Credits：%d" % _run_state.progress.get_currency("credits"))
 	if _run_state.completed:
-		lines.append("Run 已结束，点击继续返回 Hub。")
+		lines.append("路线已关闭，点击继续回到 Hub。")
 	_node_result_detail.text = "\n".join(lines)
 	_node_result_panel.visible = true
 
@@ -635,15 +692,15 @@ func _on_reward_selected(index: int) -> void:
 func _on_route_node_pressed(route_node_uid: String) -> void:
 	var result: Dictionary = _simulator.select_route_node(_run_state, route_node_uid)
 	if bool(result.get("ok", false)):
-		_feedback_label.text = "Selected route node: %s" % route_node_uid
+		_feedback_label.text = "已选定下一处信标坐标：%s" % route_node_uid
 	else:
-		_feedback_label.text = "This route node is not currently reachable."
+		_feedback_label.text = "这处坐标当前无法抵达。"
 	_render_ui()
 
 func _on_evac_pressed() -> void:
 	var result: Dictionary = _simulator.evacuate(_run_state)
 	if bool(result.get("ok", false)):
-		_feedback_label.text = "撤离成功，本次 Run 已结束。"
+		_feedback_label.text = "撤离成功。没有抵达核心，但资源、装备和记录都回到了 Hub。"
 		_emit_run_finished_if_needed()
 	else:
 		_feedback_label.text = "当前不可撤离。"
@@ -667,11 +724,11 @@ func _on_battle_closed(victory: bool, payload: Dictionary) -> void:
 	_active_battle = null
 	if bool(result.get("ok", false)):
 		if victory:
-			_feedback_label.text = "战斗胜利，已返回 Run。"
+			_feedback_label.text = "战斗胜利，信标路线继续稳定。"
 			if int(result.get("pending_rewards", 0)) > 0:
 				_feedback_label.text += " 请选择一个奖励后继续。"
 		else:
-			_feedback_label.text = "战斗失败，Run 结束。"
+			_feedback_label.text = "战斗失败，信标拖回了最后坐标；新获得装备会遗失在裂隙里。"
 			_emit_run_finished_if_needed()
 	else:
 		_feedback_label.text = "战斗结果回写失败：%s" % str(result.get("reason", "unknown"))
@@ -715,29 +772,36 @@ func _current_node_detail() -> String:
 	elif node_type == "event":
 		details.append("事件 ID：%s" % String(node.get("event_id", "")))
 		details.append(_event_text(String(node.get("event_id", ""))))
+		details.append("决策重点：稳定资源、风险构筑、付费附魔之间选 1 个。")
 	elif node_type == "supply":
-		details.append("补给节点会直接从补给奖池中结算一份奖励。")
+		details.append("决策重点：免费选 1 项补给，通常用于补资源、拿装备或稳住下一场。")
 	elif node_type == "shop":
-		details.append("商店节点提供更定向的构筑奖励选择。")
+		details.append("决策重点：花 Credits 买定向构筑修正；也可以免费离开保留经济。")
 	elif node_type == "rest":
-		details.append("休息节点用于在高压层之间恢复节奏。")
+		details.append("决策重点：在本 Run 生存、下一场安全垫、伤害准备、经济之间选 1 项。")
 	details.append("可撤离：%s" % ("是" if _run_state.can_evac() else "否"))
+	for build_line in _build_summary_lines():
+		details.append(build_line)
 	for enchant_line in _enchant_summary_lines():
 		details.append(enchant_line)
 	return "\n".join(details)
 
 func _current_node_hint() -> String:
 	if _run_state.completed:
-		return "可以直接开始一局新的 Run，或者把这套路线节奏作为后续 Hub 回流的基础。"
+		return "可以重新校准下一条路线，或把这次回收带回 Hub 做长期整备。"
 	var node_type := _current_node_type()
 	if not _run_state.pending_reward_choices.is_empty():
 		return "当前有待领取奖励，先选 1 个奖励，才能继续推进路线。"
 	if ["battle", "elite", "boss"].has(node_type):
-		return "这是压力节点：会消耗真实战斗时间，但也是主要成长来源。"
+		return "这是压力节点：敌人会检验当前 D6 校准，但也是主要成长来源。"
 	if node_type == "event":
-		return "这是缓冲节点：先做轻量事件结算，验证奖励与文本反馈。"
+		return "这是事件节点：旧设施或残留信号会提供选择，通常要在稳定回收和高风险改造之间取舍。"
 	if node_type == "supply":
-		return "这是补给节点：节奏更轻，适合放在中后段给玩家回口气。"
+		return "这是补给节点：路线中的安全夹层，优先处理短板和下一场安全性。"
+	if node_type == "shop":
+		return "这是商店节点：花 Credits 做定向改造，或者保存经济继续前进。"
+	if node_type == "rest":
+		return "这是休息节点：虚空暂退的静默口袋，只够完成一项整备。"
 	return "按顺序推进即可。"
 
 func _resolve_feedback(result: Dictionary) -> String:
@@ -746,10 +810,20 @@ func _resolve_feedback(result: Dictionary) -> String:
 		return "战斗节点已结算：%s" % String(result.get("battle_result", ""))
 	if node_type == "event":
 		var reward: Dictionary = result.get("reward", {})
+		if int(result.get("pending_rewards", 0)) > 0:
+			return "事件已展开：请选择 1 个事件选项。"
 		return "事件节点结算完成：%s" % str(reward.get("title", "已应用事件奖励"))
 	if node_type == "supply":
 		var reward_supply: Dictionary = result.get("reward", {})
+		if int(result.get("pending_rewards", 0)) > 0:
+			return "补给已展开：请选择 1 个补给选项。"
 		return "补给节点结算完成：%s" % str(reward_supply.get("title", "已获得补给"))
+	if node_type == "shop":
+		if int(result.get("pending_rewards", 0)) > 0:
+			return "商店已打开：购买 1 项，或选择离开商店。"
+	if node_type == "rest":
+		if int(result.get("pending_rewards", 0)) > 0:
+			return "休息点已打开：请选择 1 个整备方案。"
 	return "节点已结算。"
 
 func _reward_rule_hint(reward: Dictionary) -> String:
@@ -767,7 +841,23 @@ func _reward_rule_hint(reward: Dictionary) -> String:
 		return "\n附魔位置：%s 第 %d 面 | %s %s" % [die_id, face_index, mode, _enchant_name(enchant_id)]
 	if ["add_die", "replace_die", "remove_negative", "upgrade_die"].has(reward_type):
 		return "\n构筑变化：%s -> %s" % [reward_type, String(reward.get("value", ""))]
+	var decision_hint := String(reward.get("decision_hint", ""))
+	if decision_hint != "":
+		return "\n选择影响：" + decision_hint
+	var choice_kind := String(reward.get("choice_kind", ""))
+	if choice_kind == "shop_reward":
+		return "\n商店规则：购买后继续路线；Credits 不足不可点。"
+	if choice_kind == "supply_reward":
+		return "\n补给规则：免费选择 1 项。"
+	if choice_kind == "event_reward":
+		return "\n事件规则：放弃稳定收益，换更强构筑节奏。"
 	return ""
+
+func _reward_bd_hint(reward: Dictionary) -> String:
+	var label := String(reward.get("bd_label", ""))
+	if label == "":
+		return ""
+	return "\nBD 提示：" + label
 
 func _enchant_summary_lines() -> Array[String]:
 	var bindings: Array[Dictionary] = _run_state.progress.all_enchant_bindings()
@@ -783,6 +873,25 @@ func _enchant_summary_lines() -> Array[String]:
 			int(binding.get("face_index", 0)),
 			_enchant_name(String(binding.get("enchant_id", "")))
 		])
+	return out
+
+func _build_summary_lines() -> Array[String]:
+	var out: Array[String] = []
+	var loader := _loader if _loader != null else ContentLoaderScript.new()
+	var factory := UnitFactoryScript.new(loader)
+	var unit = factory.create_npc(_run_state.hero_id, _run_state.loadout_face_ids)
+	_run_state.progress.apply_all_to_unit(unit, false)
+	var dice_parts: Array[String] = []
+	for die_id in unit.loadout_die_ids:
+		dice_parts.append(String(die_id))
+	out.append("当前构筑：%s" % (" / ".join(dice_parts) if not dice_parts.is_empty() else "无 D6"))
+	var equipment_lines := _run_state.equipment_summary_lines()
+	if equipment_lines.is_empty():
+		out.append("当前装备：无")
+	else:
+		out.append("当前装备：")
+		for line in equipment_lines:
+			out.append("- " + line)
 	return out
 
 func _enchant_name(enchant_id: String) -> String:

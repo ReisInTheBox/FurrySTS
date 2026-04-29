@@ -1,4 +1,4 @@
-id,name,base_hp,resource_type,resource_init,resource_cap,starting_dice_loadout,dice_pool
-cyan_ryder,Cyan Ryder,22,overload,0,3,cyan_pulse_die|cyan_shift_die|cyan_core_die,cyan_pulse_die|cyan_shift_die|cyan_core_die
-helios_windchaser,Helios Windchaser,25,quiver,3,3,helios_hunt_die|helios_mark_die|helios_wild_die,helios_hunt_die|helios_mark_die|helios_wild_die
-umbral_draxx,Aurian,24,stance,0,2,aurian_blade_die|aurian_guard_die|aurian_might_die,aurian_blade_die|aurian_guard_die|aurian_might_die
+id,name,base_hp,resource_type,resource_init,resource_cap,starting_dice_loadout,dice_pool,portrait_id,battle_sprite_id
+cyan_ryder,Cyan Ryder,22,overload,0,3,cyan_pulse_die|cyan_shift_die|cyan_core_die,cyan_pulse_die|cyan_shift_die|cyan_core_die,portrait_cyan,portrait_cyan
+helios_windchaser,Helios Windchaser,25,quiver,3,3,helios_hunt_die|helios_mark_die|helios_wild_die,helios_hunt_die|helios_mark_die|helios_wild_die,portrait_helios,portrait_helios
+umbral_draxx,Aurian,24,stance,0,2,aurian_blade_die|aurian_guard_die|aurian_might_die,aurian_blade_die|aurian_guard_die|aurian_might_die,portrait_aurian,portrait_aurian

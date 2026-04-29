@@ -1,4 +1,4 @@
-# FurrySTS MVP Scaffold
+# Beacon Dice MVP Scaffold
 
 This repository now includes a Godot 4 MVP scaffold aligned with `mvp_tech_plan.md`.
 

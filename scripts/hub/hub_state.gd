@@ -571,9 +571,9 @@ func _blank_equipment_slots() -> Dictionary:
 
 func last_run_summary() -> String:
 	if last_run_result.is_empty():
-		return "还没有完成过任何一局 Run。"
+		return "暂无路线回收记录。信标已待命，第一条路线会验证 Hub 是否还能把人带回来。"
 	return "上次结果：%s | 清理节点 %d | 带回 Credits %d | 获得成长 %d 项" % [
-		String(last_run_result.get("result_type", "unknown")),
+		_result_label(String(last_run_result.get("result_type", "unknown"))),
 		int(last_run_result.get("nodes_cleared", 0)),
 		int(last_run_result.get("credits", 0)),
 		int(last_run_result.get("growth_count", 0))
@@ -582,7 +582,7 @@ func last_run_summary() -> String:
 func last_run_detail_lines() -> Array[String]:
 	var out: Array[String] = []
 	if last_run_result.is_empty():
-		out.append("暂无结算记录。")
+		out.append("暂无结算记录。这里现在只有一座亮着的信标，和下一次出发前能做的整备。")
 		return out
 	out.append(String(last_run_result.get("summary", "")))
 	for item_any in last_run_result.get("node_results", []):
@@ -593,6 +593,17 @@ func last_run_detail_lines() -> Array[String]:
 			String(item.get("result", ""))
 		])
 	return out
+
+func _result_label(result_type: String) -> String:
+	match result_type:
+		"completed":
+			return "路线核心稳定"
+		"evacuated":
+			return "成功撤离"
+		"failed":
+			return "信标拖回"
+		_:
+			return result_type
 
 func _process_relationship_result(result: Dictionary) -> void:
 	relationship_events.clear()

@@ -24,6 +24,9 @@ func run() -> bool:
 	if visualizer._detail_label.text.find("当前附魔") < 0 or visualizer._detail_label.text.find("cyan_pulse_die") < 0:
 		push_error("Run visualizer should show current enchant bindings in node details.")
 		return false
+	if visualizer._detail_label.text.find("当前构筑") < 0 or visualizer._detail_label.text.find("当前装备") < 0:
+		push_error("Run visualizer should show current build and equipment summary in node details.")
+		return false
 
 	visualizer._on_resolve_pressed()
 	if visualizer._active_battle == null:

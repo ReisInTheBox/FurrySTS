@@ -1,4 +1,4 @@
-id,name,base_hp,atk_low,atk_high,bonus_every_turns,bonus_flat
-boss_vanguard,Hub Edge Vanguard,58,4,6,3,2
-reef_stalker,Reef Stalker,50,5,7,4,1
-void_howler,Void Howler,64,3,8,2,2
+id,name,base_hp,atk_low,atk_high,bonus_every_turns,bonus_flat,portrait_id,battle_sprite_id
+boss_vanguard,Hub Edge Vanguard,58,4,6,3,2,enemy_vanguard,enemy_vanguard
+reef_stalker,Reef Stalker,50,5,7,4,1,enemy_stalker,enemy_stalker
+void_howler,Void Howler,64,3,8,2,2,enemy_howler,enemy_howler

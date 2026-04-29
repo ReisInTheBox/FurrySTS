@@ -2,6 +2,37 @@
 
 ## Summary
 
+## Current Progress (2026-04-29 / Update 8)
+### Overall Status
+- 当前主线进度：`Phase 8 可玩体验打磨已启动`。
+- 当前开发重点：不继续盲目堆系统，优先让 Hub / Run / Battle 的构筑、附魔、装备、奖励信息更容易理解。
+- 当前验收方式：新增 `phase8_playtest_checklist.md`，用于从 Hub 到 Run 再回 Hub 的手动试玩验收。
+
+### Completed In This Update
+- Run 当前节点详情会显示：
+  - 当前 D6 构筑列表
+  - 当前装备摘要
+  - 当前附魔绑定位置与附魔效果
+- 奖励卡会额外提示：
+  - 构筑奖励会改变什么
+  - 附魔奖励会影响哪颗 D6 的第几面
+- 新增 Phase 8 试玩验收清单，明确运行命令、手动流程和通过标准。
+- 事件、补给、商店、休息节点已补充决策摘要和选项提示，避免玩家只看到“领奖励”而不知道取舍。
+- `run_node_choices_test` 已强化：事件/商店/休息必须暴露可读的决策说明。
+- 事件节点开始按 `ev_signal` / `ev_cache` / `ev_forge` 提供不同选项；补给与商店也补了更多稳定/经济/战斗准备选项。
+- 战斗界面敌方意图显示已扩展：攻击、护甲、资源压力、预兆、针对构筑关键词会直接展示。
+- 新增挑战矩阵 smoke：按英雄 x 敌人统计胜率、平均回合和敌方 debuff 压力，避免敌人只是换皮数值包。
+- 新增 `enemy_challenge_design.md`：从 roguelike 资源博弈角度定义 Vanguard / Stalker / Howler 的主考问题、反制方式、随机性边界和后续扩怪优先级。
+- 新增 art asset 占位管线：`art_assets.csv`、`ArtCatalog`、`ArtSlotFactory`，Hub / Run / Battle 已接入背景、立绘和节点图占位槽。
+- 新增 `character_bd_design.md`：深化 Cyan / Helios / Aurian 的角色定位、BD 分支、奖励池方向和 UI 表达重点。
+- 奖励生成已补 `bd_tags` / `bd_label` 推断，Run 与 Battle 奖励卡会显示“BD 提示”，帮助玩家理解奖励适合哪条构筑线。
+
+### Phase 8 Priority
+1. UI 信息层：玩家能看懂当前构筑和奖励影响。
+2. Run 节奏：事件、商店、补给、休息各自有明确决策理由。
+3. 数值冒烟：继续记录胜率和平均回合，先防明显失控。
+4. 内容补量：围绕已有系统扩内容，而不是继续发散新系统。
+
 ## Current Progress (2026-04-28 / Update 7)
 ### Overall Status
 - 当前主线进度：`Phase 7 附魔 MVP 基础完成，可进入验收/打磨`。

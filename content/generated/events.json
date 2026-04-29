@@ -3,18 +3,18 @@
 	"rows": [
 		{
 			"id": "ev_signal",
-			"text": "你沿着微弱信号找到一处半毁前哨：可以稳妥回收，也可以冒险改造构筑。",
-			"reward_source": "event"
+			"reward_source": "event",
+			"text": "你沿着微弱信号找到一处半毁前哨：可以稳妥回收，也可以冒险改造构筑。"
 		},
 		{
 			"id": "ev_cache",
-			"text": "你撬开一只模块箱，里面的核心还在发热：它能强化骰子，也可能带来代价。",
-			"reward_source": "event"
+			"reward_source": "event",
+			"text": "你撬开一只旧世界模块箱：核心仍在发热。它能强化 D6，也会把不稳定写进本次路线。"
 		},
 		{
 			"id": "ev_forge",
-			"text": "流动锻炉还剩一次点火机会：选择修补、附魔，或换取更危险的力量。",
-			"reward_source": "event"
+			"reward_source": "event",
+			"text": "一座流动锻炉还剩一次点火机会：修补装备、写入附魔，或换取更危险的力量。"
 		}
 	],
 	"source": "res://content/csv/events.csv"

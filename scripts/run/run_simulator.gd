@@ -101,7 +101,7 @@ func complete_battle_node(
 			"turns": int(battle_meta.get("turns", 0)),
 			"log_size": int(battle_meta.get("log_size", 0))
 		})
-		run_state.finish("failed", "Battle failed. Run ended.")
+		run_state.finish("failed", "信标拖回了最后坐标。路线关闭，新获得装备遗失在裂隙里，但记录会留在 Hub。")
 		return {"ok": true, "node_type": node_type, "battle_result": "defeat"}
 
 	return _grant_node_rewards(run_state, rngs, node, node_type, {
@@ -131,7 +131,7 @@ func choose_reward(run_state: RunStateScript, reward_index: int) -> Dictionary:
 func evacuate(run_state: RunStateScript) -> Dictionary:
 	if not run_state.can_evac():
 		return {"ok": false, "reason": "evac_not_available"}
-	run_state.finish("evacuated", "Evacuated successfully.")
+	run_state.finish("evacuated", "撤离窗口及时打开。没有抵达核心，但你带回了资源、装备和下一次行动需要的记录。")
 	return {"ok": true, "result_type": "evacuated"}
 
 func generate_route_map(rngs: RngStreamsScript, config: Dictionary = {}) -> Array:
@@ -330,7 +330,7 @@ func _resolve_battle_node(run_state: RunStateScript, rngs: RngStreamsScript, nod
 			"result": "defeat",
 			"enemy_id": enemy_id
 		})
-		run_state.finish("failed", "Battle failed. Run ended.")
+		run_state.finish("failed", "信标拖回了最后坐标。路线关闭，新获得装备遗失在裂隙里，但记录会留在 Hub。")
 		return {"ok": true, "node_type": node_type, "battle_result": "defeat", "log_size": logger.entries().size()}
 
 	var grant_result := _grant_node_rewards(run_state, rngs, node, node_type, {
@@ -370,6 +370,8 @@ func _resolve_event_node(run_state: RunStateScript, rngs: RngStreamsScript, node
 		"event",
 		{"currency_cost": 12, "hero_enchant": "signature", "enchant_mode": "replace"}
 	))
+	for event_choice in _event_specific_choices(event_id, run_state):
+		options.append(event_choice)
 	if _run_has_equipment(run_state, "old_compass"):
 		options.append(_node_effect_choice(
 			"event_old_compass_route",
@@ -392,6 +394,7 @@ func _resolve_event_node(run_state: RunStateScript, rngs: RngStreamsScript, node
 		option["source_node_type"] = "event"
 		option["title"] = "风险缓存：" + String(option.get("title", "奖励"))
 		option["description"] = String(option.get("description", "")) + " 事件选择：放弃稳定资源，换取更强构筑节奏。"
+		option["decision_hint"] = "高收益选项：通常改变 D6、装备或附魔，但会少拿稳定 Credits。"
 		options.append(option)
 	if options.is_empty():
 		run_state.node_results.append({"node_id": String(node.get("id", "")), "node_type": "event", "result": "empty", "event_id": event_id})
@@ -404,7 +407,13 @@ func _resolve_event_node(run_state: RunStateScript, rngs: RngStreamsScript, node
 		"result": "pending_choice",
 		"event_id": event_id
 	})
-	return {"ok": true, "node_type": "event", "event_id": event_id, "pending_rewards": run_state.pending_reward_choices.size()}
+	return {
+		"ok": true,
+		"node_type": "event",
+		"event_id": event_id,
+		"pending_rewards": run_state.pending_reward_choices.size(),
+		"decision_summary": "事件提供稳定资源、风险构筑和付费附魔三类选择；本节点只选 1 项。"
+	}
 
 func _resolve_supply_node(run_state: RunStateScript, rngs: RngStreamsScript, node: Dictionary) -> Dictionary:
 	var reward_ids := _run_catalog.reward_ids_for_source("supply")
@@ -418,6 +427,7 @@ func _resolve_supply_node(run_state: RunStateScript, rngs: RngStreamsScript, nod
 		var option := reward.duplicate(true)
 		option["choice_kind"] = "supply_reward"
 		option["source_node_type"] = "supply"
+		option["decision_hint"] = "补给选项：免费选择 1 个，偏向续航、装备或短期稳定。"
 		run_state.pending_reward_choices.append(option)
 	run_state.pending_reward_choices.append(_node_effect_choice(
 		"supply_field_kit",
@@ -426,12 +436,31 @@ func _resolve_supply_node(run_state: RunStateScript, rngs: RngStreamsScript, nod
 		"supply",
 		{"currency_id": "credits", "amount": 10, "growth": {"growth_id": "supply_field_kit_block", "type": "stat", "target": "block", "delta": "2", "duration_scope": "battle", "grant_once": "false"}}
 	))
+	run_state.pending_reward_choices.append(_node_effect_choice(
+		"supply_ammo_sort",
+		"弹药整理",
+		"下一场战斗远程伤害 +1。适合 Cyan 或 Helios 的进攻路线。",
+		"supply",
+		{"growth": {"growth_id": "supply_ammo_sort_ranged", "type": "combat", "target": "temp_ranged_flat", "delta": "1", "duration_scope": "battle", "grant_once": "false"}}
+	))
+	run_state.pending_reward_choices.append(_node_effect_choice(
+		"supply_credit_ration",
+		"压缩口粮",
+		"获得 20 Credits，但不提供下一场战斗加成。",
+		"supply",
+		{"currency_id": "credits", "amount": 20}
+	))
 	run_state.node_results.append({
 		"node_id": String(node.get("id", "")),
 		"node_type": "supply",
 		"result": "pending_choice"
 	})
-	return {"ok": true, "node_type": "supply", "pending_rewards": run_state.pending_reward_choices.size()}
+	return {
+		"ok": true,
+		"node_type": "supply",
+		"pending_rewards": run_state.pending_reward_choices.size(),
+		"decision_summary": "补给节点没有战斗压力，选择 1 项免费收益来稳定下一段路线。"
+	}
 
 func _resolve_reward_node(run_state: RunStateScript, rngs: RngStreamsScript, node: Dictionary, source: String, choice_count: int) -> Dictionary:
 	var reward_ids := _run_catalog.reward_ids_for_source(source)
@@ -442,7 +471,22 @@ func _resolve_reward_node(run_state: RunStateScript, rngs: RngStreamsScript, nod
 			reward["choice_kind"] = "shop_reward"
 			reward["price"] = _shop_price(reward)
 			reward["description"] = String(reward.get("description", "")) + " 价格：%d Credits。" % int(reward.get("price", 0))
+			reward["decision_hint"] = "商店选项：购买后立刻离开商店；Credits 不足时不可购买。"
 			run_state.pending_reward_choices[i] = reward
+		run_state.pending_reward_choices.append(_node_effect_choice(
+			"shop_tactical_tune",
+			"战术调校",
+			"花费 15 Credits，下一场战斗开局护甲 +3。",
+			"shop",
+			{"currency_cost": 15, "growth": {"growth_id": "shop_tactical_tune_block", "type": "stat", "target": "block", "delta": "3", "duration_scope": "battle", "grant_once": "false"}}
+		))
+		run_state.pending_reward_choices.append(_node_effect_choice(
+			"shop_damage_tune",
+			"火力调校",
+			"花费 18 Credits，下一场战斗远程伤害 +1。",
+			"shop",
+			{"currency_cost": 18, "growth": {"growth_id": "shop_damage_tune_ranged", "type": "combat", "target": "temp_ranged_flat", "delta": "1", "duration_scope": "battle", "grant_once": "false"}}
+		))
 		run_state.pending_reward_choices.append(_node_effect_choice(
 			"shop_skip",
 			"离开商店",
@@ -457,7 +501,12 @@ func _resolve_reward_node(run_state: RunStateScript, rngs: RngStreamsScript, nod
 	})
 	if run_state.pending_reward_choices.is_empty():
 		run_state.advance_node()
-	return {"ok": true, "node_type": source, "pending_rewards": run_state.pending_reward_choices.size()}
+	return {
+		"ok": true,
+		"node_type": source,
+		"pending_rewards": run_state.pending_reward_choices.size(),
+		"decision_summary": "商店提供更定向的构筑修正；可花 Credits 购买 1 项，也可免费离开。"
+	}
 
 func _resolve_rest_node(run_state: RunStateScript, node: Dictionary) -> Dictionary:
 	run_state.pending_reward_choices = [
@@ -481,6 +530,13 @@ func _resolve_rest_node(run_state: RunStateScript, node: Dictionary) -> Dictiona
 			"获得 15 Credits，构筑保持不变。",
 			"rest",
 			{"currency_id": "credits", "amount": 15}
+		),
+		_node_effect_choice(
+			"rest_focus",
+			"专注训练",
+			"下一场战斗远程伤害 +1，适合准备打精英或 Boss。",
+			"rest",
+			{"growth": {"growth_id": "rest_focus_ranged", "type": "combat", "target": "temp_ranged_flat", "delta": "1", "duration_scope": "battle", "grant_once": "false"}}
 		)
 	]
 	run_state.node_results.append({
@@ -488,7 +544,12 @@ func _resolve_rest_node(run_state: RunStateScript, node: Dictionary) -> Dictiona
 		"node_type": "rest",
 		"result": "pending_choice"
 	})
-	return {"ok": true, "node_type": "rest", "pending_rewards": run_state.pending_reward_choices.size()}
+	return {
+		"ok": true,
+		"node_type": "rest",
+		"pending_rewards": run_state.pending_reward_choices.size(),
+		"decision_summary": "休息节点在本 Run 生存、下一场战斗安全垫、伤害准备和经济之间选 1 项。"
+	}
 
 func _grant_node_rewards(run_state: RunStateScript, rngs: RngStreamsScript, node: Dictionary, source: String, extra_result: Dictionary) -> Dictionary:
 	var reward_ids := _run_catalog.reward_ids_for_source(source)
@@ -555,8 +616,52 @@ func _apply_node_effect(run_state: RunStateScript, choice: Dictionary) -> Dictio
 				return enchant_result
 	return {"ok": true, "reward_id": String(choice.get("reward_id", "")), "kind": "node_effect"}
 
+func _event_specific_choices(event_id: String, run_state: RunStateScript) -> Array[Dictionary]:
+	var choices: Array[Dictionary] = []
+	match event_id:
+		"ev_signal":
+			choices.append(_node_effect_choice(
+				"event_signal_trace",
+				"追踪信号",
+				"获得 8 Credits，并让下一场战斗远程伤害 +1。",
+				"event",
+				{"currency_id": "credits", "amount": 8, "growth": {"growth_id": "event_signal_trace_ranged", "type": "combat", "target": "temp_ranged_flat", "delta": "1", "duration_scope": "battle", "grant_once": "false"}}
+			))
+		"ev_cache":
+			choices.append(_node_effect_choice(
+				"event_cache_patch",
+				"模块贴片",
+				"下一场战斗开局护甲 +5。没有 Credits 收益，但最稳。",
+				"event",
+				{"growth": {"growth_id": "event_cache_patch_block", "type": "stat", "target": "block", "delta": "5", "duration_scope": "battle", "grant_once": "false"}}
+			))
+			choices.append(_node_effect_choice(
+				"event_cache_overdraw",
+				"过载开箱",
+				"获得 35 Credits，并加入 1 颗高风险 D6。",
+				"event",
+				{"currency_id": "credits", "amount": 35, "hero_build_change": "add_risky_die"}
+			))
+		"ev_forge":
+			choices.append(_node_effect_choice(
+				"event_forge_hull",
+				"锻炉修补",
+				"本 Run 最大生命 +3，并获得 6 Credits。",
+				"event",
+				{"currency_id": "credits", "amount": 6, "growth": {"growth_id": "event_forge_hull", "type": "stat", "target": "base_hp", "delta": "3", "duration_scope": "run", "grant_once": "false"}}
+			))
+			if run_state.progress.get_currency("credits") >= 20:
+				choices.append(_node_effect_choice(
+					"event_forge_deep_enchant",
+					"深层刻印",
+					"花费 20 Credits，写入当前角色专属附魔，并获得下一场开局护甲 +2。",
+					"event",
+					{"currency_cost": 20, "hero_enchant": "signature", "enchant_mode": "replace", "growth": {"growth_id": "event_forge_deep_block", "type": "stat", "target": "block", "delta": "2", "duration_scope": "battle", "grant_once": "false"}}
+				))
+	return choices
+
 func _node_effect_choice(choice_id: String, title: String, description: String, source: String, effect: Dictionary) -> Dictionary:
-	return {
+	var choice := {
 		"reward_id": choice_id,
 		"type": "node_effect",
 		"choice_kind": "node_effect",
@@ -568,6 +673,34 @@ func _node_effect_choice(choice_id: String, title: String, description: String, 
 		"description": description,
 		"node_effect": effect
 	}
+	var cost := int(effect.get("currency_cost", 0))
+	if cost > 0:
+		choice["price"] = cost
+	choice["decision_hint"] = _node_effect_hint(effect)
+	return choice
+
+func _node_effect_hint(effect: Dictionary) -> String:
+	var hints: Array[String] = []
+	var cost := int(effect.get("currency_cost", 0))
+	if cost > 0:
+		hints.append("花费 %d Credits" % cost)
+	if effect.has("amount"):
+		hints.append("获得 %d Credits" % int(effect.get("amount", 0)))
+	if effect.has("growth"):
+		var growth: Dictionary = effect.get("growth", {})
+		var scope := String(growth.get("duration_scope", "battle"))
+		hints.append("获得%s成长：%s %s" % [
+			"下一场" if scope == "battle" else "本 Run",
+			String(growth.get("target", "growth")),
+			String(growth.get("delta", "0"))
+		])
+	if String(effect.get("hero_build_change", "")) == "add_risky_die":
+		hints.append("加入 1 颗高风险 D6")
+	if String(effect.get("hero_enchant", "")) == "signature":
+		hints.append("写入当前角色专属附魔")
+	if hints.is_empty():
+		return "无消耗，直接继续路线。"
+	return "；".join(hints) + "。"
 
 func _shop_price(reward: Dictionary) -> int:
 	match String(reward.get("rarity", "common")):

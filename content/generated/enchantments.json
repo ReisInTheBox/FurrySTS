@@ -3,123 +3,123 @@
 	"rows": [
 		{
 			"enchant_id": "ench_spark_edge",
+			"exclusive_group": "flat_damage",
 			"name": "Spark Edge",
-			"trigger": "OnDiceResolved",
 			"op_type": "damage",
-			"value": "1",
-			"tags": "attack|flat",
 			"rarity": "common",
-			"exclusive_group": "flat_damage"
+			"tags": "attack|flat",
+			"trigger": "OnDiceResolved",
+			"value": "1"
 		},
 		{
 			"enchant_id": "ench_guard_rune",
+			"exclusive_group": "guard",
 			"name": "Guard Rune",
-			"trigger": "OnDiceResolved",
 			"op_type": "add_block",
-			"value": "2",
-			"tags": "defense|block",
 			"rarity": "common",
-			"exclusive_group": "guard"
+			"tags": "defense|block",
+			"trigger": "OnDiceResolved",
+			"value": "2"
 		},
 		{
 			"enchant_id": "ench_marking_rune",
+			"exclusive_group": "mark",
 			"name": "Marking Rune",
-			"trigger": "OnDiceResolved",
 			"op_type": "add_mark",
-			"value": "1",
-			"tags": "mark|attack",
 			"rarity": "uncommon",
-			"exclusive_group": "mark"
+			"tags": "mark|attack",
+			"trigger": "OnDiceResolved",
+			"value": "1"
 		},
 		{
 			"enchant_id": "ench_echo_chip",
+			"exclusive_group": "echo",
 			"name": "Echo Chip",
-			"trigger": "OnDiceResolved",
 			"op_type": "damage_multihit",
-			"value": "1x2",
-			"tags": "attack|multi_hit",
 			"rarity": "rare",
-			"exclusive_group": "echo"
+			"tags": "attack|multi_hit",
+			"trigger": "OnDiceResolved",
+			"value": "1x2"
 		},
 		{
 			"enchant_id": "ench_focus_thread",
+			"exclusive_group": "reroll",
 			"name": "Focus Thread",
-			"trigger": "OnDiceResolved",
 			"op_type": "grant_reroll",
-			"value": "1",
-			"tags": "setup|reroll",
 			"rarity": "uncommon",
-			"exclusive_group": "reroll"
+			"tags": "setup|reroll",
+			"trigger": "OnDiceResolved",
+			"value": "1"
 		},
 		{
 			"enchant_id": "ench_piercing_rune",
+			"exclusive_group": "pierce",
 			"name": "Piercing Rune",
-			"trigger": "OnDiceResolved",
 			"op_type": "set_next_attack_ignore_block",
-			"value": "2",
-			"tags": "pierce|finisher",
 			"rarity": "uncommon",
-			"exclusive_group": "pierce"
+			"tags": "pierce|finisher",
+			"trigger": "OnDiceResolved",
+			"value": "2"
 		},
 		{
 			"enchant_id": "ench_overload_capacitor",
+			"exclusive_group": "resource_gain",
 			"name": "Overload Capacitor",
-			"trigger": "OnDiceResolved",
 			"op_type": "mod_resource",
-			"value": "overload:1",
-			"tags": "cyan|resource|overload",
 			"rarity": "uncommon",
-			"exclusive_group": "resource_gain"
+			"tags": "cyan|resource|overload",
+			"trigger": "OnDiceResolved",
+			"value": "overload:1"
 		},
 		{
 			"enchant_id": "ench_quiver_thread",
+			"exclusive_group": "resource_gain",
 			"name": "Quiver Thread",
-			"trigger": "OnDiceResolved",
 			"op_type": "mod_resource",
-			"value": "quiver:1",
-			"tags": "helios|resource|quiver",
 			"rarity": "uncommon",
-			"exclusive_group": "resource_gain"
+			"tags": "helios|resource|quiver",
+			"trigger": "OnDiceResolved",
+			"value": "quiver:1"
 		},
 		{
 			"enchant_id": "ench_stance_oath",
+			"exclusive_group": "resource_gain",
 			"name": "Stance Oath",
-			"trigger": "OnDiceResolved",
 			"op_type": "mod_resource",
-			"value": "stance:1",
-			"tags": "aurian|resource|stance",
 			"rarity": "uncommon",
-			"exclusive_group": "resource_gain"
+			"tags": "aurian|resource|stance",
+			"trigger": "OnDiceResolved",
+			"value": "stance:1"
 		},
 		{
 			"enchant_id": "ench_rupture_sig",
+			"exclusive_group": "debuff",
 			"name": "Rupture Sigil",
-			"trigger": "OnDiceResolved",
 			"op_type": "add_rupture",
-			"value": "3",
-			"tags": "attack|debuff|execute",
 			"rarity": "rare",
-			"exclusive_group": "debuff"
+			"tags": "attack|debuff|execute",
+			"trigger": "OnDiceResolved",
+			"value": "3"
 		},
 		{
 			"enchant_id": "ench_negative_focus",
+			"exclusive_group": "negative_payoff",
 			"name": "Negative Focus",
-			"trigger": "OnDiceResolved",
 			"op_type": "grant_reroll",
-			"value": "1",
-			"tags": "negative|reroll|risk",
 			"rarity": "common",
-			"exclusive_group": "negative_payoff"
+			"tags": "negative|reroll|risk",
+			"trigger": "OnDiceResolved",
+			"value": "1"
 		},
 		{
 			"enchant_id": "ench_guardian_seal",
+			"exclusive_group": "guard",
 			"name": "Guardian Seal",
-			"trigger": "OnDiceResolved",
 			"op_type": "add_block",
-			"value": "3",
-			"tags": "defense|counter|guard",
 			"rarity": "uncommon",
-			"exclusive_group": "guard"
+			"tags": "defense|counter|guard",
+			"trigger": "OnDiceResolved",
+			"value": "3"
 		}
 	],
 	"source": "res://content/csv/enchantments.csv"

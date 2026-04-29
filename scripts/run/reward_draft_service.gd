@@ -47,6 +47,9 @@ func _draft_from_rows(
 		expanded["description"] = _reward_description(expanded)
 		expanded["rarity_label"] = _rarity_label(str(expanded.get("rarity", "common")))
 		expanded["scope_label"] = _scope_label(expanded)
+		var bd_tags := _bd_tags(expanded)
+		expanded["bd_tags"] = bd_tags
+		expanded["bd_label"] = _bd_label(bd_tags)
 		candidates.append(expanded)
 
 	if candidates.is_empty():
@@ -244,6 +247,71 @@ func _growth_description(growth: Dictionary) -> String:
 		return "本%s资源上限 +%d。" % [scope_text, delta]
 	var delta_text := ("+" if delta >= 0 else "") + str(delta)
 	return "成长 %s:%s %s，作用于本%s。" % [growth_type, target, delta_text, scope_text]
+
+func _bd_tags(reward: Dictionary) -> Array[String]:
+	var haystack := _reward_search_text(reward)
+	var out: Array[String] = []
+	if _has_any(haystack, ["cyan", "overload", "pulse", "core", "multi_hit", "overheat", "tech"]):
+		_add_unique(out, "Cyan:反应炉爆发")
+	if _has_any(haystack, ["shift", "cooldown", "vent", "reroll", "stable"]):
+		_add_unique(out, "Cyan:棱镜控制")
+	if _has_any(haystack, ["drone", "summon", "tech"]):
+		_add_unique(out, "Cyan:无人机火线")
+	if _has_any(haystack, ["helios", "mark", "scope", "precision", "pierce", "quiver"]):
+		_add_unique(out, "Helios:标记处决")
+	if _has_any(haystack, ["hunt", "wild", "reroll", "stable", "field_jacket"]):
+		_add_unique(out, "Helios:游击循环")
+	if _has_any(haystack, ["companion", "whistle", "summon"]):
+		_add_unique(out, "Helios:伙伴猎杀")
+	if _has_any(haystack, ["aurian", "guard", "block", "counter", "banner", "spiked", "stance"]):
+		_add_unique(out, "Aurian:铁壁反击")
+	if _has_any(haystack, ["blade", "might", "execute", "finisher", "throwing", "rupture"]):
+		_add_unique(out, "Aurian:誓约处决")
+	if _has_any(haystack, ["blood", "self_damage", "negative", "risk", "whetstone"]):
+		_add_unique(out, "Aurian:血价狂战")
+	if out.is_empty():
+		if String(reward.get("type", "")) == "currency":
+			out.append("通用:经济")
+		elif String(reward.get("type", "")) == "growth":
+			out.append("通用:安全垫")
+		elif ENCHANT_REWARD_TYPES.has(String(reward.get("type", ""))):
+			out.append("通用:附魔构筑")
+		else:
+			out.append("通用:构筑修正")
+	return out
+
+func _bd_label(tags: Array[String]) -> String:
+	if tags.is_empty():
+		return ""
+	return " / ".join(PackedStringArray(tags))
+
+func _reward_search_text(reward: Dictionary) -> String:
+	var parts: Array[String] = []
+	for key in ["reward_id", "type", "value", "title", "description"]:
+		parts.append(String(reward.get(key, "")))
+	if reward.has("equipment"):
+		var equipment: Dictionary = reward.get("equipment", {})
+		for key in ["equipment_id", "display_name", "tags", "description"]:
+			parts.append(String(equipment.get(key, "")))
+	if reward.has("enchantment"):
+		var enchantment: Dictionary = reward.get("enchantment", {})
+		for key in ["enchant_id", "name", "op_type", "tags"]:
+			parts.append(String(enchantment.get(key, "")))
+	if reward.has("growth"):
+		var growth: Dictionary = reward.get("growth", {})
+		for key in ["growth_id", "type", "target"]:
+			parts.append(String(growth.get(key, "")))
+	return " ".join(parts).to_lower()
+
+func _has_any(text: String, needles: Array) -> bool:
+	for needle_any in needles:
+		if text.find(String(needle_any).to_lower()) >= 0:
+			return true
+	return false
+
+func _add_unique(out: Array[String], value: String) -> void:
+	if not out.has(value):
+		out.append(value)
 
 func _build_change_from_reward(reward: Dictionary) -> Dictionary:
 	var reward_type := String(reward.get("type", ""))

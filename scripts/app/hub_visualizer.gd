@@ -3,11 +3,16 @@ extends Control
 signal start_run_requested(hero_id: String)
 
 const HubStateScript = preload("res://scripts/hub/hub_state.gd")
+const ContentLoaderScript = preload("res://scripts/content/content_loader.gd")
+const ArtCatalogScript = preload("res://scripts/content/art_catalog.gd")
+const ArtSlotFactoryScript = preload("res://scripts/ui/art_slot_factory.gd")
 
 var _hub_state: HubStateScript
 
 var _summary_label: Label
+var _hub_lore_label: Label
 var _hero_buttons_row: HFlowContainer
+var _hero_art_holder: Control
 var _selected_hero_label: Label
 var _upgrade_row: HFlowContainer
 var _equipment_row: HFlowContainer
@@ -36,6 +41,12 @@ func _build_ui() -> void:
 	bg.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	bg.color = Color(0.045, 0.035, 0.06, 1.0)
 	add_child(bg)
+
+	var bg_art := _art_slot("bg_hub", Vector2(0, 0), "前线整备站", "信标仍亮，整备后再出发")
+	bg_art.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	bg_art.modulate = Color(1, 1, 1, 0.2)
+	_set_mouse_filter_recursive(bg_art, Control.MOUSE_FILTER_IGNORE)
+	add_child(bg_art)
 
 	var root := MarginContainer.new()
 	root.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
@@ -81,10 +92,20 @@ func _build_top_panel() -> Control:
 	panel.add_child(v)
 
 	var title := Label.new()
-	title.text = "Hub - 前线整备"
+	title.text = "前线整备站 - 信标仍亮"
 	title.add_theme_font_size_override("font_size", 24)
 	title.modulate = Color(1.0, 0.97, 0.92)
 	v.add_child(title)
+
+	_hub_lore_label = Label.new()
+	_hub_lore_label.text = "这里不是安全城镇，而是裂隙边缘还能记录坐标、校准 D6、打开撤离窗口的前线信标。每次归来都会让它多撑一天。"
+	_hub_lore_label.autowrap_mode = TextServer.AUTOWRAP_WORD
+	_hub_lore_label.modulate = Color(0.86, 0.82, 0.72)
+	v.add_child(_hub_lore_label)
+
+	_hero_art_holder = MarginContainer.new()
+	_hero_art_holder.custom_minimum_size = Vector2(0, 112)
+	v.add_child(_hero_art_holder)
 
 	_summary_label = Label.new()
 	_summary_label.autowrap_mode = TextServer.AUTOWRAP_WORD
@@ -123,13 +144,13 @@ func _build_progression_panel() -> Control:
 	panel.add_child(v)
 
 	var title := Label.new()
-	title.text = "局外成长"
+	title.text = "信标整备"
 	title.add_theme_font_size_override("font_size", 19)
 	title.modulate = Color(0.94, 1.0, 0.94)
 	v.add_child(title)
 
 	var hint := Label.new()
-	hint.text = "消耗 Credits 购买永久整备项，下一局 Run 会自动生效。"
+	hint.text = "把带回的 Credits 投入 Hub：修复信标、预载护甲、扩展仓库。成长会在下一次路线行动中自动生效。"
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD
 	hint.modulate = Color(0.78, 0.88, 0.82)
 	v.add_child(hint)
@@ -150,7 +171,7 @@ func _build_relationship_panel() -> Control:
 	panel.add_child(v)
 
 	var title := Label.new()
-	title.text = "关系与解锁"
+	title.text = "信标记录"
 	title.add_theme_font_size_override("font_size", 19)
 	title.modulate = Color(0.96, 0.92, 1.0)
 	v.add_child(title)
@@ -171,7 +192,7 @@ func _build_loadout_panel() -> Control:
 	panel.add_child(v)
 
 	var title := Label.new()
-	title.text = "基础构筑"
+	title.text = "D6 校准"
 	title.add_theme_font_size_override("font_size", 19)
 	title.modulate = Color(0.94, 0.97, 1.0)
 	v.add_child(title)
@@ -218,13 +239,13 @@ func _build_equipment_panel() -> Control:
 	panel.add_child(v)
 
 	var title := Label.new()
-	title.text = "Equipment - weapon / armor / item"
+	title.text = "装备仓库 - weapon / armor / item"
 	title.add_theme_font_size_override("font_size", 19)
 	title.modulate = Color(0.94, 1.0, 0.9)
 	v.add_child(title)
 
 	var hint := Label.new()
-	hint.text = "Click stored equipment to equip it into its fixed slot. Broken gear cannot be carried."
+	hint.text = "点击仓库装备并装入固定槽位。多次带回的装备会累积损耗，broken 装备不能出发。"
 	hint.autowrap_mode = TextServer.AUTOWRAP_WORD
 	hint.modulate = Color(0.8, 0.9, 0.75)
 	v.add_child(hint)
@@ -251,7 +272,7 @@ func _build_result_panel() -> Control:
 	panel.add_child(v)
 
 	var title := Label.new()
-	title.text = "上次 Run 结算"
+	title.text = "上次路线回收"
 	title.add_theme_font_size_override("font_size", 19)
 	title.modulate = Color(0.96, 0.98, 1.0)
 	v.add_child(title)
@@ -278,14 +299,14 @@ func _build_action_bar() -> Control:
 	panel.add_child(row)
 
 	var label := Label.new()
-	label.text = "准备好后进入下一局。若内容超出屏幕，请滚动中间区域。"
+	label.text = "整备完成后打开下一条短暂路线。撤离不是认输，带回资源和记录就是 Hub 的生存方式。"
 	label.autowrap_mode = TextServer.AUTOWRAP_WORD
 	label.size_flags_horizontal = SIZE_EXPAND_FILL
 	label.modulate = Color(0.96, 0.9, 0.78)
 	row.add_child(label)
 
 	_start_run_btn = Button.new()
-	_start_run_btn.text = "进入下一局 Run"
+	_start_run_btn.text = "打开路线"
 	_start_run_btn.custom_minimum_size = Vector2(190, 44)
 	_start_run_btn.pressed.connect(_on_start_run_pressed)
 	row.add_child(_start_run_btn)
@@ -295,14 +316,14 @@ func _render_ui() -> void:
 	if _hub_state == null:
 		_hub_state = HubStateScript.new()
 
-	_summary_label.text = "累计 Run %d 局 | 完成 %d | 撤离 %d | 失败 %d | 库存 %d Credits" % [
+	_summary_label.text = "信标记录：路线行动 %d 次 | 稳定核心 %d | 成功撤离 %d | 信标拖回 %d | 库存 %d Credits" % [
 		_hub_state.run_count,
 		_hub_state.completed_runs,
 		_hub_state.evacuated_runs,
 		_hub_state.failed_runs,
 		_hub_state.banked_credits
 	]
-	_selected_hero_label.text = "当前出战：%s | D6 构筑 %d/%d | 已购成长 %d 项" % [
+	_selected_hero_label.text = "当前出战：%s | D6 校准 %d/%d | Hub 整备 %d 项" % [
 		_hero_name(_hub_state.selected_hero_id),
 		_hub_state.selected_loadout().size(),
 		HubStateScript.DEFAULT_LOADOUT_SIZE,
@@ -310,6 +331,7 @@ func _render_ui() -> void:
 	]
 	_last_run_label.text = _hub_state.last_run_summary()
 	_render_hero_buttons()
+	_render_hero_art()
 	_render_upgrades()
 	_render_equipment()
 	_render_relationship()
@@ -327,6 +349,30 @@ func _render_hero_buttons() -> void:
 		btn.disabled = hero_id == _hub_state.selected_hero_id
 		btn.pressed.connect(_on_hero_selected.bind(hero_id))
 		_hero_buttons_row.add_child(btn)
+
+func _render_hero_art() -> void:
+	if _hero_art_holder == null:
+		return
+	for child in _hero_art_holder.get_children():
+		child.queue_free()
+	var loader := ContentLoaderScript.new()
+	var row := loader.find_row_by_id("npcs", _hub_state.selected_hero_id)
+	var art_id := String(row.get("portrait_id", ""))
+	var catalog := ArtCatalogScript.new(loader)
+	var factory := ArtSlotFactoryScript.new(catalog)
+	_hero_art_holder.add_child(factory.create_slot(art_id, Vector2(0, 112), _hero_name(_hub_state.selected_hero_id), "当前出战角色"))
+
+func _art_slot(art_id: String, slot_size: Vector2, fallback_title: String, fallback_subtitle: String) -> Control:
+	var loader := ContentLoaderScript.new()
+	var catalog := ArtCatalogScript.new(loader)
+	var factory := ArtSlotFactoryScript.new(catalog)
+	return factory.create_slot(art_id, slot_size, fallback_title, fallback_subtitle)
+
+func _set_mouse_filter_recursive(node: Node, filter: int) -> void:
+	if node is Control:
+		(node as Control).mouse_filter = filter
+	for child in node.get_children():
+		_set_mouse_filter_recursive(child, filter)
 
 func _render_upgrades() -> void:
 	for child in _upgrade_row.get_children():
@@ -437,13 +483,13 @@ func _render_last_run_details() -> void:
 
 func _on_hero_selected(hero_id: String) -> void:
 	_hub_state.select_hero(hero_id)
-	_feedback_label.text = "已切换出战角色：%s" % _hero_name(hero_id)
+	_feedback_label.text = "已重新分配本次路线出战者：%s" % _hero_name(hero_id)
 	_render_ui()
 
 func _on_upgrade_pressed(upgrade_id: String) -> void:
 	var result := _hub_state.purchase_upgrade(_hub_state.selected_hero_id, upgrade_id)
 	if bool(result.get("ok", false)):
-		_feedback_label.text = "购买成功，花费 %d Credits。" % int(result.get("cost", 0))
+		_feedback_label.text = "Hub 整备完成，花费 %d Credits。" % int(result.get("cost", 0))
 	else:
 		_feedback_label.text = "购买失败：%s" % String(result.get("reason", "unknown"))
 	_render_ui()
@@ -451,7 +497,7 @@ func _on_upgrade_pressed(upgrade_id: String) -> void:
 func _on_die_toggled(die_id: String) -> void:
 	var result := _hub_state.toggle_die_in_selected_loadout(die_id)
 	if bool(result.get("ok", false)):
-		_feedback_label.text = "D6 构筑已更新：%s" % _die_name(die_id)
+		_feedback_label.text = "D6 校准已更新：%s" % _die_name(die_id)
 	else:
 		_feedback_label.text = "构筑更新失败：%s" % String(result.get("reason", "unknown"))
 	_render_ui()
@@ -459,7 +505,7 @@ func _on_die_toggled(die_id: String) -> void:
 func _on_equipment_pressed(instance_id: String) -> void:
 	var result := _hub_state.equip_storage_instance(_hub_state.selected_hero_id, instance_id)
 	if bool(result.get("ok", false)):
-		_feedback_label.text = "Equipped %s into %s." % [instance_id, String(result.get("equip_slot", ""))]
+		_feedback_label.text = "装备已装入 %s：%s" % [String(result.get("equip_slot", "")), instance_id]
 	else:
 		_feedback_label.text = "Equipment failed: %s" % String(result.get("reason", "unknown"))
 	_render_ui()

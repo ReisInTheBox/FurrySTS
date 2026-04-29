@@ -3,9 +3,11 @@
 	"rows": [
 		{
 			"base_hp": "22",
+			"battle_sprite_id": "portrait_cyan",
 			"dice_pool": "cyan_pulse_die|cyan_shift_die|cyan_core_die",
 			"id": "cyan_ryder",
 			"name": "Cyan Ryder",
+			"portrait_id": "portrait_cyan",
 			"resource_cap": "3",
 			"resource_init": "0",
 			"resource_type": "overload",
@@ -13,9 +15,11 @@
 		},
 		{
 			"base_hp": "25",
+			"battle_sprite_id": "portrait_helios",
 			"dice_pool": "helios_hunt_die|helios_mark_die|helios_wild_die",
 			"id": "helios_windchaser",
 			"name": "Helios Windchaser",
+			"portrait_id": "portrait_helios",
 			"resource_cap": "3",
 			"resource_init": "3",
 			"resource_type": "quiver",
@@ -23,9 +27,11 @@
 		},
 		{
 			"base_hp": "24",
+			"battle_sprite_id": "portrait_aurian",
 			"dice_pool": "aurian_blade_die|aurian_guard_die|aurian_might_die",
 			"id": "umbral_draxx",
 			"name": "Aurian",
+			"portrait_id": "portrait_aurian",
 			"resource_cap": "2",
 			"resource_init": "0",
 			"resource_type": "stance",

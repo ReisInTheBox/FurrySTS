@@ -13,7 +13,7 @@
 			"node_type": "battle",
 			"phase": "starter",
 			"pool": "start",
-			"requires_after_layer": "First contact. Break through the vanguard.",
+			"requires_after_layer": "第一次接触：旧前线守卫挡在信标外缘。",
 			"text": "",
 			"weight": "100"
 		},
@@ -29,7 +29,7 @@
 			"node_type": "battle",
 			"phase": "starter",
 			"pool": "starter",
-			"requires_after_layer": "Another patrol blocks the way forward.",
+			"requires_after_layer": "巡逻残兵封锁了下一段坐标。",
 			"text": "",
 			"weight": "60"
 		},
@@ -45,7 +45,7 @@
 			"node_type": "battle",
 			"phase": "starter",
 			"pool": "starter",
-			"requires_after_layer": "A fast hunter tests your early defense.",
+			"requires_after_layer": "高速猎手逼近，测试早期防线。",
 			"text": "",
 			"weight": "35"
 		},
@@ -61,14 +61,14 @@
 			"node_type": "event",
 			"phase": "starter",
 			"pool": "starter",
-			"requires_after_layer": "A faint signal points to a risky salvage route.",
+			"requires_after_layer": "微弱信号指向一处风险回收点。",
 			"text": "",
 			"weight": "28"
 		},
 		{
 			"allow_evac": "false",
 			"battle_enemy_id": "2",
-			"elite_weight_bias": "A safe cache offers a small stabilizer.",
+			"elite_weight_bias": "安全缓存还能提供一次小型稳定。",
 			"event_id": "4",
 			"id": "rn_starter_supply_cache",
 			"max_layer": "0",
@@ -93,7 +93,7 @@
 			"node_type": "battle",
 			"phase": "mid",
 			"pool": "mid",
-			"requires_after_layer": "A fast hunter pressures your dice control.",
+			"requires_after_layer": "猎手压迫 D6 控制节奏。",
 			"text": "",
 			"weight": "35"
 		},
@@ -109,7 +109,7 @@
 			"node_type": "battle",
 			"phase": "mid",
 			"pool": "mid",
-			"requires_after_layer": "A hardened vanguard blocks a richer route.",
+			"requires_after_layer": "加固守卫挡住更富集的路线。",
 			"text": "",
 			"weight": "30"
 		},
@@ -125,7 +125,7 @@
 			"node_type": "event",
 			"phase": "mid",
 			"pool": "mid",
-			"requires_after_layer": "A side channel offers a build-altering choice.",
+			"requires_after_layer": "侧向信号提供一次改造构筑的机会。",
 			"text": "",
 			"weight": "28"
 		},
@@ -141,14 +141,14 @@
 			"node_type": "event",
 			"phase": "mid",
 			"pool": "mid",
-			"requires_after_layer": "A sealed cache can reshape your run.",
+			"requires_after_layer": "密封缓存可能重塑本次路线。",
 			"text": "",
 			"weight": "18"
 		},
 		{
 			"allow_evac": "false",
 			"battle_enemy_id": "5",
-			"elite_weight_bias": "A supply point lets you stabilize before pushing deeper.",
+			"elite_weight_bias": "补给点能在继续深入前稳定状态。",
 			"event_id": "8",
 			"id": "rn_mid_supply_cache",
 			"max_layer": "0",
@@ -164,7 +164,7 @@
 		{
 			"allow_evac": "false",
 			"battle_enemy_id": "5",
-			"elite_weight_bias": "A field trader offers controlled build edits.",
+			"elite_weight_bias": "游离商队提供可控构筑手术。",
 			"event_id": "8",
 			"id": "rn_mid_shop_trader",
 			"max_layer": "4",
@@ -189,7 +189,7 @@
 			"node_type": "elite",
 			"phase": "mid",
 			"pool": "mid",
-			"requires_after_layer": "An elite threat guards a rare upgrade route.",
+			"requires_after_layer": "稀有升级路线被深层威胁守住。",
 			"text": "",
 			"weight": "10"
 		},
@@ -205,7 +205,7 @@
 			"node_type": "battle",
 			"phase": "deep",
 			"pool": "deep",
-			"requires_after_layer": "Deep pressure starts locking your options.",
+			"requires_after_layer": "深层压力开始锁住选择。",
 			"text": "",
 			"weight": "35"
 		},
@@ -221,7 +221,7 @@
 			"node_type": "battle",
 			"phase": "deep",
 			"pool": "deep",
-			"requires_after_layer": "A relentless hunter punishes loose sequencing.",
+			"requires_after_layer": "持续追猎会惩罚松散结算。",
 			"text": "",
 			"weight": "25"
 		},
@@ -237,7 +237,7 @@
 			"node_type": "elite",
 			"phase": "deep",
 			"pool": "deep",
-			"requires_after_layer": "An elite howl tests whether your build is real.",
+			"requires_after_layer": "精英嚎声检验构筑是否真正成型。",
 			"text": "",
 			"weight": "20"
 		},
@@ -253,7 +253,7 @@
 			"node_type": "event",
 			"phase": "deep",
 			"pool": "deep",
-			"requires_after_layer": "A dangerous cache can reshape the final push.",
+			"requires_after_layer": "危险缓存能改变最后推进。",
 			"text": "",
 			"weight": "24"
 		},
@@ -269,14 +269,14 @@
 			"node_type": "event",
 			"phase": "deep",
 			"pool": "deep",
-			"requires_after_layer": "A late signal offers power at an awkward price.",
+			"requires_after_layer": "迟来的信号以别扭代价提供力量。",
 			"text": "",
 			"weight": "12"
 		},
 		{
 			"allow_evac": "false",
 			"battle_enemy_id": "9",
-			"elite_weight_bias": "A quiet pocket gives time to recover.",
+			"elite_weight_bias": "虚空暂退的静默口袋允许短暂整备。",
 			"event_id": "12",
 			"id": "rn_deep_rest_pocket",
 			"max_layer": "8",
@@ -292,7 +292,7 @@
 		{
 			"allow_evac": "false",
 			"battle_enemy_id": "9",
-			"elite_weight_bias": "A final trader offers precise build surgery.",
+			"elite_weight_bias": "最后的交易点提供精确改造。",
 			"event_id": "12",
 			"id": "rn_deep_shop_trader",
 			"max_layer": "8",
@@ -308,7 +308,7 @@
 		{
 			"allow_evac": "boss_vanguard",
 			"battle_enemy_id": "13",
-			"elite_weight_bias": "The vanguard core tests your finished build.",
+			"elite_weight_bias": "守卫核心检验完成后的 D6 构筑。",
 			"event_id": "13",
 			"id": "rn_boss_vanguard",
 			"max_layer": "0",

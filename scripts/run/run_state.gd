@@ -83,7 +83,7 @@ func advance_node() -> void:
 		return
 	current_node_index += 1
 	if current_node_index >= route_nodes.size():
-		_finish_completed("Route completed.")
+		_finish_completed("路线核心已稳定。Hub 获得新的坐标记录，下一次出发会更清楚。")
 
 func advance_after_node() -> void:
 	if route_layers.is_empty():
@@ -91,7 +91,7 @@ func advance_after_node() -> void:
 		return
 	var completed_node := current_node()
 	if completed_node.is_empty():
-		_finish_completed("Route completed.")
+		_finish_completed("路线核心已稳定。Hub 获得新的坐标记录，下一次出发会更清楚。")
 		return
 
 	var completed_uid := String(completed_node.get("route_node_uid", current_node_uid))
@@ -105,7 +105,7 @@ func advance_after_node() -> void:
 	if next_layer.is_empty():
 		current_available_uids.clear()
 		current_node_uid = ""
-		_finish_completed("Route completed.")
+		_finish_completed("路线核心已稳定。Hub 获得新的坐标记录，下一次出发会更清楚。")
 		return
 
 	var next_uids: Array[String] = []

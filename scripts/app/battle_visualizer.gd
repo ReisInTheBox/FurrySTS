@@ -8,6 +8,8 @@ const ActionLoggerScript = preload("res://scripts/core/action_logger.gd")
 const CombatStateScript = preload("res://scripts/combat/combat_state.gd")
 const BattleSimulatorScript = preload("res://scripts/combat/battle_simulator.gd")
 const ContentLoaderScript = preload("res://scripts/content/content_loader.gd")
+const ArtCatalogScript = preload("res://scripts/content/art_catalog.gd")
+const ArtSlotFactoryScript = preload("res://scripts/ui/art_slot_factory.gd")
 const UnitFactoryScript = preload("res://scripts/content/unit_factory.gd")
 const CombatCatalogScript = preload("res://scripts/content/combat_catalog.gd")
 const DiceFaceDefinitionScript = preload("res://scripts/combat/dice_face_definition.gd")
@@ -58,6 +60,8 @@ var _enemy_name: Label
 var _enemy_hp_bar: ProgressBar
 var _enemy_meta: Label
 var _enemy_status: Label
+var _player_art_holder: Control
+var _enemy_art_holder: Control
 
 var _reroll_btn: Button
 var _reroll_mode_btn: Button
@@ -127,6 +131,12 @@ func _build_ui() -> void:
 	bg.color = Color(0.05, 0.07, 0.11, 1.0)
 	add_child(bg)
 
+	var bg_art := _art_slot("bg_battle", Vector2(0, 0), "Battle Line", "Read intents spend dice manage resources")
+	bg_art.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
+	bg_art.modulate = Color(1, 1, 1, 0.28)
+	_set_mouse_filter_recursive(bg_art, Control.MOUSE_FILTER_IGNORE)
+	add_child(bg_art)
+
 	var root := MarginContainer.new()
 	root.set_anchors_and_offsets_preset(PRESET_FULL_RECT)
 	root.add_theme_constant_override("margin_left", 18)
@@ -156,7 +166,7 @@ func _build_header_bar() -> Control:
 	panel.add_child(row)
 
 	var title := Label.new()
-	title.text = "FurrySTS Battle"
+	title.text = "Beacon Dice Battle"
 	title.add_theme_font_size_override("font_size", 22)
 	title.modulate = Color(0.9, 0.93, 1.0)
 	title.size_flags_horizontal = SIZE_EXPAND_FILL
@@ -226,28 +236,29 @@ func _build_unit_panel(is_enemy: bool) -> Control:
 	spacer.size_flags_vertical = SIZE_EXPAND_FILL
 	v.add_child(spacer)
 
-	var art_stub := ColorRect.new()
-	art_stub.custom_minimum_size = Vector2(0, 28)
-	art_stub.color = Color(0.14, 0.2, 0.31, 0.75) if not is_enemy else Color(0.33, 0.14, 0.16, 0.75)
-	v.add_child(art_stub)
+	var art_holder := MarginContainer.new()
+	art_holder.custom_minimum_size = Vector2(0, 56)
+	v.add_child(art_holder)
 
 	if is_enemy:
 		_enemy_name = name_label
 		_enemy_hp_bar = hp_bar
 		_enemy_meta = meta
 		_enemy_status = status
+		_enemy_art_holder = art_holder
 	else:
 		_player_name = name_label
 		_player_hp_bar = hp_bar
 		_player_meta = meta
 		_player_status = status
+		_player_art_holder = art_holder
 
 	return card
 
 func _build_center_token() -> Control:
 	var center := VBoxContainer.new()
 	center.alignment = BoxContainer.ALIGNMENT_CENTER
-	center.custom_minimum_size = Vector2(190, 135)
+	center.custom_minimum_size = Vector2(240, 150)
 	center.add_theme_constant_override("separation", 10)
 
 	var intent_panel := PanelContainer.new()
@@ -255,9 +266,10 @@ func _build_center_token() -> Control:
 	center.add_child(intent_panel)
 
 	_enemy_intent_value = Label.new()
-	_enemy_intent_value.custom_minimum_size = Vector2(170, 34)
+	_enemy_intent_value.custom_minimum_size = Vector2(230, 78)
 	_enemy_intent_value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_enemy_intent_value.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_enemy_intent_value.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_enemy_intent_value.add_theme_font_size_override("font_size", 18)
 	_enemy_intent_value.modulate = Color(0.95, 0.9, 1.0)
 	intent_panel.add_child(_enemy_intent_value)
@@ -495,6 +507,7 @@ func _render_ui() -> void:
 	_enemy_hp_bar.value = _state.enemy.hp
 	_enemy_meta.text = "HP %d/%d | Block %d | Mark %d" % [_state.enemy.hp, _state.enemy.max_hp, _state.enemy.block, _state.enemy.marks]
 	_enemy_status.text = "Rupture +%d" % _state.enemy.rupture_bonus
+	_render_unit_art()
 
 	if _state.battle_ended():
 		_enemy_intent_value.text = "意图：无"
@@ -503,7 +516,7 @@ func _render_ui() -> void:
 			_feedback_value.text = "战斗结束。返回 Run 继续。"
 	else:
 		var intent := _simulator.preview_enemy_intent(_state, _rngs)
-		_enemy_intent_value.text = "意图: 攻击 %d (%s)" % [intent.attack_value, intent.source]
+		_enemy_intent_value.text = _intent_text(intent)
 		_result_value.text = "结果：战斗中"
 
 	_run_summary.text = _battle_context_summary()
@@ -525,6 +538,104 @@ func _render_ui() -> void:
 	_return_btn.visible = _managed_by_run
 	_return_btn.text = "返回 Run" if _state.battle_ended() else "撤退回 Run"
 	_return_btn.disabled = not _managed_by_run
+
+func _render_unit_art() -> void:
+	_fill_art_holder(_player_art_holder, _unit_art_id(false), _pretty_id(_hero_id), "Player")
+	_fill_art_holder(_enemy_art_holder, _unit_art_id(true), _pretty_id(_enemy_id), "Enemy")
+
+func _fill_art_holder(holder: Control, art_id: String, title: String, subtitle: String) -> void:
+	if holder == null:
+		return
+	for child in holder.get_children():
+		child.queue_free()
+	holder.add_child(_art_slot(art_id, Vector2(0, 56), title, subtitle))
+
+func _unit_art_id(is_enemy: bool) -> String:
+	var loader := _loader if _loader != null else ContentLoaderScript.new()
+	var table := "enemies" if is_enemy else "npcs"
+	var row_id := _enemy_id if is_enemy else _hero_id
+	var row := loader.find_row_by_id(table, row_id)
+	var key := "battle_sprite_id"
+	var fallback_key := "portrait_id"
+	var value := String(row.get(key, ""))
+	if value == "":
+		value = String(row.get(fallback_key, ""))
+	return value
+
+func _art_slot(art_id: String, slot_size: Vector2, fallback_title: String, fallback_subtitle: String) -> Control:
+	var loader := _loader if _loader != null else ContentLoaderScript.new()
+	var catalog := ArtCatalogScript.new(loader)
+	var factory := ArtSlotFactoryScript.new(catalog)
+	return factory.create_slot(art_id, slot_size, fallback_title, fallback_subtitle)
+
+func _set_mouse_filter_recursive(node: Node, filter: int) -> void:
+	if node is Control:
+		(node as Control).mouse_filter = filter
+	for child in node.get_children():
+		_set_mouse_filter_recursive(child, filter)
+
+func _intent_text(intent) -> String:
+	var parts: Array[String] = []
+	if intent.attack_value > 0:
+		parts.append("攻击 %d" % intent.attack_value)
+	if intent.block_value > 0:
+		parts.append("护甲 +%d" % intent.block_value)
+	if intent.status_type != "":
+		parts.append(_intent_status_text(intent.status_type, intent.status_value))
+	if parts.is_empty():
+		parts.append("观察")
+	var text := "意图：%s" % " / ".join(parts)
+	var telegraph := String(intent.telegraph)
+	if telegraph != "":
+		text += "\n预兆：" + telegraph
+	var counter_text := _counter_tag_text(String(intent.counter_tag))
+	if counter_text != "":
+		text += "\n针对：" + counter_text
+	return text
+
+func _intent_status_text(status_type: String, value: int) -> String:
+	match status_type:
+		"lock_die":
+			return "下回合锁骰 %d" % value
+		"pollute_die":
+			return "本回合重骰 -%d" % value
+		"tax_reroll":
+			return "重骰压力 -%d" % value
+		"drain_resource":
+			return "资源 -%d" % value
+		"shed_mark":
+			return "清除标记"
+		"disable_summon":
+			return "压制召唤 %d" % value
+		_:
+			return "%s %d" % [status_type, value]
+
+func _counter_tag_text(counter_tag: String) -> String:
+	match counter_tag:
+		"mark":
+			return "标记/点杀路线"
+		"counter":
+			return "反击与格挡路线"
+		"summon":
+			return "召唤/同伴路线"
+		"overload":
+			return "过载资源"
+		"negative":
+			return "负面骰面与高风险构筑"
+		"reroll":
+			return "重骰资源"
+		"attack":
+			return "纯攻击竞速"
+		"defense":
+			return "防御拖回合"
+		"setup":
+			return "蓄力/铺垫"
+		"control":
+			return "控制与锁骰"
+		"cleanse":
+			return "净化/稳定路线"
+		_:
+			return ""
 func _render_cards() -> void:
 	for child in _card_row.get_children():
 		child.queue_free()
@@ -586,7 +697,8 @@ func _render_rewards() -> void:
 		var reward: Dictionary = _pending_rewards[i]
 		var btn := Button.new()
 		btn.custom_minimum_size = Vector2(240, 112)
-		btn.text = "[%s | %s]\n%s\n%s" % [str(reward.get("rarity_label", "Common")), str(reward.get("scope_label", "Run")), str(reward.get("title", "Reward")), str(reward.get("description", ""))]
+		var bd_hint := _reward_bd_hint(reward)
+		btn.text = "[%s | %s]\n%s\n%s%s" % [str(reward.get("rarity_label", "Common")), str(reward.get("scope_label", "Run")), str(reward.get("title", "Reward")), str(reward.get("description", "")), bd_hint]
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD
 		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		var rarity_colors := _reward_colors(str(reward.get("rarity", "common")))
@@ -937,6 +1049,12 @@ func _reward_history_text() -> String:
 			break
 	return "当前成长: %s" % ", ".join(names)
 
+func _reward_bd_hint(reward: Dictionary) -> String:
+	var label := String(reward.get("bd_label", ""))
+	if label == "":
+		return ""
+	return "\nBD 提示：" + label
+
 func _growth_short_name(growth: Dictionary) -> String:
 	var target := str(growth.get("target", ""))
 	var delta := int(growth.get("delta", "0"))
@@ -1020,4 +1138,3 @@ func _style_card(bg: Color, border: Color) -> StyleBoxFlat:
 	sb.content_margin_top = 8
 	sb.content_margin_bottom = 8
 	return sb
-

@@ -1,0 +1,141 @@
+{
+	"row_count": 15,
+	"rows": [
+		{
+			"art_id": "portrait_cyan",
+			"kind": "portrait",
+			"path": "Cyan Ryder",
+			"placeholder_subtitle": "1a6fa8",
+			"placeholder_title": "Blue dragon starship captain",
+			"tint_a": "59d7ff",
+			"tint_b": ""
+		},
+		{
+			"art_id": "portrait_helios",
+			"kind": "portrait",
+			"path": "Helios Windchaser",
+			"placeholder_subtitle": "b37a25",
+			"placeholder_title": "Griffin ranger and hunter",
+			"tint_a": "ffe08a",
+			"tint_b": ""
+		},
+		{
+			"art_id": "portrait_aurian",
+			"kind": "portrait",
+			"path": "Aurian",
+			"placeholder_subtitle": "2b2d38",
+			"placeholder_title": "Black dragon oathbound knight",
+			"tint_a": "b9b4a8",
+			"tint_b": ""
+		},
+		{
+			"art_id": "enemy_vanguard",
+			"kind": "enemy",
+			"path": "Hub Edge Vanguard",
+			"placeholder_subtitle": "7f2f35",
+			"placeholder_title": "Armored rhythm test",
+			"tint_a": "ff7b62",
+			"tint_b": ""
+		},
+		{
+			"art_id": "enemy_stalker",
+			"kind": "enemy",
+			"path": "Reef Stalker",
+			"placeholder_subtitle": "2b7f6a",
+			"placeholder_title": "Reroll and mark pressure",
+			"tint_a": "6fe3bd",
+			"tint_b": ""
+		},
+		{
+			"art_id": "enemy_howler",
+			"kind": "enemy",
+			"path": "Void Howler",
+			"placeholder_subtitle": "50317f",
+			"placeholder_title": "Deep resource pressure",
+			"tint_a": "bf8cff",
+			"tint_b": ""
+		},
+		{
+			"art_id": "bg_hub",
+			"kind": "background",
+			"path": "前线整备站",
+			"placeholder_subtitle": "221327",
+			"placeholder_title": "信标仍亮，整备后再出发",
+			"tint_a": "c58b4c",
+			"tint_b": ""
+		},
+		{
+			"art_id": "bg_run",
+			"kind": "background",
+			"path": "裂隙路线",
+			"placeholder_subtitle": "102033",
+			"placeholder_title": "推进、回收、判断撤离窗口",
+			"tint_a": "4d82c8",
+			"tint_b": ""
+		},
+		{
+			"art_id": "bg_battle",
+			"kind": "background",
+			"path": "战斗接触线",
+			"placeholder_subtitle": "101727",
+			"placeholder_title": "读懂意图，排序 D6，管理资源",
+			"tint_a": "6d86c9",
+			"tint_b": ""
+		},
+		{
+			"art_id": "node_battle",
+			"kind": "icon",
+			"path": "战斗",
+			"placeholder_subtitle": "b73a3f",
+			"placeholder_title": "压力与成长",
+			"tint_a": "ff8c7a",
+			"tint_b": ""
+		},
+		{
+			"art_id": "node_event",
+			"kind": "icon",
+			"path": "事件",
+			"placeholder_subtitle": "315f9e",
+			"placeholder_title": "风险选择与构筑分叉",
+			"tint_a": "9dc6ff",
+			"tint_b": ""
+		},
+		{
+			"art_id": "node_supply",
+			"kind": "icon",
+			"path": "补给",
+			"placeholder_subtitle": "2f7f48",
+			"placeholder_title": "免费稳定",
+			"tint_a": "8ff0a0",
+			"tint_b": ""
+		},
+		{
+			"art_id": "node_shop",
+			"kind": "icon",
+			"path": "商店",
+			"placeholder_subtitle": "a17428",
+			"placeholder_title": "花费 Credits 精确改造",
+			"tint_a": "ffe08a",
+			"tint_b": ""
+		},
+		{
+			"art_id": "node_rest",
+			"kind": "icon",
+			"path": "休息",
+			"placeholder_subtitle": "2d7f7b",
+			"placeholder_title": "压力前的短暂整备",
+			"tint_a": "8ee8df",
+			"tint_b": ""
+		},
+		{
+			"art_id": "node_boss",
+			"kind": "icon",
+			"path": "Boss",
+			"placeholder_subtitle": "7e3a89",
+			"placeholder_title": "最终构筑检验",
+			"tint_a": "f4a3ff",
+			"tint_b": ""
+		}
+	],
+	"source": "res://content/csv/art_assets.csv"
+}

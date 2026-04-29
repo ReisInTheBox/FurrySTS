@@ -11,6 +11,7 @@ const CombatCatalogScript = preload("res://scripts/content/combat_catalog.gd")
 const CombatRulesTestScript = preload("res://scripts/tests/combat_rules_test.gd")
 const BattleFlowTestScript = preload("res://scripts/tests/battle_flow_test.gd")
 const BalanceSmokeTestScript = preload("res://scripts/tests/balance_smoke_test.gd")
+const ChallengeProfileSmokeTestScript = preload("res://scripts/tests/challenge_profile_smoke_test.gd")
 const MechanicCoverageTestScript = preload("res://scripts/tests/mechanic_coverage_test.gd")
 const InrunGrowthTestScript = preload("res://scripts/tests/inrun_growth_test.gd")
 const BattleVisualizerUiTestScript = preload("res://scripts/tests/battle_visualizer_ui_test.gd")
@@ -30,6 +31,7 @@ const RunBuildRewardTestScript = preload("res://scripts/tests/run_build_reward_t
 const RunNodeChoicesTestScript = preload("res://scripts/tests/run_node_choices_test.gd")
 const EquipmentSystemTestScript = preload("res://scripts/tests/equipment_system_test.gd")
 const EnchantSystemTestScript = preload("res://scripts/tests/enchant_system_test.gd")
+const ArtAssetTestScript = preload("res://scripts/tests/art_asset_test.gd")
 const ReadabilityGuardTestScript = preload("res://scripts/tests/readability_guard_test.gd")
 
 const HEROES := ["cyan_ryder", "helios_windchaser", "umbral_draxx"]
@@ -136,6 +138,11 @@ func run() -> bool:
         push_error("Enchant system test failed.")
         return false
 
+    var art_asset_test := ArtAssetTestScript.new()
+    if not art_asset_test.run():
+        push_error("Art asset test failed.")
+        return false
+
     if not _check_content_tables(loader):
         return false
     if not _check_enemy_template_depth(loader):
@@ -186,6 +193,11 @@ func run() -> bool:
         push_error("Mechanic coverage smoke failed.")
         return false
 
+    var challenge_profile_test := ChallengeProfileSmokeTestScript.new()
+    if not challenge_profile_test.run(loader, HEROES):
+        push_error("Challenge profile smoke failed.")
+        return false
+
     var balance_test := BalanceSmokeTestScript.new()
     var stats_ok := balance_test.run(loader, HEROES, STRICT_BALANCE_GATE, Callable(self, "_simulate_once"))
     return stats_ok
@@ -229,7 +241,7 @@ func _is_int_field(row: Dictionary, field: String) -> bool:
     return raw != "" and raw.is_valid_int()
 
 func _check_content_tables(loader: ContentLoaderScript) -> bool:
-    var names := ["npcs", "enemies", "dice", "status_effects", "rewards", "inrun_growth", "run_nodes", "run_rewards", "events", "outgame_growth", "relationship_nodes", "relationship_rewards", "story_events", "equipment", "enchantments", "enchant_pools"]
+    var names := ["npcs", "enemies", "dice", "status_effects", "rewards", "inrun_growth", "run_nodes", "run_rewards", "events", "outgame_growth", "relationship_nodes", "relationship_rewards", "story_events", "equipment", "enchantments", "enchant_pools", "art_assets"]
     for table in names:
         var rows := loader.load_rows(table)
         if rows.is_empty():

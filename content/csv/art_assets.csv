@@ -1,0 +1,16 @@
+art_id,kind,path,placeholder_title,placeholder_subtitle,tint_a,tint_b
+portrait_cyan,portrait,,Cyan Ryder,Blue dragon starship captain,1a6fa8,59d7ff
+portrait_helios,portrait,,Helios Windchaser,Griffin ranger and hunter,b37a25,ffe08a
+portrait_aurian,portrait,,Aurian,Black dragon oathbound knight,2b2d38,b9b4a8
+enemy_vanguard,enemy,,Hub Edge Vanguard,Armored rhythm test,7f2f35,ff7b62
+enemy_stalker,enemy,,Reef Stalker,Reroll and mark pressure,2b7f6a,6fe3bd
+enemy_howler,enemy,,Void Howler,Deep resource pressure,50317f,bf8cff
+bg_hub,background,,前线整备站,信标仍亮，整备后再出发,221327,c58b4c
+bg_run,background,,裂隙路线,推进、回收、判断撤离窗口,102033,4d82c8
+bg_battle,background,,战斗接触线,读懂意图，排序 D6，管理资源,101727,6d86c9
+node_battle,icon,,战斗,压力与成长,b73a3f,ff8c7a
+node_event,icon,,事件,风险选择与构筑分叉,315f9e,9dc6ff
+node_supply,icon,,补给,免费稳定,2f7f48,8ff0a0
+node_shop,icon,,商店,花费 Credits 精确改造,a17428,ffe08a
+node_rest,icon,,休息,压力前的短暂整备,2d7f7b,8ee8df
+node_boss,icon,,Boss,最终构筑检验,7e3a89,f4a3ff

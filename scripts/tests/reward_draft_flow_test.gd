@@ -30,6 +30,9 @@ func _test_reward_draft() -> bool:
 			return false
 		if str(reward.get("scope_label", "")) == "":
 			return false
+		if str(reward.get("bd_label", "")) == "":
+			push_error("Drafted reward missing BD label: " + str(reward.get("reward_id", "")))
+			return false
 	return true
 
 func _test_growth_application() -> bool:

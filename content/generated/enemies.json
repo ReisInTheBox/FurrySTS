@@ -5,28 +5,34 @@
 			"atk_high": "6",
 			"atk_low": "4",
 			"base_hp": "58",
+			"battle_sprite_id": "enemy_vanguard",
 			"bonus_every_turns": "3",
 			"bonus_flat": "2",
 			"id": "boss_vanguard",
-			"name": "Hub Edge Vanguard"
+			"name": "Hub Edge Vanguard",
+			"portrait_id": "enemy_vanguard"
 		},
 		{
 			"atk_high": "7",
 			"atk_low": "5",
 			"base_hp": "50",
+			"battle_sprite_id": "enemy_stalker",
 			"bonus_every_turns": "4",
 			"bonus_flat": "1",
 			"id": "reef_stalker",
-			"name": "Reef Stalker"
+			"name": "Reef Stalker",
+			"portrait_id": "enemy_stalker"
 		},
 		{
 			"atk_high": "8",
 			"atk_low": "3",
 			"base_hp": "64",
+			"battle_sprite_id": "enemy_howler",
 			"bonus_every_turns": "2",
 			"bonus_flat": "2",
 			"id": "void_howler",
-			"name": "Void Howler"
+			"name": "Void Howler",
+			"portrait_id": "enemy_howler"
 		}
 	],
 	"source": "res://content/csv/enemies.csv"
