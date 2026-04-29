@@ -1,0 +1,13 @@
+pool_id,enchant_id,weight,unlock_condition
+common,ench_spark_edge,20,always
+common,ench_guard_rune,20,always
+common,ench_negative_focus,12,always
+cyan,ench_overload_capacitor,24,hero:cyan_ryder
+cyan,ench_focus_thread,14,hero:cyan_ryder
+helios,ench_marking_rune,22,hero:helios_windchaser
+helios,ench_quiver_thread,20,hero:helios_windchaser
+aurian,ench_stance_oath,22,hero:umbral_draxx
+aurian,ench_guardian_seal,18,hero:umbral_draxx
+rare,ench_echo_chip,10,elite_or_deep
+rare,ench_piercing_rune,10,elite_or_deep
+rare,ench_rupture_sig,8,elite_or_deep

@@ -502,11 +502,31 @@ func _scripted_enemy_intent(state: CombatStateScript) -> EnemyIntentScript:
     )
 
 func _apply_enemy_status_intent(state: CombatStateScript, intent: EnemyIntentScript, logger: ActionLoggerScript) -> void:
+    var status_result: Dictionary = {}
     match intent.status_type:
         "lock_die":
             state.player.pending_lock_faces += intent.status_value
+            status_result["pending_lock_faces"] = state.player.pending_lock_faces
         "pollute_die":
             state.rerolls_left = max(0, state.rerolls_left - intent.status_value)
+            status_result["rerolls_left"] = state.rerolls_left
+        "tax_reroll":
+            state.rerolls_left = max(0, state.rerolls_left - intent.status_value)
+            status_result["rerolls_left"] = state.rerolls_left
+        "drain_resource":
+            if state.player.resource.resource_type != "none":
+                var delta := state.player.resource.apply_delta(-intent.status_value)
+                status_result["pre_resource"] = delta["before"]
+                status_result["post_resource"] = delta["after"]
+                status_result["resource_type"] = state.player.resource.resource_type
+        "shed_mark":
+            var consumed := state.enemy.consume_all_marks()
+            status_result["marks_removed"] = consumed
+        "disable_summon":
+            var before := int(state.equipment_battle_flags.get("summon_count", 0))
+            state.equipment_battle_flags["summon_count"] = max(0, before - intent.status_value)
+            status_result["summon_before"] = before
+            status_result["summon_after"] = state.equipment_battle_flags["summon_count"]
         _:
             pass
     logger.append(ActionLogEntryScript.new(
@@ -519,7 +539,9 @@ func _apply_enemy_status_intent(state: CombatStateScript, intent: EnemyIntentScr
             "intent_source": intent.source,
             "status_type": intent.status_type,
             "status_value": intent.status_value,
-            "telegraph": intent.telegraph
+            "telegraph": intent.telegraph,
+            "counter_tag": intent.counter_tag,
+            "status_result": status_result
         }
     ))
 

@@ -1,5 +1,5 @@
 {
-	"row_count": 6,
+	"row_count": 12,
 	"rows": [
 		{
 			"enchant_id": "ench_spark_edge",
@@ -60,6 +60,66 @@
 			"tags": "pierce|finisher",
 			"rarity": "uncommon",
 			"exclusive_group": "pierce"
+		},
+		{
+			"enchant_id": "ench_overload_capacitor",
+			"name": "Overload Capacitor",
+			"trigger": "OnDiceResolved",
+			"op_type": "mod_resource",
+			"value": "overload:1",
+			"tags": "cyan|resource|overload",
+			"rarity": "uncommon",
+			"exclusive_group": "resource_gain"
+		},
+		{
+			"enchant_id": "ench_quiver_thread",
+			"name": "Quiver Thread",
+			"trigger": "OnDiceResolved",
+			"op_type": "mod_resource",
+			"value": "quiver:1",
+			"tags": "helios|resource|quiver",
+			"rarity": "uncommon",
+			"exclusive_group": "resource_gain"
+		},
+		{
+			"enchant_id": "ench_stance_oath",
+			"name": "Stance Oath",
+			"trigger": "OnDiceResolved",
+			"op_type": "mod_resource",
+			"value": "stance:1",
+			"tags": "aurian|resource|stance",
+			"rarity": "uncommon",
+			"exclusive_group": "resource_gain"
+		},
+		{
+			"enchant_id": "ench_rupture_sig",
+			"name": "Rupture Sigil",
+			"trigger": "OnDiceResolved",
+			"op_type": "add_rupture",
+			"value": "3",
+			"tags": "attack|debuff|execute",
+			"rarity": "rare",
+			"exclusive_group": "debuff"
+		},
+		{
+			"enchant_id": "ench_negative_focus",
+			"name": "Negative Focus",
+			"trigger": "OnDiceResolved",
+			"op_type": "grant_reroll",
+			"value": "1",
+			"tags": "negative|reroll|risk",
+			"rarity": "common",
+			"exclusive_group": "negative_payoff"
+		},
+		{
+			"enchant_id": "ench_guardian_seal",
+			"name": "Guardian Seal",
+			"trigger": "OnDiceResolved",
+			"op_type": "add_block",
+			"value": "3",
+			"tags": "defense|counter|guard",
+			"rarity": "uncommon",
+			"exclusive_group": "guard"
 		}
 	],
 	"source": "res://content/csv/enchantments.csv"

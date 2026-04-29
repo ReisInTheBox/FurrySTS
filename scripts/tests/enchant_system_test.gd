@@ -16,19 +16,33 @@ func run() -> bool:
 	var loader := ContentLoaderScript.new()
 	var catalog := CombatCatalogScript.new(loader)
 	return _test_enchant_data(catalog) \
+		and _test_enchant_pools(catalog) \
 		and _test_reward_binding_rules() \
 		and _test_build_replacement_removes_enchant() \
 		and _test_battle_enchant_determinism(loader, catalog)
 
 func _test_enchant_data(catalog: CombatCatalogScript) -> bool:
 	var rows := catalog.all_enchantments()
-	if rows.size() < 6:
-		push_error("Need at least 6 MVP enchantments.")
+	if rows.size() < 12:
+		push_error("Need at least 12 MVP enchantments after Phase 7 expansion.")
 		return false
 	for row in rows:
 		if String(row.get("enchant_id", "")) == "" or String(row.get("op_type", "")) == "":
 			push_error("Invalid enchantment row.")
 			return false
+	return true
+
+func _test_enchant_pools(catalog: CombatCatalogScript) -> bool:
+	for pool_id in ["common", "cyan", "helios", "aurian", "rare"]:
+		var pool := catalog.enchant_pool(pool_id)
+		if pool.is_empty():
+			push_error("Missing enchant pool: " + pool_id)
+			return false
+		for row_any in pool:
+			var row: Dictionary = row_any
+			if catalog.enchantment_by_id(String(row.get("enchant_id", ""))).is_empty():
+				push_error("Enchant pool points to missing enchantment: " + String(row.get("enchant_id", "")))
+				return false
 	return true
 
 func _test_reward_binding_rules() -> bool:

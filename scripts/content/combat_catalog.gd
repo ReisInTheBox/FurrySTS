@@ -15,6 +15,7 @@ var _equipment_by_id: Dictionary = {}
 var _equipment: Array[Dictionary] = []
 var _enchantments_by_id: Dictionary = {}
 var _enchantments: Array[Dictionary] = []
+var _enchant_pools_by_id: Dictionary = {}
 var _enemy_intents_by_enemy: Dictionary = {}
 
 func _init(loader: ContentLoaderScript) -> void:
@@ -32,6 +33,7 @@ func _build_cache() -> void:
     _equipment.clear()
     _enchantments_by_id.clear()
     _enchantments.clear()
+    _enchant_pools_by_id.clear()
     _enemy_intents_by_enemy.clear()
 
     var dice_rows := _loader.load_rows("dice")
@@ -95,6 +97,19 @@ func _build_cache() -> void:
             continue
         _enchantments_by_id[enchant_id] = row_any
         _enchantments.append(row_any)
+
+    var enchant_pool_rows := _loader.load_rows("enchant_pools")
+    for row_any in enchant_pool_rows:
+        if typeof(row_any) != TYPE_DICTIONARY:
+            continue
+        var pool_id := String(row_any.get("pool_id", ""))
+        if pool_id == "":
+            continue
+        if not _enchant_pools_by_id.has(pool_id):
+            _enchant_pools_by_id[pool_id] = []
+        var pool_rows: Array = _enchant_pools_by_id[pool_id]
+        pool_rows.append(row_any)
+        _enchant_pools_by_id[pool_id] = pool_rows
 
     var intent_rows := _loader.load_rows("enemy_intents")
     for row_any in intent_rows:
@@ -191,6 +206,15 @@ func all_enchantments() -> Array[Dictionary]:
     var out: Array[Dictionary] = []
     for row in _enchantments:
         out.append(row)
+    return out
+
+func enchant_pool(pool_id: String) -> Array[Dictionary]:
+    if not _enchant_pools_by_id.has(pool_id):
+        return []
+    var out: Array[Dictionary] = []
+    for row_any in _enchant_pools_by_id[pool_id]:
+        if typeof(row_any) == TYPE_DICTIONARY:
+            out.append(row_any)
     return out
 
 func all_growths() -> Array[Dictionary]:

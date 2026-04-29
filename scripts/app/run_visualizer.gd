@@ -385,7 +385,8 @@ func _render_status_cards() -> void:
 		{"title": "当前状态", "value": _run_state.result.result_type, "color": Color(0.47, 0.76, 0.98)},
 		{"title": "当前进度", "value": "%d / %d" % [_run_state.current_node_index + 1 if not _run_state.completed else _run_state.route_nodes.size(), _run_state.route_nodes.size()], "color": Color(0.48, 0.86, 0.64)},
 		{"title": "可撤离", "value": "是" if _run_state.can_evac() else "否", "color": Color(0.98, 0.74, 0.46)},
-		{"title": "待选奖励", "value": str(_run_state.pending_reward_choices.size()), "color": Color(0.87, 0.67, 0.98)}
+		{"title": "待选奖励", "value": str(_run_state.pending_reward_choices.size()), "color": Color(0.87, 0.67, 0.98)},
+		{"title": "当前附魔", "value": str(_run_state.progress.all_enchant_bindings().size()), "color": Color(0.64, 0.86, 0.98)}
 	]
 	for data_any in cards:
 		var data: Dictionary = data_any
@@ -540,12 +541,14 @@ func _render_rewards() -> void:
 		var price := int(reward.get("price", 0))
 		var price_text := ""
 		if price > 0:
-			price_text = "\nCost: %d credits" % price
-		btn.text = "[%s | %s]\n%s\n%s%s" % [
+			price_text = "\n价格：%d Credits" % price
+		var rule_hint := _reward_rule_hint(reward)
+		btn.text = "[%s | %s]\n%s\n%s%s%s" % [
 			str(reward.get("rarity_label", "普通")),
 			str(reward.get("scope_label", "下一场")),
 			str(reward.get("title", "奖励")),
 			str(reward.get("description", "")),
+			rule_hint,
 			price_text
 		]
 		btn.autowrap_mode = TextServer.AUTOWRAP_WORD
@@ -719,6 +722,8 @@ func _current_node_detail() -> String:
 	elif node_type == "rest":
 		details.append("休息节点用于在高压层之间恢复节奏。")
 	details.append("可撤离：%s" % ("是" if _run_state.can_evac() else "否"))
+	for enchant_line in _enchant_summary_lines():
+		details.append(enchant_line)
 	return "\n".join(details)
 
 func _current_node_hint() -> String:
@@ -746,6 +751,53 @@ func _resolve_feedback(result: Dictionary) -> String:
 		var reward_supply: Dictionary = result.get("reward", {})
 		return "补给节点结算完成：%s" % str(reward_supply.get("title", "已获得补给"))
 	return "节点已结算。"
+
+func _reward_rule_hint(reward: Dictionary) -> String:
+	var reward_type := String(reward.get("type", ""))
+	if ["grant_enchant", "replace_enchant", "remove_enchant"].has(reward_type):
+		var change: Dictionary = reward.get("enchant_change", {})
+		var die_id := String(change.get("die_id", ""))
+		var face_index := int(change.get("face_index", 0))
+		var enchant_id := String(change.get("enchant_id", ""))
+		var mode := "写入"
+		if reward_type == "replace_enchant":
+			mode = "替换"
+		elif reward_type == "remove_enchant":
+			mode = "移除"
+		return "\n附魔位置：%s 第 %d 面 | %s %s" % [die_id, face_index, mode, _enchant_name(enchant_id)]
+	if ["add_die", "replace_die", "remove_negative", "upgrade_die"].has(reward_type):
+		return "\n构筑变化：%s -> %s" % [reward_type, String(reward.get("value", ""))]
+	return ""
+
+func _enchant_summary_lines() -> Array[String]:
+	var bindings: Array[Dictionary] = _run_state.progress.all_enchant_bindings()
+	var out: Array[String] = []
+	if bindings.is_empty():
+		out.append("当前附魔：无")
+		return out
+	out.append("当前附魔：")
+	for binding_any in bindings:
+		var binding: Dictionary = binding_any
+		out.append("- %s 第 %d 面：%s" % [
+			String(binding.get("die_id", "")),
+			int(binding.get("face_index", 0)),
+			_enchant_name(String(binding.get("enchant_id", "")))
+		])
+	return out
+
+func _enchant_name(enchant_id: String) -> String:
+	if enchant_id == "":
+		return ""
+	var loader := _loader if _loader != null else ContentLoaderScript.new()
+	for row_any in loader.load_rows("enchantments"):
+		var row: Dictionary = row_any
+		if String(row.get("enchant_id", "")) == enchant_id:
+			return "%s (%s %s)" % [
+				String(row.get("name", enchant_id)),
+				String(row.get("op_type", "")),
+				String(row.get("value", ""))
+			]
+	return enchant_id
 
 func _render_badge(label: Label, colors: Dictionary) -> void:
 	label.add_theme_color_override("font_color", colors["text"])

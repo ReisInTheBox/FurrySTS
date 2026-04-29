@@ -1,0 +1,78 @@
+{
+	"row_count": 12,
+	"rows": [
+		{
+			"pool_id": "common",
+			"enchant_id": "ench_spark_edge",
+			"weight": "20",
+			"unlock_condition": "always"
+		},
+		{
+			"pool_id": "common",
+			"enchant_id": "ench_guard_rune",
+			"weight": "20",
+			"unlock_condition": "always"
+		},
+		{
+			"pool_id": "common",
+			"enchant_id": "ench_negative_focus",
+			"weight": "12",
+			"unlock_condition": "always"
+		},
+		{
+			"pool_id": "cyan",
+			"enchant_id": "ench_overload_capacitor",
+			"weight": "24",
+			"unlock_condition": "hero:cyan_ryder"
+		},
+		{
+			"pool_id": "cyan",
+			"enchant_id": "ench_focus_thread",
+			"weight": "14",
+			"unlock_condition": "hero:cyan_ryder"
+		},
+		{
+			"pool_id": "helios",
+			"enchant_id": "ench_marking_rune",
+			"weight": "22",
+			"unlock_condition": "hero:helios_windchaser"
+		},
+		{
+			"pool_id": "helios",
+			"enchant_id": "ench_quiver_thread",
+			"weight": "20",
+			"unlock_condition": "hero:helios_windchaser"
+		},
+		{
+			"pool_id": "aurian",
+			"enchant_id": "ench_stance_oath",
+			"weight": "22",
+			"unlock_condition": "hero:umbral_draxx"
+		},
+		{
+			"pool_id": "aurian",
+			"enchant_id": "ench_guardian_seal",
+			"weight": "18",
+			"unlock_condition": "hero:umbral_draxx"
+		},
+		{
+			"pool_id": "rare",
+			"enchant_id": "ench_echo_chip",
+			"weight": "10",
+			"unlock_condition": "elite_or_deep"
+		},
+		{
+			"pool_id": "rare",
+			"enchant_id": "ench_piercing_rune",
+			"weight": "10",
+			"unlock_condition": "elite_or_deep"
+		},
+		{
+			"pool_id": "rare",
+			"enchant_id": "ench_rupture_sig",
+			"weight": "8",
+			"unlock_condition": "elite_or_deep"
+		}
+	],
+	"source": "res://content/csv/enchant_pools.csv"
+}

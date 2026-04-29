@@ -286,9 +286,9 @@ func _build_center_info() -> Control:
 	panel.add_child(row)
 
 	var labels := [
-		"??????? 3 ? D6???????????",
-		"????????????????? 2 ??????????????",
-		"??????????????"
+		"流程：每回合掷 3 颗 D6，全部使用后敌人行动。",
+		"操作：点击骰子决定执行顺序；每回合 2 次重骰，可一次选择多个骰位。",
+		"目标：在角色倒下前击败敌人。"
 	]
 	for text in labels:
 		var chip := Label.new()
@@ -314,7 +314,7 @@ func _build_actions_tray() -> Control:
 	v.add_child(controls)
 
 	_new_battle_btn = Button.new()
-	_new_battle_btn.text = "???"
+	_new_battle_btn.text = "新战斗"
 	_new_battle_btn.pressed.connect(_start_manual_battle)
 	controls.add_child(_new_battle_btn)
 
@@ -326,32 +326,32 @@ func _build_actions_tray() -> Control:
 	controls.add_child(_return_btn)
 
 	_reroll_mode_btn = Button.new()
-	_reroll_mode_btn.text = "??????"
+	_reroll_mode_btn.text = "选择重骰：关"
 	_reroll_mode_btn.pressed.connect(_on_reroll_mode_toggled)
 	controls.add_child(_reroll_mode_btn)
 
 	_reroll_btn = Button.new()
-	_reroll_btn.text = "????"
+	_reroll_btn.text = "重骰已选"
 	_reroll_btn.pressed.connect(_on_reroll_pressed)
 	controls.add_child(_reroll_btn)
 
 	_active_item_btn = Button.new()
-	_active_item_btn.text = "????"
+	_active_item_btn.text = "使用道具"
 	_active_item_btn.pressed.connect(_on_active_item_pressed)
 	controls.add_child(_active_item_btn)
 
 	_clear_reroll_selection_btn = Button.new()
-	_clear_reroll_selection_btn.text = "????"
+	_clear_reroll_selection_btn.text = "清空重骰"
 	_clear_reroll_selection_btn.pressed.connect(_on_clear_reroll_selection_pressed)
 	controls.add_child(_clear_reroll_selection_btn)
 
 	_end_turn_btn = Button.new()
-	_end_turn_btn.text = "????"
+	_end_turn_btn.text = "结束回合"
 	_end_turn_btn.pressed.connect(_on_end_turn_pressed)
 	controls.add_child(_end_turn_btn)
 
 	var tray_title := Label.new()
-	tray_title.text = "???"
+	tray_title.text = "骰子区"
 	tray_title.modulate = Color(0.92, 0.95, 1.0)
 	tray_title.add_theme_font_size_override("font_size", 18)
 	v.add_child(tray_title)
@@ -415,13 +415,13 @@ func _build_reward_panel() -> Control:
 	_reward_panel.add_child(v)
 
 	_reward_title = Label.new()
-	_reward_title.text = "????"
+	_reward_title.text = "奖励选择"
 	_reward_title.add_theme_font_size_override("font_size", 18)
 	_reward_title.modulate = Color(1.0, 0.96, 0.85)
 	v.add_child(_reward_title)
 
 	_reward_desc = Label.new()
-	_reward_desc.text = "Choose 1 reward after victory; build rewards carry into the next battle."
+	_reward_desc.text = "胜利后选择 1 个奖励；构筑类奖励会带入后续战斗。"
 	_reward_desc.autowrap_mode = TextServer.AUTOWRAP_WORD
 	_reward_desc.modulate = Color(0.96, 0.9, 0.76)
 	v.add_child(_reward_desc)
@@ -488,7 +488,7 @@ func _render_ui() -> void:
 	_player_hp_bar.max_value = _state.player.max_hp
 	_player_hp_bar.value = _state.player.hp
 	_player_meta.text = "HP %d/%d | Block %d | Resource %d/%d (%s)" % [_state.player.hp, _state.player.max_hp, _state.player.block, _state.player.resource.current_value, _state.player.resource.cap_value, _state.player.resource.resource_type]
-	_player_status.text = "?? %d/%d | ?? %d | ?? %d" % [_state.picks_used, _state.picks_budget, _state.rerolls_left, _state.locked_face_ids.size()]
+	_player_status.text = "已用 %d/%d | 重骰 %d | 锁定 %d" % [_state.picks_used, _state.picks_budget, _state.rerolls_left, _state.locked_face_ids.size()]
 
 	_enemy_name.text = _pretty_id(_state.enemy.unit_id)
 	_enemy_hp_bar.max_value = _state.enemy.max_hp
@@ -497,14 +497,14 @@ func _render_ui() -> void:
 	_enemy_status.text = "Rupture +%d" % _state.enemy.rupture_bonus
 
 	if _state.battle_ended():
-		_enemy_intent_value.text = "Intent: none"
-		_result_value.text = "???%s" % ("??" if _state.player.is_alive() else "??")
+		_enemy_intent_value.text = "意图：无"
+		_result_value.text = "结果：%s" % ("胜利" if _state.player.is_alive() else "失败")
 		if _managed_by_run:
-			_feedback_value.text = "??????? Run ???"
+			_feedback_value.text = "战斗结束。返回 Run 继续。"
 	else:
 		var intent := _simulator.preview_enemy_intent(_state, _rngs)
-		_enemy_intent_value.text = "????? %d?%s?" % [intent.attack_value, intent.source]
-		_result_value.text = "??????"
+		_enemy_intent_value.text = "意图: 攻击 %d (%s)" % [intent.attack_value, intent.source]
+		_result_value.text = "结果：战斗中"
 
 	_run_summary.text = _battle_context_summary()
 	_run_preview.text = _next_battle_preview()
@@ -512,7 +512,7 @@ func _render_ui() -> void:
 	_render_cards()
 	_render_rewards()
 	_render_log()
-	_reroll_mode_btn.text = "?????%s" % ("?" if _is_reroll_mode else "?")
+	_reroll_mode_btn.text = "选择重骰：%s" % ("开" if _is_reroll_mode else "关")
 	_reroll_btn.disabled = _state.battle_ended() or _state.rerolls_left <= 0
 	_clear_reroll_selection_btn.disabled = _reroll_selection.is_empty()
 	_reroll_mode_btn.disabled = _state.battle_ended()
@@ -523,7 +523,7 @@ func _render_ui() -> void:
 	_new_battle_btn.visible = not _managed_by_run
 	_new_battle_btn.disabled = _state.battle_ended() and _state.player.is_alive() and _standalone_rewards and not _reward_claimed_this_battle and not _pending_rewards.is_empty()
 	_return_btn.visible = _managed_by_run
-	_return_btn.text = "?? Run" if _state.battle_ended() else "??? Run"
+	_return_btn.text = "返回 Run" if _state.battle_ended() else "撤退回 Run"
 	_return_btn.disabled = not _managed_by_run
 func _render_cards() -> void:
 	for child in _card_row.get_children():
@@ -531,18 +531,18 @@ func _render_cards() -> void:
 
 	if _state.battle_ended():
 		var end_label := Label.new()
-		end_label.text = "?????"
+		end_label.text = "战斗结束。"
 		if _managed_by_run:
-			end_label.text += " ?? Run ???"
+			end_label.text += " 返回 Run 继续。"
 		elif _standalone_rewards and _state.player.is_alive():
-			end_label.text += " ?????????????"
+			end_label.text += " 先选择奖励，再开始新战斗。"
 		end_label.modulate = Color(0.82, 0.9, 0.96)
 		_card_row.add_child(end_label)
 		return
 
 	if _state.rolled_faces.is_empty():
 		var empty := Label.new()
-		empty.text = "?????????????"
+		empty.text = "没有可用骰子，请结束回合。"
 		empty.modulate = Color(0.72, 0.8, 0.96)
 		_card_row.add_child(empty)
 		return
@@ -553,12 +553,12 @@ func _render_cards() -> void:
 		var is_selected_for_reroll := _reroll_selection.has(slot_index)
 		var card := Button.new()
 		card.custom_minimum_size = Vector2(_card_width_for(_state.rolled_faces.size()), 108)
-		var slot_label := "?? #%d" % (slot_index + 1)
+		var slot_label := "骰位 #%d" % (slot_index + 1)
 		if is_locked:
-			slot_label += "????"
+			slot_label += " (锁定)"
 		elif _is_reroll_mode and is_selected_for_reroll:
-			slot_label += "??????"
-		card.text = "%s\n%s\n%s\n???%s ???%s %d" % [slot_label, _face_name(face.face_id), _face_short_desc(face), face.die_type, face.cost_type, face.cost_value]
+			slot_label += " (已选重骰)"
+		card.text = "%s\n%s\n%s\n类型: %s 费用: %s %d" % [slot_label, _face_name(face.face_id), _face_short_desc(face), face.die_type, face.cost_type, face.cost_value]
 		card.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		card.autowrap_mode = TextServer.AUTOWRAP_WORD
 		card.add_theme_font_size_override("font_size", 15)
@@ -579,8 +579,8 @@ func _render_rewards() -> void:
 	_reward_panel.visible = show_rewards
 	if not show_rewards:
 		return
-	_reward_title.text = "????"
-	_reward_desc.text = "????? 1 ????"
+	_reward_title.text = "战后奖励"
+	_reward_desc.text = "胜利后选择 1 个奖励。"
 	_reward_history_label.text = _reward_history_text()
 	for i in range(_pending_rewards.size()):
 		var reward: Dictionary = _pending_rewards[i]
@@ -635,23 +635,23 @@ func _on_reroll_pressed() -> void:
 		return
 	var selected := _selected_reroll_indices()
 	if _simulator.manual_reroll_selected(_state, _rngs, selected):
-		_feedback_value.text = "??? %d ????" % selected.size()
+		_feedback_value.text = "已重骰 %d 个骰位。" % selected.size()
 		_reroll_selection.clear()
 		_is_reroll_mode = false
 	else:
 		if selected.is_empty():
-			_feedback_value.text = "?????? 1 ????"
+			_feedback_value.text = "请先选择至少 1 个骰位。"
 		else:
-			_feedback_value.text = "???????"
+			_feedback_value.text = "现在不能重骰。"
 	_render_ui()
 func _on_end_turn_pressed() -> void:
 	if _state == null or _state.battle_ended():
 		return
 	if _simulator.can_player_act(_state):
-		_feedback_value.text = "????????????????"
+		_feedback_value.text = "结束回合前必须用完全部可用骰子。"
 		_render_ui()
 		return
-	_feedback_value.text = "?????"
+	_feedback_value.text = "回合结束。"
 	_reroll_selection.clear()
 	_is_reroll_mode = false
 	_simulator.run_manual_enemy_phase(_state, _rngs, _logger)
@@ -663,12 +663,12 @@ func _on_reroll_mode_toggled() -> void:
 	_is_reroll_mode = not _is_reroll_mode
 	if not _is_reroll_mode:
 		_reroll_selection.clear()
-	_feedback_value.text = "??????" if _is_reroll_mode else "??????"
+	_feedback_value.text = "重骰选择：开" if _is_reroll_mode else "重骰选择：关"
 	_render_ui()
 
 func _on_clear_reroll_selection_pressed() -> void:
 	_reroll_selection.clear()
-	_feedback_value.text = "????????"
+	_feedback_value.text = "已清空重骰选择。"
 	_render_ui()
 
 func _on_active_item_pressed() -> void:
@@ -676,9 +676,9 @@ func _on_active_item_pressed() -> void:
 		return
 	var result := _simulator.use_active_item(_state, _logger)
 	if bool(result.get("ok", false)):
-		_feedback_value.text = "??????%s" % String(result.get("equipment_id", "item"))
+		_feedback_value.text = "已使用道具：%s" % String(result.get("equipment_id", "item"))
 	else:
-		_feedback_value.text = "???????%s" % String(result.get("reason", "unknown"))
+		_feedback_value.text = "道具使用失败：%s" % String(result.get("reason", "unknown"))
 	_render_ui()
 
 func _on_reward_selected(index: int) -> void:
@@ -687,11 +687,11 @@ func _on_reward_selected(index: int) -> void:
 	var reward := _pending_rewards[index]
 	var result := _reward_service.apply_reward(_run_progress, reward)
 	if not bool(result.get("ok", false)):
-		_feedback_value.text = "???????"
+		_feedback_value.text = "奖励领取失败。"
 		return
 	_reward_claimed_this_battle = true
 	_pending_rewards.clear()
-	_feedback_value.text = "??????%s" % str(reward.get("title", "Reward"))
+	_feedback_value.text = "已领取奖励：%s" % str(reward.get("title", "奖励"))
 	_render_ui()
 
 func _on_return_pressed() -> void:
@@ -718,10 +718,10 @@ func _toggle_reroll_slot(slot_index: int) -> void:
 		return
 	if _reroll_selection.has(slot_index):
 		_reroll_selection.erase(slot_index)
-		_feedback_value.text = "????????#%d" % (slot_index + 1)
+		_feedback_value.text = "已移除重骰骰位：#%d" % (slot_index + 1)
 	else:
 		_reroll_selection[slot_index] = true
-		_feedback_value.text = "????????#%d" % (slot_index + 1)
+		_feedback_value.text = "已选择重骰骰位：#%d" % (slot_index + 1)
 
 func _selected_reroll_indices() -> Array[int]:
 	var out: Array[int] = []
@@ -844,29 +844,29 @@ func _format_log_line(entry: ActionLogEntryScript, payload: Dictionary) -> Strin
 	if payload.has("face_id"):
 		face_name = _face_name(str(payload["face_id"]))
 	if ev == "player_attack":
-		return "T%02d %s ?? %s -> %s ?? %s ???HP %s??" % [t, _pretty_id(actor), face_name, _pretty_id(target), str(payload.get("damage", "?")), str(payload.get("target_hp", "?"))]
+		return "T%02d %s 使用 %s -> %s 受到 %s 伤害 (HP %s)." % [t, _pretty_id(actor), face_name, _pretty_id(target), str(payload.get("damage", "?")), str(payload.get("target_hp", "?"))]
 	if ev == "enemy_attack":
-		return "T%02d ???? %s -> ???? %s ???HP %s??" % [t, str(payload.get("value", "?")), str(payload.get("damage", "?")), str(payload.get("target_hp", "?"))]
+		return "T%02d 敌人攻击 %s -> 玩家受到 %s 伤害 (HP %s)." % [t, str(payload.get("value", "?")), str(payload.get("damage", "?")), str(payload.get("target_hp", "?"))]
 	if ev == "resource_changed":
-		return "T%02d ?? %s -> %s?" % [t, str(payload.get("pre_resource", "?")), str(payload.get("post_resource", "?"))]
+		return "T%02d 资源 %s -> %s." % [t, str(payload.get("pre_resource", "?")), str(payload.get("post_resource", "?"))]
 	if ev == "equipment_triggered":
-		return "T%02d ?? %s ???%s?" % [t, str(payload.get("equipment_id", "?")), str(payload.get("trigger", "?"))]
+		return "T%02d 装备 %s 触发: %s." % [t, str(payload.get("equipment_id", "?")), str(payload.get("trigger", "?"))]
 	if ev == "enchant_triggered":
-		return "T%02d ?? %s ? %s ????" % [t, str(payload.get("enchant_id", "?")), face_name]
+		return "T%02d 附魔 %s 在 %s 上触发." % [t, str(payload.get("enchant_id", "?")), face_name]
 	if ev == "dice_locked":
-		return "T%02d ?????%s?" % [t, str(payload.get("locked_faces", []))]
+		return "T%02d 骰面锁定: %s." % [t, str(payload.get("locked_faces", []))]
 	if ev == "action_rejected":
-		return "T%02d ??????%s?" % [t, str(payload.get("reason", ""))]
+		return "T%02d 行动被拒绝: %s." % [t, str(payload.get("reason", ""))]
 	if ev == "bonus_roll_granted":
-		return "T%02d ????????? %s?" % [t, str(payload.get("rerolls_left", "?"))]
+		return "T%02d 获得重骰, 现在剩余 %s." % [t, str(payload.get("rerolls_left", "?"))]
 	return "T%02d %s %s -> %s" % [t, ev, _pretty_id(actor), _pretty_id(target)]
 
 func _battle_context_summary() -> String:
 	var equipment_text := _equipment_summary()
 	if _managed_by_run:
 		var node_suffix := _node_title if _node_title != "" else _enemy_id
-		return "Run ???%s | Credits %d | ?? %d | %s" % [node_suffix, _run_progress.get_currency("credits"), _run_progress.all_growths().size(), equipment_text]
-	return "???? | Credits %d | ?? %d | %s | %s" % [_run_progress.get_currency("credits"), _run_progress.all_growths().size(), _growth_summary(), equipment_text]
+		return "Run 战斗: %s | Credits %d | 成长 %d | %s" % [node_suffix, _run_progress.get_currency("credits"), _run_progress.all_growths().size(), equipment_text]
+	return "单场战斗 | Credits %d | 成长 %d | %s | %s" % [_run_progress.get_currency("credits"), _run_progress.all_growths().size(), _growth_summary(), equipment_text]
 
 func _has_active_item_equipped() -> bool:
 	for item_any in _equipment_instances:
@@ -877,12 +877,12 @@ func _has_active_item_equipped() -> bool:
 
 func _equipment_summary() -> String:
 	if _equipment_instances.is_empty():
-		return "????"
+		return "装备：无"
 	var names: Array[String] = []
 	for item_any in _equipment_instances:
 		var item: Dictionary = item_any
 		names.append("%s:%s" % [String(item.get("equip_slot", "")), String(item.get("display_name", item.get("equipment_id", "")))])
-	return "???" + " / ".join(names)
+	return "装备：" + " / ".join(names)
 
 func _enchant_lines_for_face(face: DiceFaceDefinitionScript) -> Array[String]:
 	var out: Array[String] = []
@@ -897,7 +897,7 @@ func _enchant_lines_for_face(face: DiceFaceDefinitionScript) -> Array[String]:
 		var enchantment := _catalog.enchantment_by_id(String(binding.get("enchant_id", "")))
 		if enchantment.is_empty():
 			continue
-		out.append("???%s?%s %s?" % [
+		out.append("附魔: %s (%s %s)" % [
 			String(enchantment.get("name", binding.get("enchant_id", ""))),
 			String(enchantment.get("op_type", "")),
 			String(enchantment.get("value", ""))
@@ -907,7 +907,7 @@ func _enchant_lines_for_face(face: DiceFaceDefinitionScript) -> Array[String]:
 func _growth_summary() -> String:
 	var growths := _run_progress.all_growths()
 	if growths.is_empty():
-		return "???"
+		return "无成长"
 	var parts: Array[String] = []
 	for growth_any in growths:
 		var growth: Dictionary = growth_any
@@ -923,19 +923,19 @@ func _next_battle_preview() -> String:
 	var factory := UnitFactoryScript.new(loader)
 	var preview_unit := factory.create_npc(_hero_id, _loadout_face_ids)
 	_run_progress.apply_all_to_unit(preview_unit, false)
-	return "??????HP %d/%d | ?? %d/%d?%s?| ?? %d" % [preview_unit.hp, preview_unit.max_hp, preview_unit.resource.current_value, preview_unit.resource.cap_value, preview_unit.resource.resource_type, preview_unit.block]
+	return "下一场预览: HP %d/%d | 资源 %d/%d (%s) | 护甲 %d" % [preview_unit.hp, preview_unit.max_hp, preview_unit.resource.current_value, preview_unit.resource.cap_value, preview_unit.resource.resource_type, preview_unit.block]
 
 func _reward_history_text() -> String:
 	var growths := _run_progress.all_growths()
 	if growths.is_empty():
-		return "No current growth."
+		return "当前没有成长。"
 	var names: Array[String] = []
 	for growth_any in growths:
 		var growth: Dictionary = growth_any
 		names.append(_growth_short_name(growth))
 		if names.size() >= 4:
 			break
-	return "Current growths: %s" % ", ".join(names)
+	return "当前成长: %s" % ", ".join(names)
 
 func _growth_short_name(growth: Dictionary) -> String:
 	var target := str(growth.get("target", ""))

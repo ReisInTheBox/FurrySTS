@@ -1,10 +1,10 @@
 reward_id,type,value,rarity,weight,title,description
-rw_credits_small,currency,25,common,70
-rw_growth_ranged,growth,gr_battle_ranged_boost,common,30
-rw_growth_hull,growth,gr_run_hull_plate,rare,18
-rw_growth_overload,growth,gr_run_overload_boot,uncommon,22
-rw_growth_guard,growth,gr_battle_guard_matrix,common,20
-rw_growth_cap,growth,gr_run_resource_cap,rare,10
+rw_credits_small,currency,25,common,70,,
+rw_growth_ranged,growth,gr_battle_ranged_boost,common,30,,
+rw_growth_hull,growth,gr_run_hull_plate,rare,18,,
+rw_growth_overload,growth,gr_run_overload_boot,uncommon,22,,
+rw_growth_guard,growth,gr_battle_guard_matrix,common,20,,
+rw_growth_cap,growth,gr_run_resource_cap,rare,10,,
 rw_add_cyan_support,add_die,cyan_shift_die,uncommon,12,Extra Shift Die,Add another Cyan shift/control D6 for this run.
 rw_add_helios_support,add_die,helios_mark_die,uncommon,12,Extra Mark Die,Add another Helios mark/control D6 for this run.
 rw_add_aurian_support,add_die,aurian_guard_die,uncommon,12,Extra Guard Die,Add another Aurian guard/counter D6 for this run.
@@ -33,3 +33,15 @@ rw_enchant_guard,grant_enchant,cyan_shift_die:1:ench_guard_rune,common,14,Guard 
 rw_enchant_mark,grant_enchant,helios_mark_die:1:ench_marking_rune,uncommon,10,Marking Rune,Enchant Helios Mark face 1 with +1 mark.
 rw_enchant_echo,grant_enchant,aurian_blade_die:1:ench_echo_chip,rare,6,Echo Chip,Enchant Aurian Blade face 1 with a small echo hit.
 rw_enchant_focus,grant_enchant,cyan_shift_die:2:ench_focus_thread,uncommon,10,Focus Thread,Enchant Cyan Shift face 2 with +1 reroll.
+rw_enchant_cyan_overload,grant_enchant,cyan_core_die:1:ench_overload_capacitor,uncommon,12,Overload Capacitor,Enchant Cyan Core face 1: gain +1 Overload when resolved.
+rw_enchant_helios_quiver,grant_enchant,helios_hunt_die:3:ench_quiver_thread,uncommon,12,Quiver Thread,Enchant Helios Hunt face 3: restore +1 Quiver when resolved.
+rw_enchant_aurian_stance,grant_enchant,aurian_guard_die:3:ench_stance_oath,uncommon,12,Stance Oath,Enchant Aurian Guard face 3: gain +1 Stance when resolved.
+rw_enchant_negative_focus,grant_enchant,cyan_shift_die:5:ench_negative_focus,common,10,Negative Focus,Enchant a risky negative face so resolving it restores +1 reroll.
+rw_replace_cyan_pierce,replace_enchant,cyan_pulse_die:4:ench_piercing_rune,rare,7,Piercing Rune,Replace or add an enchant on Cyan Pulse face 4: next attack ignores +2 block.
+rw_replace_aurian_rupture,replace_enchant,aurian_blade_die:2:ench_rupture_sig,rare,7,Rupture Sigil,Replace or add an enchant on Aurian Blade face 2: next hit gains rupture payoff.
+rw_upgrade_cyan_core,upgrade_die,cyan_pulse_die:cyan_core_die,rare,8,Cyan Reactor Swap,Upgrade one stable Pulse D6 into a high-risk Core D6 for this run.
+rw_upgrade_helios_wild,upgrade_die,helios_hunt_die:helios_wild_die,rare,8,Helios Wild Hunt,Upgrade one Hunt D6 into a high-risk Wild D6 for this run.
+rw_upgrade_aurian_might,upgrade_die,aurian_guard_die:aurian_might_die,rare,8,Aurian Might Path,Upgrade one Guard D6 into a high-risk Might D6 for this run.
+rw_replace_cyan_shift,replace_die,cyan_shift_die:cyan_pulse_die,uncommon,10,Cyan Fireline Pivot,Replace one Shift D6 with a Pulse D6 for a cleaner ranged plan.
+rw_replace_helios_mark,replace_die,helios_mark_die:helios_hunt_die,uncommon,10,Helios Hunt Pivot,Replace one Mark D6 with a Hunt D6 for more direct damage.
+rw_replace_aurian_guard,replace_die,aurian_guard_die:aurian_blade_die,uncommon,10,Aurian Blade Pivot,Replace one Guard D6 with a Blade D6 for more execution pressure.

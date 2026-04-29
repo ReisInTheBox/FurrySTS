@@ -347,29 +347,51 @@ func _resolve_event_node(run_state: RunStateScript, rngs: RngStreamsScript, node
 	var event_row := _run_catalog.event_by_id(event_id)
 	var source := String(event_row.get("reward_source", "event"))
 	var reward_ids := _run_catalog.reward_ids_for_source(source)
-	var drafted := _reward_service.draft_rewards_from_ids(_combat_catalog, rngs, reward_ids, 2)
+	var drafted := _filter_applicable_rewards(run_state, _reward_service.draft_rewards_from_ids(_combat_catalog, rngs, reward_ids, 2))
 	var options: Array[Dictionary] = []
 	options.append(_node_effect_choice(
 		"event_safe_salvage",
-		"Safe salvage",
-		"Gain 18 credits. Low impact, no risk.",
+		"稳妥回收",
+		"获得 18 Credits。收益较低，但没有副作用。",
 		"event",
 		{"currency_id": "credits", "amount": 18}
+	))
+	options.append(_node_effect_choice(
+		"event_risk_die",
+		"危险改造",
+		"获得 30 Credits，但本 Run 构筑加入 1 颗高风险 D6。",
+		"event",
+		{"currency_id": "credits", "amount": 30, "hero_build_change": "add_risky_die"}
+	))
+	options.append(_node_effect_choice(
+		"event_field_enchant",
+		"临场附魔",
+		"花费 12 Credits，为当前角色的一颗核心 D6 替换/写入专属附魔。",
+		"event",
+		{"currency_cost": 12, "hero_enchant": "signature", "enchant_mode": "replace"}
 	))
 	if _run_has_equipment(run_state, "old_compass"):
 		options.append(_node_effect_choice(
 			"event_old_compass_route",
-			"Old Compass route",
-			"Take the safer hidden line: gain 12 credits and a next-battle reroll buffer.",
+			"旧罗盘路线",
+			"走一条更安全的暗线：获得 12 Credits，并让下一场战斗的远程伤害 +1。",
 			"event",
 			{"currency_id": "credits", "amount": 12, "growth": {"growth_id": "old_compass_reroll_buffer", "type": "combat", "target": "temp_ranged_flat", "delta": "1", "duration_scope": "battle", "grant_once": "false"}}
+		))
+	if _run_has_equipment(run_state, "forge_needle"):
+		options.append(_node_effect_choice(
+			"event_forge_needle_enchant",
+			"锻针校准",
+			"Forge Needle 让本次附魔免费：为当前角色的一颗核心 D6 写入专属附魔。",
+			"event",
+			{"hero_enchant": "signature", "enchant_mode": "replace"}
 		))
 	for reward in drafted:
 		var option := reward.duplicate(true)
 		option["choice_kind"] = "event_reward"
 		option["source_node_type"] = "event"
-		option["title"] = "Risk cache: " + String(option.get("title", "reward"))
-		option["description"] = String(option.get("description", "")) + " Event choice: stronger build tempo instead of credits."
+		option["title"] = "风险缓存：" + String(option.get("title", "奖励"))
+		option["description"] = String(option.get("description", "")) + " 事件选择：放弃稳定资源，换取更强构筑节奏。"
 		options.append(option)
 	if options.is_empty():
 		run_state.node_results.append({"node_id": String(node.get("id", "")), "node_type": "event", "result": "empty", "event_id": event_id})
@@ -386,7 +408,7 @@ func _resolve_event_node(run_state: RunStateScript, rngs: RngStreamsScript, node
 
 func _resolve_supply_node(run_state: RunStateScript, rngs: RngStreamsScript, node: Dictionary) -> Dictionary:
 	var reward_ids := _run_catalog.reward_ids_for_source("supply")
-	var drafted := _reward_service.draft_rewards_from_ids(_combat_catalog, rngs, reward_ids, 2)
+	var drafted := _filter_applicable_rewards(run_state, _reward_service.draft_rewards_from_ids(_combat_catalog, rngs, reward_ids, 2))
 	if drafted.is_empty():
 		run_state.node_results.append({"node_id": String(node.get("id", "")), "node_type": "supply", "result": "empty"})
 		run_state.advance_node()
@@ -399,8 +421,8 @@ func _resolve_supply_node(run_state: RunStateScript, rngs: RngStreamsScript, nod
 		run_state.pending_reward_choices.append(option)
 	run_state.pending_reward_choices.append(_node_effect_choice(
 		"supply_field_kit",
-		"Field kit",
-		"Gain 2 starting block for the next battle and 10 credits.",
+		"野战工具包",
+		"下一场战斗开局护甲 +2，并获得 10 Credits。",
 		"supply",
 		{"currency_id": "credits", "amount": 10, "growth": {"growth_id": "supply_field_kit_block", "type": "stat", "target": "block", "delta": "2", "duration_scope": "battle", "grant_once": "false"}}
 	))
@@ -413,18 +435,18 @@ func _resolve_supply_node(run_state: RunStateScript, rngs: RngStreamsScript, nod
 
 func _resolve_reward_node(run_state: RunStateScript, rngs: RngStreamsScript, node: Dictionary, source: String, choice_count: int) -> Dictionary:
 	var reward_ids := _run_catalog.reward_ids_for_source(source)
-	run_state.pending_reward_choices = _reward_service.draft_rewards_from_ids(_combat_catalog, rngs, reward_ids, choice_count)
+	run_state.pending_reward_choices = _filter_applicable_rewards(run_state, _reward_service.draft_rewards_from_ids(_combat_catalog, rngs, reward_ids, choice_count))
 	if source == "shop":
 		for i in range(run_state.pending_reward_choices.size()):
 			var reward: Dictionary = run_state.pending_reward_choices[i]
 			reward["choice_kind"] = "shop_reward"
 			reward["price"] = _shop_price(reward)
-			reward["description"] = String(reward.get("description", "")) + " Price: %d credits." % int(reward.get("price", 0))
+			reward["description"] = String(reward.get("description", "")) + " 价格：%d Credits。" % int(reward.get("price", 0))
 			run_state.pending_reward_choices[i] = reward
 		run_state.pending_reward_choices.append(_node_effect_choice(
 			"shop_skip",
-			"Leave shop",
-			"Buy nothing and move on.",
+			"离开商店",
+			"不购买任何东西，继续前进。",
 			"shop",
 			{}
 		))
@@ -441,22 +463,22 @@ func _resolve_rest_node(run_state: RunStateScript, node: Dictionary) -> Dictiona
 	run_state.pending_reward_choices = [
 		_node_effect_choice(
 			"rest_repair",
-			"Repair armor",
-			"Gain 4 max HP for this run.",
+			"整备装甲",
+			"本 Run 最大生命 +4。",
 			"rest",
 			{"growth": {"growth_id": "rest_repair_hull", "type": "stat", "target": "base_hp", "delta": "4", "duration_scope": "run", "grant_once": "false"}}
 		),
 		_node_effect_choice(
 			"rest_prepare",
-			"Prepare stance",
-			"Gain 4 starting block for the next battle.",
+			"预备架势",
+			"下一场战斗开局护甲 +4。",
 			"rest",
 			{"growth": {"growth_id": "rest_prepare_block", "type": "stat", "target": "block", "delta": "4", "duration_scope": "battle", "grant_once": "false"}}
 		),
 		_node_effect_choice(
 			"rest_scout",
-			"Scout ahead",
-			"Gain 15 credits and keep your build unchanged.",
+			"侦察前路",
+			"获得 15 Credits，构筑保持不变。",
 			"rest",
 			{"currency_id": "credits", "amount": 15}
 		)
@@ -470,7 +492,7 @@ func _resolve_rest_node(run_state: RunStateScript, node: Dictionary) -> Dictiona
 
 func _grant_node_rewards(run_state: RunStateScript, rngs: RngStreamsScript, node: Dictionary, source: String, extra_result: Dictionary) -> Dictionary:
 	var reward_ids := _run_catalog.reward_ids_for_source(source)
-	run_state.pending_reward_choices = _reward_service.draft_rewards_from_ids(_combat_catalog, rngs, reward_ids, 3)
+	run_state.pending_reward_choices = _filter_applicable_rewards(run_state, _reward_service.draft_rewards_from_ids(_combat_catalog, rngs, reward_ids, 3))
 	var node_result := {
 		"node_id": String(node.get("id", "")),
 		"node_type": source,
@@ -511,12 +533,26 @@ func _apply_pending_choice(run_state: RunStateScript, choice: Dictionary) -> Dic
 
 func _apply_node_effect(run_state: RunStateScript, choice: Dictionary) -> Dictionary:
 	var effect: Dictionary = choice.get("node_effect", {})
+	var cost := int(effect.get("currency_cost", "0"))
+	if cost > 0 and not run_state.progress.spend_currency("credits", cost):
+		return {"ok": false, "reason": "not_enough_credits", "price": cost}
 	if effect.has("amount"):
 		run_state.progress.add_currency(String(effect.get("currency_id", "credits")), int(effect.get("amount", 0)))
 	if effect.has("growth"):
 		var growth: Dictionary = effect.get("growth", {})
 		if not growth.is_empty():
 			run_state.progress.add_growth(growth)
+	if String(effect.get("hero_build_change", "")) == "add_risky_die":
+		var risky_die := _risky_die_for_hero(run_state.hero_id)
+		if risky_die != "":
+			run_state.progress.add_build_change({"change_type": "add_die", "die_id": risky_die})
+	if String(effect.get("hero_enchant", "")) == "signature":
+		var binding := _signature_enchant_for_hero(run_state.hero_id)
+		if not binding.is_empty():
+			var mode := String(effect.get("enchant_mode", "grant"))
+			var enchant_result := run_state.progress.replace_enchant(binding) if mode == "replace" else run_state.progress.grant_enchant(binding)
+			if not bool(enchant_result.get("ok", false)):
+				return enchant_result
 	return {"ok": true, "reward_id": String(choice.get("reward_id", "")), "kind": "node_effect"}
 
 func _node_effect_choice(choice_id: String, title: String, description: String, source: String, effect: Dictionary) -> Dictionary:
@@ -526,8 +562,8 @@ func _node_effect_choice(choice_id: String, title: String, description: String, 
 		"choice_kind": "node_effect",
 		"source_node_type": source,
 		"rarity": "common",
-		"rarity_label": "Node",
-		"scope_label": "Immediate",
+		"rarity_label": "节点",
+		"scope_label": "立即",
 		"title": title,
 		"description": description,
 		"node_effect": effect
@@ -547,3 +583,76 @@ func _run_has_equipment(run_state: RunStateScript, equipment_id: String) -> bool
 		if String(item.get("equipment_id", "")) == equipment_id and String(item.get("damage_state", "intact")) != "broken":
 			return true
 	return false
+
+func _filter_applicable_rewards(run_state: RunStateScript, rewards: Array[Dictionary]) -> Array[Dictionary]:
+	var out: Array[Dictionary] = []
+	var active_die_ids := _active_die_ids_for_run(run_state)
+	for reward_any in rewards:
+		var reward: Dictionary = reward_any
+		var reward_type := String(reward.get("type", ""))
+		if reward_type == "grant_enchant":
+			var change: Dictionary = reward.get("enchant_change", {})
+			if not active_die_ids.has(String(change.get("die_id", ""))):
+				continue
+			if _has_enchant_slot(run_state, String(change.get("die_id", "")), int(change.get("face_index", "0"))):
+				continue
+		elif reward_type == "replace_enchant":
+			var replace_change: Dictionary = reward.get("enchant_change", {})
+			if not active_die_ids.has(String(replace_change.get("die_id", ""))):
+				continue
+		elif reward_type == "remove_enchant":
+			var remove_change: Dictionary = reward.get("enchant_change", {})
+			if not _has_enchant_slot(run_state, String(remove_change.get("die_id", "")), int(remove_change.get("face_index", "0"))):
+				continue
+		elif ["replace_die", "remove_negative", "upgrade_die"].has(reward_type):
+			var from_die := _from_die_for_build_reward(reward)
+			if from_die != "" and not active_die_ids.has(from_die):
+				continue
+		out.append(reward)
+	return out
+
+func _active_die_ids_for_run(run_state: RunStateScript) -> Array[String]:
+	var factory := UnitFactoryScript.new(_loader)
+	var unit := factory.create_npc(run_state.hero_id, run_state.loadout_face_ids)
+	run_state.progress.apply_all_to_unit(unit, false)
+	var out: Array[String] = []
+	for die_id in unit.loadout_die_ids:
+		if not out.has(die_id):
+			out.append(die_id)
+	return out
+
+func _from_die_for_build_reward(reward: Dictionary) -> String:
+	var parts := String(reward.get("value", "")).split(":", false)
+	match String(reward.get("type", "")):
+		"replace_die", "remove_negative", "upgrade_die":
+			return String(parts[0]) if parts.size() > 0 else ""
+	return ""
+
+func _has_enchant_slot(run_state: RunStateScript, die_id: String, face_index: int) -> bool:
+	for binding_any in run_state.progress.all_enchant_bindings():
+		var binding: Dictionary = binding_any
+		if String(binding.get("die_id", "")) == die_id and int(binding.get("face_index", "0")) == face_index:
+			return true
+	return false
+
+func _risky_die_for_hero(hero_id: String) -> String:
+	match hero_id:
+		"cyan_ryder":
+			return "cyan_core_die"
+		"helios_windchaser":
+			return "helios_wild_die"
+		"umbral_draxx":
+			return "aurian_might_die"
+		_:
+			return ""
+
+func _signature_enchant_for_hero(hero_id: String) -> Dictionary:
+	match hero_id:
+		"cyan_ryder":
+			return {"die_id": "cyan_core_die", "face_index": 1, "enchant_id": "ench_overload_capacitor", "source": "event", "grant_run_id": "current_run"}
+		"helios_windchaser":
+			return {"die_id": "helios_hunt_die", "face_index": 3, "enchant_id": "ench_quiver_thread", "source": "event", "grant_run_id": "current_run"}
+		"umbral_draxx":
+			return {"die_id": "aurian_guard_die", "face_index": 3, "enchant_id": "ench_stance_oath", "source": "event", "grant_run_id": "current_run"}
+		_:
+			return {}

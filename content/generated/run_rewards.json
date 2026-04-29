@@ -1,5 +1,5 @@
 {
-	"row_count": 55,
+	"row_count": 75,
 	"rows": [
 		{
 			"id": "rr_battle_credits",
@@ -330,6 +330,126 @@
 			"reward_id": "rw_enchant_focus",
 			"source_node_type": "boss",
 			"weight": "18"
+		},
+		{
+			"id": "rr_battle_upgrade_cyan",
+			"reward_id": "rw_upgrade_cyan_core",
+			"source_node_type": "battle",
+			"weight": "5"
+		},
+		{
+			"id": "rr_battle_upgrade_helios",
+			"reward_id": "rw_upgrade_helios_wild",
+			"source_node_type": "battle",
+			"weight": "5"
+		},
+		{
+			"id": "rr_battle_upgrade_aurian",
+			"reward_id": "rw_upgrade_aurian_might",
+			"source_node_type": "battle",
+			"weight": "5"
+		},
+		{
+			"id": "rr_event_enchant_cyan",
+			"reward_id": "rw_enchant_cyan_overload",
+			"source_node_type": "event",
+			"weight": "18"
+		},
+		{
+			"id": "rr_event_enchant_helios",
+			"reward_id": "rw_enchant_helios_quiver",
+			"source_node_type": "event",
+			"weight": "18"
+		},
+		{
+			"id": "rr_event_enchant_aurian",
+			"reward_id": "rw_enchant_aurian_stance",
+			"source_node_type": "event",
+			"weight": "18"
+		},
+		{
+			"id": "rr_event_enchant_negative",
+			"reward_id": "rw_enchant_negative_focus",
+			"source_node_type": "event",
+			"weight": "12"
+		},
+		{
+			"id": "rr_elite_replace_cyan_pierce",
+			"reward_id": "rw_replace_cyan_pierce",
+			"source_node_type": "elite",
+			"weight": "10"
+		},
+		{
+			"id": "rr_elite_replace_aurian_rupture",
+			"reward_id": "rw_replace_aurian_rupture",
+			"source_node_type": "elite",
+			"weight": "10"
+		},
+		{
+			"id": "rr_shop_upgrade_cyan",
+			"reward_id": "rw_upgrade_cyan_core",
+			"source_node_type": "shop",
+			"weight": "12"
+		},
+		{
+			"id": "rr_shop_upgrade_helios",
+			"reward_id": "rw_upgrade_helios_wild",
+			"source_node_type": "shop",
+			"weight": "12"
+		},
+		{
+			"id": "rr_shop_upgrade_aurian",
+			"reward_id": "rw_upgrade_aurian_might",
+			"source_node_type": "shop",
+			"weight": "12"
+		},
+		{
+			"id": "rr_shop_replace_cyan",
+			"reward_id": "rw_replace_cyan_shift",
+			"source_node_type": "shop",
+			"weight": "14"
+		},
+		{
+			"id": "rr_shop_replace_helios",
+			"reward_id": "rw_replace_helios_mark",
+			"source_node_type": "shop",
+			"weight": "14"
+		},
+		{
+			"id": "rr_shop_replace_aurian",
+			"reward_id": "rw_replace_aurian_guard",
+			"source_node_type": "shop",
+			"weight": "14"
+		},
+		{
+			"id": "rr_boss_replace_cyan_pierce",
+			"reward_id": "rw_replace_cyan_pierce",
+			"source_node_type": "boss",
+			"weight": "18"
+		},
+		{
+			"id": "rr_boss_replace_aurian_rupture",
+			"reward_id": "rw_replace_aurian_rupture",
+			"source_node_type": "boss",
+			"weight": "18"
+		},
+		{
+			"id": "rr_boss_enchant_cyan",
+			"reward_id": "rw_enchant_cyan_overload",
+			"source_node_type": "boss",
+			"weight": "14"
+		},
+		{
+			"id": "rr_boss_enchant_helios",
+			"reward_id": "rw_enchant_helios_quiver",
+			"source_node_type": "boss",
+			"weight": "14"
+		},
+		{
+			"id": "rr_boss_enchant_aurian",
+			"reward_id": "rw_enchant_aurian_stance",
+			"source_node_type": "boss",
+			"weight": "14"
 		}
 	],
 	"source": "res://content/csv/run_rewards.csv"

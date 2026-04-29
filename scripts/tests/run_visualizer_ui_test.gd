@@ -15,6 +15,15 @@ func run() -> bool:
 	if String(node.get("node_type", "")) != "battle":
 		push_error("Expected first run node to be a battle node for UI smoke.")
 		return false
+	visualizer._run_state.progress.grant_enchant({
+		"die_id": "cyan_pulse_die",
+		"face_index": 1,
+		"enchant_id": "ench_spark_edge"
+	})
+	visualizer._render_ui()
+	if visualizer._detail_label.text.find("当前附魔") < 0 or visualizer._detail_label.text.find("cyan_pulse_die") < 0:
+		push_error("Run visualizer should show current enchant bindings in node details.")
+		return false
 
 	visualizer._on_resolve_pressed()
 	if visualizer._active_battle == null:

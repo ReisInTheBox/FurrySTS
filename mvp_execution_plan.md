@@ -2,6 +2,40 @@
 
 ## Summary
 
+## Current Progress (2026-04-28 / Update 7)
+### Overall Status
+- 当前主线进度：`Phase 7 附魔 MVP 基础完成，可进入验收/打磨`。
+- 当前开发重点：把 `D6 构筑 + Run 内 BD + 附魔 + 装备` 的体验从“可玩”打磨到“更清楚、更好选、更有差异”。
+- 当前可运行形态：`Hub -> Run -> 战斗/事件/商店/补给 -> 奖励选择 -> 后续战斗生效` 已具备基础闭环。
+
+### Completed Since Update 6
+- 数据导入噪音已收口：`content/csv/.gdignore` 保留，`*.csv.import` 与 `*.translation` 已移出版本管理，并在 `.gitignore` 中忽略。
+- 附魔 MVP 已接入基础闭环：
+  - `content/csv/enchantments.csv` 与 `content/generated/enchantments.json` 已存在。
+  - `content/csv/enchant_pools.csv` 与 `content/generated/enchant_pools.json` 已存在。
+  - 运行时绑定结构使用 `die_id + face_index + enchant_id + source + grant_run_id`。
+  - Run 奖励已支持 `grant_enchant / replace_enchant / remove_enchant`。
+  - 战斗规则层已读取附魔效果，并输出 `enchant_triggered` 日志。
+  - 战斗 UI 已能在骰面说明中展示附魔名称与效果。
+  - Run UI 已能展示当前附魔数量、附魔绑定位置，以及奖励将影响哪颗 D6 的哪一面。
+- BD 奖励池已扩展：新增更多 `replace_die`、`upgrade_die`、角色专属附魔与高风险构筑选择。
+- Run 事件已补取舍：稳妥回收、危险改造、付费附魔、Forge Needle 免费附魔路线。
+- 敌人意图已开始针对 `mark / counter / summon / overload / negative / reroll` 关键词做压力测试。
+- 装备系统已进入可验证状态：主动道具每场一次，`damaged` 装备弱于 `intact`，装备不会突破“每回合 3 颗 D6 全部使用”的骰子经济。
+
+### In Progress
+- Phase 7 后续打磨项：
+  - Hub 层还没有正式的附魔仓库/长期附魔管理 UI。
+  - 附魔数值还未做完整平衡，只保证规则闭环和可读性。
+  - 关系系统后续可以解锁专属附魔池，但本轮只保留池结构与数据入口。
+  - 敌人针对性已经有第一版标签和效果，仍需要更多战斗体验调参。
+
+### Next Priority
+1. 进行 Phase 7 手动验收与小修。
+2. 打磨 Run/Hub 构筑可读性，尤其是“当前构筑为什么变强/变危险”。
+3. 继续扩 Run 事件文本和敌人针对性数值。
+4. 之后进入整体体验打磨：UI、节奏、数值、内容量。
+
 ## Current Progress (2026-04-26 / Update 6)
 ### Direction Adjustment
 - Current development direction is now `D6 build + in-run BD + relationship-unlocked build content`.
@@ -9,7 +43,7 @@
 - Run rewards now prioritize build-changing rewards: `add_die`, `replace_die`, `remove_negative`, and `upgrade_die`.
 - Hub progression should gradually move away from long-term raw stat stacking and toward unlocking dice, upgrade branches, enchant pools, and relationship-specific build items.
 - Phase 6 relationship rewards should be build-facing. Aurian relationship content should eventually unlock Aurian-specific dice/enchant/upgrade routes, not only permanent stats.
-- Enchant is preserved as a compatibility/interface direction only for now. Full implementation is deferred to `Phase 7`.
+- Enchant has moved from reserved interface to `Phase 7 MVP implementation`; current work should finish the playable enchant loop before expanding story volume.
 
 ### Implemented This Update
 - Hub build UI now presents equipped/reserve D6 dice and exposes face details for each `die_id`.
@@ -18,7 +52,7 @@
 
 ### Immediate Priority
 - Stabilize D6 build editing, Run build reward application, and data validation before expanding story volume.
-- Keep enchant data/interface compatibility in mind, but do not force full enchant gameplay into Phase 6.
+- Finish Phase 7 enchant gameplay loop, then expand BD rewards, Run events, and targeted enemies.
 
 ## Current Progress (2026-04-25 / Update 5)
 ### Overall Status
@@ -653,16 +687,16 @@
 - 自动化测试覆盖触发、推进、奖励、联动四个关键路径。
 
 ### 7. Enchant System MVP (Phase 7 / after D6 build stabilization)
-- Phase 7 will turn the reserved enchant interfaces into a real playable system; do not force the full enchant loop into Phase 6.
+- Phase 7 has turned the reserved enchant interfaces into a playable MVP loop.
 - Enchant binding key: `die_id + face_index`, so die replacement, die upgrade, and negative removal have clear ownership rules.
 - MVP reward sources: post-battle rewards, events, shop, and relationship-unlocked pools.
 - Combat resolution must stay deterministic: same seed, same build, and same enchant bindings produce the same action log.
 - Relationship content may unlock enchant pools or exclusive enchantments, but should not become long-term raw stat stacking.
 
 #### Phase 7 Minimal Data Fields
-- `content/csv/enchantments.csv` (planned)
+- `content/csv/enchantments.csv` (implemented)
   - Required: `enchant_id,name,trigger,op_type,value,tags,rarity,exclusive_group`
-- `content/csv/enchant_pools.csv` (planned)
+- `content/csv/enchant_pools.csv` (implemented)
   - Required: `pool_id,enchant_id,weight,unlock_condition`
 - Existing reward tables should remain compatible with: `grant_enchant` / `replace_enchant` / `remove_enchant`.
 - Runtime binding shape: `die_id,face_index,enchant_id,source,grant_run_id`.
@@ -679,6 +713,7 @@
 - Enchant effects enter `EffectResolver` or an equivalent rules-layer path; UI must not special-case combat rules.
 - UI explains which die/face holds each enchant and what the enchant does.
 - Automated tests cover binding, replacement, combat effect application, and log determinism.
+- Current status: MVP DoD is met for rules/data/tests; remaining work is UX polish, balance, and long-term Hub management.
 
 ## Test Plan
 - 规则层自动测试必须覆盖：

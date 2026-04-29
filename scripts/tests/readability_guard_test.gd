@@ -37,7 +37,8 @@ func _suspicious_tokens() -> Array[String]:
 		String.chr(0x7e3a),
 		String.chr(0x00c3),
 		String.chr(0x00c2),
-		String.chr(0x00e2) + String.chr(0x20ac)
+		String.chr(0x00e2) + String.chr(0x20ac),
+		"??" + "??"
 	]
 
 func _token_debug(token: String) -> String:

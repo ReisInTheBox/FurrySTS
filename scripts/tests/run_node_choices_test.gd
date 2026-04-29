@@ -9,6 +9,10 @@ func run() -> bool:
 	var simulator := RunSimulatorScript.new(loader)
 	if not _event_choice_flow(simulator):
 		return false
+	if not _event_tradeoff_flow(simulator):
+		return false
+	if not _reward_filter_flow(simulator):
+		return false
 	if not _shop_price_flow(simulator):
 		return false
 	return _rest_choice_flow(simulator)
@@ -26,6 +30,41 @@ func _event_choice_flow(simulator: RunSimulatorScript) -> bool:
 		push_error("Event node choice failed.")
 		return false
 	return run_state.completed and run_state.progress.get_currency("credits") >= 18
+
+func _event_tradeoff_flow(simulator: RunSimulatorScript) -> bool:
+	var bundle := simulator.create_run(91004, "cyan_ryder")
+	var run_state = bundle["state"]
+	run_state.progress.add_currency("credits", 20)
+	_force_single_node(run_state, {"id": "test_event_tradeoff", "node_type": "event", "event_id": "ev_forge", "text": "test event tradeoff"})
+	var resolved := simulator.resolve_current_node(run_state, bundle["rngs"])
+	if not bool(resolved.get("ok", false)):
+		push_error("Event tradeoff node did not resolve.")
+		return false
+	var enchant_index := _choice_index_by_id(run_state.pending_reward_choices, "event_field_enchant")
+	if enchant_index < 0:
+		push_error("Event should expose a direct enchant tradeoff choice.")
+		return false
+	var chosen := simulator.choose_reward(run_state, enchant_index)
+	if not bool(chosen.get("ok", false)):
+		push_error("Event enchant tradeoff failed: " + String(chosen.get("reason", "unknown")))
+		return false
+	return run_state.completed and run_state.progress.all_enchant_bindings().size() == 1 and run_state.progress.get_currency("credits") == 8
+
+func _reward_filter_flow(simulator: RunSimulatorScript) -> bool:
+	var bundle := simulator.create_run(91005, "helios_windchaser")
+	var run_state = bundle["state"]
+	_force_single_node(run_state, {"id": "test_event_filter", "node_type": "event", "event_id": "ev_signal", "text": "test event filter"})
+	var resolved := simulator.resolve_current_node(run_state, bundle["rngs"])
+	if not bool(resolved.get("ok", false)):
+		push_error("Event filter node did not resolve.")
+		return false
+	for choice_any in run_state.pending_reward_choices:
+		var choice: Dictionary = choice_any
+		var change: Dictionary = choice.get("enchant_change", {})
+		if String(change.get("die_id", "")).begins_with("cyan_"):
+			push_error("Reward filter leaked Cyan enchant into Helios run.")
+			return false
+	return true
 
 func _shop_price_flow(simulator: RunSimulatorScript) -> bool:
 	var bundle := simulator.create_run(91002)
@@ -75,5 +114,11 @@ func _force_single_node(run_state, node: Dictionary) -> void:
 func _first_priced_choice(choices: Array[Dictionary]) -> int:
 	for i in range(choices.size()):
 		if int(choices[i].get("price", 0)) > 0:
+			return i
+	return -1
+
+func _choice_index_by_id(choices: Array[Dictionary], reward_id: String) -> int:
+	for i in range(choices.size()):
+		if String(choices[i].get("reward_id", "")) == reward_id:
 			return i
 	return -1

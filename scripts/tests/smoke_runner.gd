@@ -229,7 +229,7 @@ func _is_int_field(row: Dictionary, field: String) -> bool:
     return raw != "" and raw.is_valid_int()
 
 func _check_content_tables(loader: ContentLoaderScript) -> bool:
-    var names := ["npcs", "enemies", "dice", "status_effects", "rewards", "inrun_growth", "run_nodes", "run_rewards", "events", "outgame_growth", "relationship_nodes", "relationship_rewards", "story_events", "equipment", "enchantments"]
+    var names := ["npcs", "enemies", "dice", "status_effects", "rewards", "inrun_growth", "run_nodes", "run_rewards", "events", "outgame_growth", "relationship_nodes", "relationship_rewards", "story_events", "equipment", "enchantments", "enchant_pools"]
     for table in names:
         var rows := loader.load_rows(table)
         if rows.is_empty():
@@ -403,12 +403,17 @@ func _check_enemy_intent_signals(loader: ContentLoaderScript) -> bool:
     var seen_attack := false
     var seen_block := false
     var seen_debuff := false
+    var target_tags: Dictionary = {}
     var enemy_rows := loader.load_rows("enemies")
     for i in range(enemy_rows.size()):
         var enemy_id := String(Dictionary(enemy_rows[i]).get("id", ENEMY_ID))
         var entries := _simulate_enemy_once(610000 + i, "cyan_ryder", enemy_id, loader)
         for e_any in entries:
             var e = e_any
+            var payload: Dictionary = e.payload if typeof(e.payload) == TYPE_DICTIONARY else {}
+            var counter_tag := String(payload.get("counter_tag", ""))
+            if counter_tag != "":
+                target_tags[counter_tag] = true
             match String(e.event_type):
                 "enemy_attack":
                     seen_attack = true
@@ -422,6 +427,17 @@ func _check_enemy_intent_signals(loader: ContentLoaderScript) -> bool:
         push_error("No enemy_block signal observed.")
     if not seen_debuff:
         push_error("No enemy_debuff signal observed.")
+    for required_tag in ["mark", "counter", "summon", "overload", "negative", "reroll"]:
+        var tag_seen := target_tags.has(required_tag)
+        if not tag_seen:
+            for row_any in loader.load_rows("enemy_intents"):
+                var row: Dictionary = row_any
+                if String(row.get("counter_tag", "")) == required_tag:
+                    tag_seen = true
+                    break
+        if not tag_seen:
+            push_error("Missing targeted enemy counter tag: " + required_tag)
+            return false
     return seen_attack and seen_block and seen_debuff
 
 func _simulate_enemy_once(seed_value: int, hero_id: String, enemy_id: String, loader: ContentLoaderScript) -> Array:

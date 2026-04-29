@@ -8,3 +8,12 @@ reef_stalker,0,10,block,4,4,,,Shell roll,attack
 void_howler,1,10,charge,10,0,,,Void howl,setup
 void_howler,2,10,debuff,4,0,lock_die,1,Gravity snare,control
 void_howler,0,10,attack,8,0,,,Rift bite,
+boss_vanguard,4,10,overload_check,7,0,drain_resource,1,Grounding field,overload
+boss_vanguard,5,10,counter_check,8,0,disable_summon,1,Cleave the guard,counter
+boss_vanguard,6,10,negative_check,5,3,lock_die,1,Suppress weak faces,negative
+reef_stalker,4,10,mark_shed,4,0,shed_mark,99,Shake the tracer,mark
+reef_stalker,5,10,reroll_tax,6,0,tax_reroll,1,Tangle the hand,reroll
+reef_stalker,6,10,summon_bite,7,0,disable_summon,1,Snap at companions,summon
+void_howler,4,10,overload_drain,6,0,drain_resource,2,Void siphon,overload
+void_howler,5,10,mark_void,5,2,shed_mark,99,Erase the target line,mark
+void_howler,6,10,reroll_collapse,9,0,tax_reroll,2,Collapse the dice line,reroll

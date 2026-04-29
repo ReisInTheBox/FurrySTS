@@ -172,10 +172,10 @@ func _reward_title(reward: Dictionary) -> String:
 		var enchantment: Dictionary = reward.get("enchantment", {})
 		return String(reward.get("title", enchantment.get("name", "Enchant")))
 	if reward_type == "currency":
-		return "Supply cache"
+		return "补给缓存"
 	var growth: Dictionary = reward.get("growth", {})
 	var scope := str(growth.get("duration_scope", "battle"))
-	return "Upgrade module (%s)" % ("Battle" if scope == "battle" else "Run")
+	return "强化模块（%s）" % ("下一场" if scope == "battle" else "本 Run")
 
 func _reward_description(reward: Dictionary) -> String:
 	var reward_type := str(reward.get("type", ""))
@@ -192,58 +192,58 @@ func _reward_description(reward: Dictionary) -> String:
 		var enchantment: Dictionary = reward.get("enchantment", {})
 		var name := String(enchantment.get("name", change.get("enchant_id", "Enchant")))
 		if reward_type == "remove_enchant":
-			return "Remove enchant from %s face %d." % [String(change.get("die_id", "")), int(change.get("face_index", 0))]
-		return "%s on %s face %d. %s" % [
+			return "移除 %s 第 %d 面的附魔。" % [String(change.get("die_id", "")), int(change.get("face_index", 0))]
+		return "%s -> %s 第 %d 面。%s" % [
 			name,
 			String(change.get("die_id", "")),
 			int(change.get("face_index", 0)),
 			String(reward.get("description", ""))
 		]
 	if reward_type == "currency":
-		return "Gain %d credits." % int(reward.get("value", "0"))
+		return "获得 %d Credits。" % int(reward.get("value", "0"))
 	var growth: Dictionary = reward.get("growth", {})
 	return _growth_description(growth)
 
 func _scope_label(reward: Dictionary) -> String:
 	var reward_type := str(reward.get("type", ""))
 	if BUILD_REWARD_TYPES.has(reward_type):
-		return "Run build"
+		return "Run 构筑"
 	if reward_type == "equipment":
 		var equipment: Dictionary = reward.get("equipment", {})
-		return "Equip: " + String(equipment.get("equip_slot", "slot"))
+		return "装备：" + String(equipment.get("equip_slot", "slot"))
 	if ENCHANT_REWARD_TYPES.has(reward_type):
-		return "Enchant"
+		return "附魔"
 	if reward_type == "currency":
-		return "Immediate"
+		return "立即"
 	var growth: Dictionary = reward.get("growth", {})
 	var scope := str(growth.get("duration_scope", "battle"))
-	return "Next battle" if scope == "battle" else "This run"
+	return "下一场" if scope == "battle" else "本 Run"
 
 func _rarity_label(rarity: String) -> String:
 	match rarity:
 		"rare":
-			return "Rare"
+			return "稀有"
 		"uncommon":
-			return "Uncommon"
+			return "优秀"
 		_:
-			return "Common"
+			return "普通"
 
 func _growth_description(growth: Dictionary) -> String:
 	var growth_type := str(growth.get("type", ""))
 	var target := str(growth.get("target", ""))
 	var delta := int(growth.get("delta", "0"))
 	var scope := str(growth.get("duration_scope", "battle"))
-	var scope_text := "battle" if scope == "battle" else "run"
+	var scope_text := "场战斗" if scope == "battle" else " Run"
 	if growth_type == "combat" and target == "temp_ranged_flat":
-		return "Ranged damage +%d for this %s." % [delta, scope_text]
+		return "本%s远程伤害 +%d。" % [scope_text, delta]
 	if growth_type == "stat" and target == "base_hp":
-		return "Max HP +%d for this %s." % [delta, scope_text]
+		return "本%s最大 HP +%d。" % [scope_text, delta]
 	if growth_type == "stat" and target == "block":
-		return "Starting block +%d for this %s." % [delta, scope_text]
+		return "本%s开局护甲 +%d。" % [scope_text, delta]
 	if growth_type == "resource" and target == "resource_cap":
-		return "Resource cap +%d for this %s." % [delta, scope_text]
+		return "本%s资源上限 +%d。" % [scope_text, delta]
 	var delta_text := ("+" if delta >= 0 else "") + str(delta)
-	return "Growth %s:%s %s for this %s." % [growth_type, target, delta_text, scope_text]
+	return "成长 %s:%s %s，作用于本%s。" % [growth_type, target, delta_text, scope_text]
 
 func _build_change_from_reward(reward: Dictionary) -> Dictionary:
 	var reward_type := String(reward.get("type", ""))
